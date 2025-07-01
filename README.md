@@ -121,18 +121,6 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 | Exfiltration | 5 |
 | Impact | 5 |
 
-## Key Observations
-
-1. **Most Populated Tactics**: Persistence and Defense Evasion have the most techniques (7 each), indicating these are critical areas for MCP security.
-
-2. **Attack Complexity**: The framework covers the entire attack lifecycle from initial access through impact, demonstrating the comprehensive nature of MCP threats.
-
-3. **Unique MCP Threats**: Many techniques are specific to MCP/AI environments (e.g., Tool Poisoning, Prompt Injection, Context Memory Implants) and don't have direct equivalents in traditional MITRE ATT&CK.
-
-4. **Cross-Domain Attacks**: Several techniques involve bridging AI and traditional IT security domains (e.g., Command Injection, OAuth Token Persistence).
-
-5. **Supply Chain Focus**: Multiple techniques target the MCP supply chain, reflecting the distributed nature of MCP server deployments.
-
 ## Usage Guidelines
 
 - Use technique IDs (e.g., SAFE-T1001) for consistent reference across documentation
