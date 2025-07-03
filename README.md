@@ -29,7 +29,7 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 |-----------|-------------|--------------|----------------|-------------|
 | **ATK-TA0043** | **Reconnaissance** | | | *No MCP-specific techniques currently documented* |
 | **ATK-TA0042** | **Resource Development** | | | *No MCP-specific techniques currently documented* |
-| **ATK-TA0001** | **Initial Access** | SAFE-T1001 | Tool Poisoning Attack (TPA) | Attackers embed malicious instructions within MCP tool descriptions that are invisible to users but processed by LLMs |
+| **ATK-TA0001** | **Initial Access** | [SAFE-T1001](techniques/SAFE-T1001/README.md) | Tool Poisoning Attack (TPA) | Attackers embed malicious instructions within MCP tool descriptions that are invisible to users but processed by LLMs |
 | ATK-TA0001 | Initial Access | SAFE-T1002 | Supply Chain Compromise | Distribution of backdoored MCP server packages through unofficial repositories or compromised legitimate sources |
 | ATK-TA0001 | Initial Access | SAFE-T1003 | Malicious MCP-Server Distribution | Adversary ships a trojanized server package or Docker image that users install, gaining foothold when the host registers its tools |
 | ATK-TA0001 | Initial Access | SAFE-T1004 | Server Impersonation / Name-Collision | Attacker registers a server with the same name/URL as a trusted one, or hijacks discovery, so the client connects to them instead |
