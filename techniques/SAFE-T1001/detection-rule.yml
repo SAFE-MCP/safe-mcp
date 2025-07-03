@@ -1,0 +1,28 @@
+title: MCP Tool Description Poisoning Detection
+id: 5894b8fe-29f0-44d8-ad9b-2266a132ec57
+status: experimental
+description: Detects potential tool poisoning through suspicious patterns in descriptions
+author: Frederick Kautz
+date: 2025-01-02
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1001
+logsource:
+  product: mcp
+  service: tool_registry
+detection:
+  selection:
+    tool_description:
+      - '*<!-- SYSTEM:*'
+      - '*<|system|>*'
+      - '*[INST]*'
+      - '*### Instruction:*'
+      - '*\u200b*'  # Zero-width space
+      - '*\u200c*'  # Zero-width non-joiner
+  condition: selection
+falsepositives:
+  - Legitimate HTML comments in tool descriptions
+level: high
+tags:
+  - attack.initial_access
+  - attack.t1195
+  - safe.t1001
