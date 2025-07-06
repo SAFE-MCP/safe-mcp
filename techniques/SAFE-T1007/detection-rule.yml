@@ -1,0 +1,34 @@
+title: MCP OAuth Authorization Phishing Detection
+id: 8f3e7b92-4a56-4d89-b789-2c5e8f9a3d21
+status: experimental
+description: Detects potential OAuth phishing through malicious MCP servers
+author: Frederick Kautz
+date: 2025-01-06
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1007
+  - https://github.com/modelcontextprotocol/modelcontextprotocol/issues/544
+logsource:
+  product: mcp
+  service: oauth_flow
+detection:
+  selection_suspicious_redirect:
+    oauth_redirect_uri:
+      - '*://*/oauth/callback*'
+      - '*://*/auth/return*'
+    oauth_redirect_domain|not:
+      - '*.google.com'
+      - '*.amazonaws.com'
+      - '*.microsoft.com'
+      - '*.github.com'
+  selection_multiple_providers:
+    oauth_provider|count|gt: 2
+    timeframe: 1h
+  condition: selection_suspicious_redirect or selection_multiple_providers
+falsepositives:
+  - Legitimate MCP servers with custom OAuth implementations
+  - Development/testing environments
+level: high
+tags:
+  - attack.initial_access
+  - attack.t1566
+  - safe.t1007

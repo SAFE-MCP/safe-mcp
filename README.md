@@ -35,6 +35,7 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 | ATK-TA0001 | Initial Access | SAFE-T1004 | Server Impersonation / Name-Collision | Attacker registers a server with the same name/URL as a trusted one, or hijacks discovery, so the client connects to them instead |
 | ATK-TA0001 | Initial Access | SAFE-T1005 | Exposed Endpoint Exploit | Misconfigured public MCP endpoints (no auth, debug on) let attackers connect, enumerate tools or trigger RCE |
 | ATK-TA0001 | Initial Access | SAFE-T1006 | User-Social-Engineering Install | Phishing/social posts persuade developers to "try this cool tool"; the installer silently registers dangerous capabilities |
+| ATK-TA0001 | Initial Access | [SAFE-T1007](techniques/SAFE-T1007/README.md) | OAuth Authorization Phishing | Malicious MCP servers exploit OAuth flows to steal access tokens from legitimate services by tricking users during authorization |
 | **ATK-TA0002** | **Execution** | SAFE-T1101 | Command Injection | Exploitation of unsanitized input in MCP server implementations leading to remote code execution |
 | ATK-TA0002 | Execution | SAFE-T1102 | Prompt Injection (Multiple Vectors) | Malicious instructions injected through various vectors to manipulate AI behavior via MCP |
 | ATK-TA0002 | Execution | SAFE-T1103 | Fake Tool Invocation (Function Spoofing) | Adversary forges JSON that mimics an MCP function-call message, tricking the host into running a tool that was never offered |
@@ -99,8 +100,8 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 ## Summary Statistics
 
 - **Total Tactics**: 14
-- **Total Techniques**: 65
-- **Average Techniques per Tactic**: 4.6
+- **Total Techniques**: 66
+- **Average Techniques per Tactic**: 4.7
 
 ## Tactic Distribution
 
@@ -108,7 +109,7 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 |--------|---------------------|
 | Reconnaissance | 0 |
 | Resource Development | 0 |
-| Initial Access | 6 |
+| Initial Access | 7 |
 | Execution | 6 |
 | Persistence | 7 |
 | Privilege Escalation | 5 |
