@@ -4,7 +4,7 @@
 **Tactic**: Initial Access (ATK-TA0001)  
 **Technique ID**: SAFE-T1007  
 **Severity**: Critical  
-**First Observed**: January 2025 (Discovered by Alibaba Cloud Security Team)  
+**First Observed**: May 2025 (Reported by Alibaba Cloud Security Team)  
 **Last Updated**: 2025-01-06
 
 ## Description
@@ -180,3 +180,4 @@ tags:
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
 | 1.0 | 2025-01-06 | Initial documentation based on Alibaba Cloud security disclosure | Frederick Kautz |
+| 1.1 | 2025-01-06 | Corrected first observed date to May 2025 | Frederick Kautz |
