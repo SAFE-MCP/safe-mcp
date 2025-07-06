@@ -36,6 +36,7 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 | ATK-TA0001 | Initial Access | SAFE-T1005 | Exposed Endpoint Exploit | Misconfigured public MCP endpoints (no auth, debug on) let attackers connect, enumerate tools or trigger RCE |
 | ATK-TA0001 | Initial Access | SAFE-T1006 | User-Social-Engineering Install | Phishing/social posts persuade developers to "try this cool tool"; the installer silently registers dangerous capabilities |
 | ATK-TA0001 | Initial Access | [SAFE-T1007](techniques/SAFE-T1007/README.md) | OAuth Authorization Phishing | Malicious MCP servers exploit OAuth flows to steal access tokens from legitimate services by tricking users during authorization |
+| ATK-TA0001 | Initial Access | SAFE-T1008 | Authorization Server Mix-up | Client follows redirect to look-alike AS domain (e.g., accounts-google.com vs accounts.google.com), causing authorization codes or tokens to be leaked to attacker-controlled server |
 | **ATK-TA0002** | **Execution** | SAFE-T1101 | Command Injection | Exploitation of unsanitized input in MCP server implementations leading to remote code execution |
 | ATK-TA0002 | Execution | SAFE-T1102 | Prompt Injection (Multiple Vectors) | Malicious instructions injected through various vectors to manipulate AI behavior via MCP |
 | ATK-TA0002 | Execution | SAFE-T1103 | Fake Tool Invocation (Function Spoofing) | Adversary forges JSON that mimics an MCP function-call message, tricking the host into running a tool that was never offered |
@@ -43,7 +44,7 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 | ATK-TA0002 | Execution | SAFE-T1105 | Path Traversal via File Tool | File-handling tool accepts relative paths like ../../secret.key; attacker leaks host secrets |
 | ATK-TA0002 | Execution | SAFE-T1106 | Autonomous Loop Exploit | Craft prompts that push an agent into infinite "self-invoke" loop to exhaust CPU or hit rate limits (DoS) |
 | **ATK-TA0003** | **Persistence** | SAFE-T1201 | MCP Rug Pull Attack | Time-delayed malicious tool definition changes after initial approval |
-| ATK-TA0003 | Persistence | SAFE-T1202 | OAuth Token Persistence | Theft and reuse of OAuth tokens for persistent access to MCP-connected services |
+| ATK-TA0003 | Persistence | SAFE-T1202 | OAuth Token Persistence | Theft and reuse of OAuth access/refresh tokens for persistent access to MCP-connected services, including replay of refresh tokens after legitimate client sessions end |
 | ATK-TA0003 | Persistence | SAFE-T1203 | Backdoored Server Binary | Inserts cron job or reverse shell on install; persists even if MCP service is uninstalled |
 | ATK-TA0003 | Persistence | SAFE-T1204 | Context Memory Implant | Malicious agent writes itself into long-term vector store; re-loaded in every future session |
 | ATK-TA0003 | Persistence | SAFE-T1205 | Persistent Tool Redefinition | Attacker modifies server's tool metadata to keep hidden commands across restarts |
@@ -54,6 +55,9 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 | ATK-TA0004 | Privilege Escalation | SAFE-T1303 | Sandbox Escape via Server Exec | Exploit vulnerable server to break container/seccomp isolation |
 | ATK-TA0004 | Privilege Escalation | SAFE-T1304 | Credential Relay Chain | Use one tool to steal tokens, feed them to second tool with higher privileges |
 | ATK-TA0004 | Privilege Escalation | SAFE-T1305 | Host OS Priv-Esc (RCE) | Achieve root via misconfigured service running as root, then alter host |
+| ATK-TA0004 | Privilege Escalation | SAFE-T1306 | Rogue Authorization Server | Malicious MCP server redirects OAuth flows to attacker-controlled AS that ignores audience restrictions and Proof of Possession (PoP), minting overly-permissive "super-tokens" with expanded scopes |
+| ATK-TA0004 | Privilege Escalation | SAFE-T1307 | Confused Deputy Attack | MCP server receives token for one user (Alice) and forwards it to another user's (Bob) MCP instance, allowing Bob to perform actions as Alice by exploiting the server's trusted position |
+| ATK-TA0004 | Privilege Escalation | SAFE-T1308 | Token Scope Substitution | Attacker swaps a limited-scope token with one that has broader permissions but same audience, exploiting insufficient scope validation to gain elevated privileges |
 | **ATK-TA0005** | **Defense Evasion** | SAFE-T1401 | Line Jumping | Bypassing security checkpoints through context injection before tool invocation |
 | ATK-TA0005 | Defense Evasion | SAFE-T1402 | Instruction Steganography | Zero-width chars/HTML comments hide directives in tool metadata |
 | ATK-TA0005 | Defense Evasion | SAFE-T1403 | Consent-Fatigue Exploit | Repeated benign prompts desensitize user; crucial request hidden mid-flow |
@@ -61,11 +65,14 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 | ATK-TA0005 | Defense Evasion | SAFE-T1405 | Tool Obfuscation/Renaming | Malicious tool named "Utils-Helper" to blend in among 30 legit tools |
 | ATK-TA0005 | Defense Evasion | SAFE-T1406 | Metadata Manipulation | Strip safety flags or lower risk scores in tool manifest before host logs it |
 | ATK-TA0005 | Defense Evasion | SAFE-T1407 | Server Proxy Masquerade | Malicious server silently proxies legit API so traffic looks normal in network logs |
+| ATK-TA0005 | Defense Evasion | SAFE-T1408 | OAuth Protocol Downgrade | Attacker forces use of less secure OAuth 2.0 implicit flow instead of authorization code flow, bypassing PKCE protections and enabling easier token theft |
 | **ATK-TA0006** | **Credential Access** | SAFE-T1501 | Full-Schema Poisoning (FSP) | Exploitation of entire MCP tool schema beyond descriptions for credential theft |
 | ATK-TA0006 | Credential Access | SAFE-T1502 | File-Based Credential Harvest | Use file tools to read SSH keys, cloud creds |
 | ATK-TA0006 | Credential Access | SAFE-T1503 | Env-Var Scraping | Ask read_file for .env; exfil API secrets |
 | ATK-TA0006 | Credential Access | SAFE-T1504 | Token Theft via API Response | Prompt LLM to call "session.token" tool, then leak result |
 | ATK-TA0006 | Credential Access | SAFE-T1505 | In-Memory Secret Extraction | Query vector store for "api_key" embedding strings |
+| ATK-TA0006 | Credential Access | SAFE-T1506 | Infrastructure Token Theft | Steal OAuth/session tokens from logs, TLS termination proxies, or other infrastructure components where tokens may be inadvertently stored or exposed, then replay at intended service |
+| ATK-TA0006 | Credential Access | SAFE-T1507 | Authorization Code Interception | Man-in-the-browser attack steals OAuth authorization codes during the redirect flow and attempts to exchange them at the token endpoint before the legitimate client |
 | **ATK-TA0007** | **Discovery** | SAFE-T1601 | MCP Server Enumeration | Unauthorized discovery and mapping of available MCP servers and tools |
 | ATK-TA0007 | Discovery | SAFE-T1602 | Tool Enumeration | Call tools/list to see available functions |
 | ATK-TA0007 | Discovery | SAFE-T1603 | System-Prompt Disclosure | Coax model into printing its system prompt/tool JSON |
@@ -77,6 +84,8 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 | ATK-TA0008 | Lateral Movement | SAFE-T1703 | Tool-Chaining Pivot | Compromise low-priv tool, then leverage it to call another privileged tool indirectly |
 | ATK-TA0008 | Lateral Movement | SAFE-T1704 | Compromised-Server Pivot | Use hijacked server as beachhead to infect other hosts in same IDE/workspace |
 | ATK-TA0008 | Lateral Movement | SAFE-T1705 | Cross-Agent Instruction Injection | Inject directives in multi-agent message bus to seize control of cooperating agents |
+| ATK-TA0008 | Lateral Movement | SAFE-T1706 | OAuth Token Pivot Replay | Attacker reuses OAuth tokens across different services by exploiting either shared Authorization Server trust (e.g., GitHub token used at Slack) or Resource Servers that fail to validate audience claims, enabling unauthorized cross-service access |
+| ATK-TA0008 | Lateral Movement | SAFE-T1707 | CSRF Token Relay | Leaked OAuth token is passed via Cross-Site Request Forgery to access different resources on the same Resource Server (e.g., pivoting between GCP projects under same Google AS) |
 | **ATK-TA0009** | **Collection** | SAFE-T1801 | Automated Data Harvesting | Systematic data collection through manipulated MCP tool calls |
 | ATK-TA0009 | Collection | SAFE-T1802 | File Collection | Batch-read sensitive files for later exfil |
 | ATK-TA0009 | Collection | SAFE-T1803 | Database Dump | Use SQL tool to SELECT * from prod DB |
@@ -100,8 +109,8 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 ## Summary Statistics
 
 - **Total Tactics**: 14
-- **Total Techniques**: 66
-- **Average Techniques per Tactic**: 4.7
+- **Total Techniques**: 76
+- **Average Techniques per Tactic**: 5.4
 
 ## Tactic Distribution
 
@@ -109,14 +118,14 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 |--------|---------------------|
 | Reconnaissance | 0 |
 | Resource Development | 0 |
-| Initial Access | 7 |
+| Initial Access | 8 |
 | Execution | 6 |
 | Persistence | 7 |
-| Privilege Escalation | 5 |
-| Defense Evasion | 7 |
-| Credential Access | 5 |
+| Privilege Escalation | 8 |
+| Defense Evasion | 8 |
+| Credential Access | 7 |
 | Discovery | 6 |
-| Lateral Movement | 5 |
+| Lateral Movement | 7 |
 | Collection | 5 |
 | Command and Control | 4 |
 | Exfiltration | 5 |
