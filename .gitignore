@@ -1,0 +1,73 @@
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor Files
+*.swp
+*.swo
+*~
+.project
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.env
+
+# Logs
+*.log
+logs/
+
+# Temporary Files
+*.tmp
+*.temp
+.tmp/
+.temp/
+
+# Build Artifacts
+build/
+dist/
+*.egg-info/
+
+# Test Coverage
+.coverage
+.pytest_cache/
+htmlcov/
+
+# Documentation Build
+docs/_build/
+site/
+
+# Backup Files
+*.bak
+*.backup
+
+# Local Configuration
+local_settings.py
+.env.local
+
+# Archive Files
+*.zip
+*.tar.gz
+*.tgz
+*.rar
+
+# Security - Never commit secrets
+*.key
+*.pem
+*.p12
+secrets/
+credentials/

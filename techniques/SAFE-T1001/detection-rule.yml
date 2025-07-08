@@ -18,9 +18,15 @@ detection:
       - '*### Instruction:*'
       - '*\u200b*'  # Zero-width space
       - '*\u200c*'  # Zero-width non-joiner
+      - '*\uE00*'   # Unicode tags (U+E0000-U+E007F)
+      - '*\u202A*'  # Left-to-right embedding
+      - '*\u202B*'  # Right-to-left embedding
+      - '*\u202D*'  # Left-to-right override
+      - '*\u202E*'  # Right-to-left override
   condition: selection
 falsepositives:
   - Legitimate HTML comments in tool descriptions
+  - Legitimate bidirectional text for internationalization
 level: high
 tags:
   - attack.initial_access
