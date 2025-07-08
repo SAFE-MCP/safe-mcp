@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+title: "SAFE-MCP: Security Analysis Framework for Evaluation of Model Context Protocol"
+message: "If you use this framework, please cite it as below."
+type: software
+authors:
+  - name: "The SAFE-MCP Authors"
+repository-code: 'https://github.com/fkautz/safe-mcp'
+url: 'https://github.com/fkautz/safe-mcp'
+abstract: >-
+  SAFE-MCP is a comprehensive security framework for documenting and
+  mitigating threats in the Model Context Protocol (MCP) ecosystem.
+  It provides a structured approach to identifying, categorizing, and
+  defending against attacks targeting MCP implementations and
+  AI-powered applications.
+keywords:
+  - security
+  - model-context-protocol
+  - mcp
+  - threat-modeling
+  - ai-security
+  - llm-security
+  - mitre-attack
+license: "Apache-2.0 AND CC-BY-4.0"
+version: 1.0.0
+date-released: '2025-01-07'

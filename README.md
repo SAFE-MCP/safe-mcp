@@ -1,4 +1,24 @@
-# SAFE-MCP TTP Reference Table
+# SAFE-MCP: Security Analysis Framework for Evaluation of Model Context Protocol
+
+## About SAFE-MCP
+
+SAFE-MCP is a comprehensive security framework for documenting and mitigating threats in the Model Context Protocol (MCP) ecosystem. This framework adapts the proven MITRE ATT&CK methodology specifically for MCP environments, providing structured documentation of adversary tactics, techniques, and procedures (TTPs) that target MCP implementations and AI-powered applications.
+
+### Key Features
+
+- **MITRE ATT&CK Alignment**: We use patterns and methodologies from the MITRE ATT&CK Framework, explicitly targeting MCP-specific threats while maintaining compatibility with established security practices.
+- **Compliance Mapping**: Each SAFE-MCP technique links to corresponding MITRE ATT&CK techniques where applicable, helping organizations determine compliance with existing security frameworks and controls.
+- **Comprehensive Coverage**: Documenting attack techniques across 14 tactical categories, from initial access to impact, with continuous additions as new threats emerge.
+- **Actionable Mitigations**: Each technique includes detailed mitigation strategies and detection rules to help defenders protect their MCP deployments.
+
+### How to Use This Framework
+
+1. **Security Teams**: Use the TTP reference table below to understand potential threats to your MCP implementation
+2. **Developers**: Review techniques relevant to your MCP tools and implement recommended mitigations
+3. **Compliance Officers**: Map SAFE-MCP techniques to your existing security controls via MITRE ATT&CK linkages
+4. **Red Teams**: Reference attack techniques for security testing of MCP deployments
+
+## TTP Reference Table
 
 This table provides a comprehensive reference of all Tactics, Techniques, and Procedures (TTPs) defined in the SAFE-MCP framework.
 
