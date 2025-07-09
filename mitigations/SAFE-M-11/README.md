@@ -8,11 +8,12 @@
 **First Published**: 2025-01-03
 
 ## Description
-Behavioral Monitoring tracks LLM behavior patterns to detect unexpected tool usage, suspicious sequences of operations, or deviations from normal behavior that may indicate compromise or attack.
+Behavioral Monitoring tracks LLM behavior patterns to detect unexpected tool usage, suspicious sequences of operations, or deviations from normal behavior that may indicate compromise or attack. This includes monitoring for signs of prompt injection attacks such as sudden context switches, execution of unrelated commands, or acknowledgment of instructions not visible in the original user request.
 
 ## Mitigates
 - [SAFE-T1001](../../techniques/SAFE-T1001/README.md): Tool Poisoning Attack (TPA)
 - [SAFE-T1101](../../techniques/SAFE-T1101/README.md): Command Injection
+- [SAFE-T1102](../../techniques/SAFE-T1102/README.md): Prompt Injection (Multiple Vectors)
 - [SAFE-T1701](../../techniques/SAFE-T1701/README.md): Cross-Tool Contamination
 
 ## Technical Implementation
@@ -33,3 +34,4 @@ Behavioral Monitoring tracks LLM behavior patterns to detect unexpected tool usa
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
 | 0.1 | 2025-01-03 | Initial stub | Frederick Kautz |
+| 0.2 | 2025-01-09 | Added explicit prompt injection monitoring | Frederick Kautz |

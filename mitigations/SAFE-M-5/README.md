@@ -1,4 +1,4 @@
-# SAFE-M-5: Tool Description Sanitization
+# SAFE-M-5: Content Sanitization
 
 ## Overview
 **Mitigation ID**: SAFE-M-5  
@@ -8,7 +8,7 @@
 **First Published**: 2025-01-03
 
 ## Description
-Tool Description Sanitization filters tool descriptions to remove hidden content and instruction patterns using pattern-based detection combined with structural analysis. Note that pattern-based filtering alone is insufficient and should be combined with other mitigations.
+Content Sanitization filters MCP-related content (including tool descriptions, tool outputs, error messages, and other data) to remove hidden content and instruction patterns using pattern-based detection combined with structural analysis. This mitigation applies sanitization at multiple points in the MCP pipeline to prevent prompt injection from various sources. Note that pattern-based filtering alone is insufficient and should be combined with other mitigations.
 
 ## Mitigates
 - [SAFE-T1001](../../techniques/SAFE-T1001/README.md): Tool Poisoning Attack (TPA)
@@ -28,3 +28,4 @@ Tool Description Sanitization filters tool descriptions to remove hidden content
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
 | 0.1 | 2025-01-03 | Initial stub | Frederick Kautz |
+| 0.2 | 2025-01-09 | Generalized from tool descriptions to all MCP content | Frederick Kautz |
