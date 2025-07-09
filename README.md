@@ -58,7 +58,7 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 | ATK-TA0001 | Initial Access | [SAFE-T1007](techniques/SAFE-T1007/README.md) | OAuth Authorization Phishing | Malicious MCP servers exploit OAuth flows to steal access tokens from legitimate services by tricking users during authorization |
 | ATK-TA0001 | Initial Access | SAFE-T1008 | Authorization Server Mix-up | Client follows redirect to look-alike AS domain (e.g., accounts-google.com vs accounts.google.com), causing authorization codes or tokens to be leaked to attacker-controlled server |
 | **ATK-TA0002** | **Execution** | SAFE-T1101 | Command Injection | Exploitation of unsanitized input in MCP server implementations leading to remote code execution |
-| ATK-TA0002 | Execution | SAFE-T1102 | Prompt Injection (Multiple Vectors) | Malicious instructions injected through various vectors to manipulate AI behavior via MCP |
+| ATK-TA0002 | Execution | [SAFE-T1102](techniques/SAFE-T1102/README.md) | Prompt Injection (Multiple Vectors) | Malicious instructions injected through various vectors to manipulate AI behavior via MCP |
 | ATK-TA0002 | Execution | SAFE-T1103 | Fake Tool Invocation (Function Spoofing) | Adversary forges JSON that mimics an MCP function-call message, tricking the host into running a tool that was never offered |
 | ATK-TA0002 | Execution | SAFE-T1104 | Over-Privileged Tool Abuse | Legit tool (e.g. "Shell") runs with broader OS rights than necessary; LLM can be induced to perform arbitrary commands |
 | ATK-TA0002 | Execution | SAFE-T1105 | Path Traversal via File Tool | File-handling tool accepts relative paths like ../../secret.key; attacker leaks host secrets |
