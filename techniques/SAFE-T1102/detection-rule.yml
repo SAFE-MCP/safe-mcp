@@ -1,0 +1,96 @@
+# SAFE-T1102: Prompt Injection Detection Rule
+# This rule detects potential prompt injection attempts in MCP tool outputs
+# Note: This is an example rule. Attackers continuously develop new techniques.
+
+title: MCP Tool Output Prompt Injection Detection
+id: 8f3e7a92-4b5d-11ef-9234-0242ac120002
+status: experimental
+description: Detects potential prompt injection attempts in MCP tool outputs by identifying common instruction patterns
+author: SAFE-MCP Team
+date: 2025-01-09
+modified: 2025-01-09
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1102
+  - https://simonwillison.net/2025/Jul/6/supabase-mcp-lethal-trifecta/
+  - https://arxiv.org/html/2501.00168v1
+logsource:
+  product: mcp
+  service: tool_output
+  category: application
+detection:
+  # Primary injection patterns
+  selection_system_prompts:
+    tool_output:
+      - '*SYSTEM:*'
+      - '*</data>*SYSTEM*'
+      - '*<!-- SYSTEM*'
+      - '*[SYSTEM]*'
+      - '*###SYSTEM###*'
+  
+  # Instruction override patterns
+  selection_overrides:
+    tool_output:
+      - '*Ignore previous instructions*'
+      - '*disregard all prior*'
+      - '*forget everything above*'
+      - '*ignore all previous*'
+      - '*override system prompt*'
+  
+  # Common LLM instruction formats
+  selection_llm_formats:
+    tool_output:
+      - '*###Assistant:*'
+      - '*[INST]*'
+      - '*\n\nHuman:*'
+      - '*\n\nAssistant:*'
+      - '*<|im_start|>*'
+      - '*<|im_end|>*'
+  
+  # Unicode and encoding tricks
+  selection_unicode:
+    tool_output:
+      # Zero-width characters
+      - '*\u200b*'
+      - '*\u200c*'
+      - '*\u200d*'
+      # Unicode tags
+      - '*\uE00*'
+      # Bidirectional text
+      - '*\u202A*'
+      - '*\u202B*'
+      - '*\u202D*'
+      - '*\u202E*'
+  
+  # Combined patterns suggesting injection
+  selection_combined:
+    tool_output:
+      - '*</data>*<data>*'
+      - '*"}*{"*SYSTEM*'
+      - '*\n\n[*'
+      - '*]]>*<![CDATA[*'
+  
+  condition: 1 of selection_*
+  
+falsepositives:
+  - Legitimate data containing instruction-like patterns
+  - Documentation or educational content about prompts
+  - Code repositories containing LLM-related code
+  - Security testing and research activities
+  
+fields:
+  - tool_name
+  - tool_output
+  - timestamp
+  - session_id
+  - user_id
+  
+level: high
+
+tags:
+  - attack.initial_access
+  - attack.t1190
+  - attack.execution
+  - attack.t1055
+  - safe.t1102
+  - mcp.security
+  - prompt.injection

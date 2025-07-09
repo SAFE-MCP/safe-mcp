@@ -1,4 +1,4 @@
-# SAFE-M-7: Description Rendering Parity
+# SAFE-M-7: Content Rendering Parity
 
 ## Overview
 **Mitigation ID**: SAFE-M-7  
@@ -8,10 +8,11 @@
 **First Published**: 2025-01-03
 
 ## Description
-Description Rendering Parity ensures that what users see in the UI exactly matches what is sent to the LLM, preventing attacks that exploit differences between displayed and processed content.
+Content Rendering Parity ensures that what users see in the UI exactly matches what is sent to the LLM for all types of content (tool descriptions, tool outputs, error messages, and other data). This prevents attacks that exploit differences between displayed and processed content, including hidden instructions in tool outputs or visual deception techniques.
 
 ## Mitigates
 - [SAFE-T1001](../../techniques/SAFE-T1001/README.md): Tool Poisoning Attack (TPA)
+- [SAFE-T1102](../../techniques/SAFE-T1102/README.md): Prompt Injection (Multiple Vectors)
 - [SAFE-T1401](../../techniques/SAFE-T1401/README.md): Line Jumping
 - [SAFE-T1402](../../techniques/SAFE-T1402/README.md): Instruction Steganography
 
@@ -29,3 +30,4 @@ Description Rendering Parity ensures that what users see in the UI exactly match
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
 | 0.1 | 2025-01-03 | Initial stub | Frederick Kautz |
+| 0.2 | 2025-01-09 | Generalized to cover all content types, not just descriptions | Frederick Kautz |

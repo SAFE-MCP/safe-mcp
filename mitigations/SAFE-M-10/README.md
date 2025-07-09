@@ -8,7 +8,7 @@
 **First Published**: 2025-01-03
 
 ## Description
-Automated Scanning regularly scans tool descriptions for known malicious patterns and hidden content using signature-based detection, heuristics, and anomaly detection to identify potential threats.
+Automated Scanning regularly scans all MCP-related content (tool descriptions, tool outputs, error messages, and API responses) for known malicious patterns and hidden content using signature-based detection, heuristics, and anomaly detection to identify potential threats. This includes real-time scanning of tool outputs before they reach the LLM.
 
 ## Mitigates
 - [SAFE-T1001](../../techniques/SAFE-T1001/README.md): Tool Poisoning Attack (TPA)
@@ -30,3 +30,4 @@ Automated Scanning regularly scans tool descriptions for known malicious pattern
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
 | 0.1 | 2025-01-03 | Initial stub | Frederick Kautz |
+| 0.2 | 2025-01-09 | Expanded to scan all MCP content including outputs | Frederick Kautz |
