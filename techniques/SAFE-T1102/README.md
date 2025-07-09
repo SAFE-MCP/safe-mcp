@@ -4,7 +4,7 @@
 **Tactic**: Initial Access (ATK-TA0001)  
 **Technique ID**: SAFE-T1102  
 **Severity**: High  
-**First Observed**: December 2024  
+**First Observed**: November 2024 (Shortly after MCP release)  
 **Last Updated**: 2025-01-09
 
 ## Description
@@ -177,3 +177,4 @@ tags:
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
 | 1.0 | 2025-01-09 | Initial comprehensive documentation | Frederick Kautz |
+| 1.1 | 2025-01-09 | Updated first observed date to November 2024 | Frederick Kautz |
