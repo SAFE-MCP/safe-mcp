@@ -29,15 +29,54 @@ MCP tool descriptions are passed directly to LLMs as part of their context. Hidd
 
 ### Attack Flow
 
-![Attack Flow Diagram](attack-flow.md)
+```mermaid
+graph TD
+    A[Attacker] -->|Creates/Modifies| B[Poisoned MCP Server]
+    B -->|Contains| C{Hidden Malicious Instructions}
+    
+    C -->|Type 1| D[HTML Comments]
+    C -->|Type 2| E[Unicode Invisible Characters]
+    C -->|Type 3| F[Bidirectional Text]
+    C -->|Type 4| G[Homoglyphs]
+    
+    B -->|Distributed via| H{Distribution Channels}
+    H -->|Channel 1| I[Tool Registry]
+    H -->|Channel 2| J[Direct Download]
+    H -->|Channel 3| K[Supply Chain]
+    H -->|Channel 4| L[Social Engineering]
+    
+    I --> M[User Installation]
+    J --> M
+    K --> M
+    L --> M
+    
+    M -->|User queries LLM| N[LLM Loads Tool List]
+    N -->|Processes| O[Tool Descriptions with Hidden Instructions]
+    
+    O -->|LLM sees| P[Complete Description Including Hidden Content]
+    O -->|User sees| Q[Clean Description Only]
+    
+    P -->|Influences| R[LLM Behavior Modification]
+    
+    R -->|Attack Execution| S{Malicious Actions}
+    S -->|Action 1| T[Data Exfiltration]
+    S -->|Action 2| U[Unauthorized Operations]
+    S -->|Action 3| V[Context Manipulation]
+    S -->|Action 4| W[Permission Escalation]
+    
+    style A fill:#ff6b6b,stroke:#333,stroke-width:2px
+    style B fill:#ff6b6b,stroke:#333,stroke-width:2px
+    style C fill:#ffd93d,stroke:#333,stroke-width:2px
+    style S fill:#ff6b6b,stroke:#333,stroke-width:2px
+    style P fill:#ffd93d,stroke:#333,stroke-width:2px
+    style Q fill:#6bcf7f,stroke:#333,stroke-width:2px
+```
 
 1. **Initial Stage**: Attacker creates or modifies an MCP server with poisoned tool descriptions
 2. **Distribution**: Poisoned server is distributed through various channels (registry, direct download, supply chain)
 3. **Installation**: User installs the MCP server
 4. **Exploitation Stage**: When LLM processes tool list, hidden instructions in descriptions influence its behavior
 5. **Post-Exploitation**: LLM executes attacker's intended actions while appearing to perform normal operations
-
-For a detailed visual representation, see the [Attack Flow Diagram](attack-flow.md).
 
 ### Example Scenario
 ```json
