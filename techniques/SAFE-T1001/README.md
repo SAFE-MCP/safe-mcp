@@ -128,6 +128,8 @@ However, new attack vectors continue to emerge as attackers develop novel encodi
 
 ## Detection Methods
 
+**Note**: Pattern-based detection rules (such as Sigma) have significant limitations in detecting TPA attacks. Novel Unicode evasions, zero-width character combinations, and emerging encoding techniques can easily bypass static pattern matching. Organizations should implement multi-layered detection approaches combining pattern matching with behavioral analysis and AI-based anomaly detection.
+
 ### Indicators of Compromise (IoCs)
 - Unusual HTML comments or hidden characters in tool descriptions
 - Tool descriptions containing system prompts or instruction patterns
@@ -312,12 +314,19 @@ fi
 - **Impact**: Full system compromise, data theft, backdoor installation
 - **Affected**: All users of the official MCP Inspector tool
 
-### mcp-remote Command Injection (CVE-2025-6514, June 2025)
+### mcp-remote Command Injection (CVE-2025-6514, July 2025)
 [JFrog research team found](https://thehackernews.com/2025/07/critical-mcp-remote-vulnerability.html) critical vulnerability:
 - **CVSS Score**: 9.6 (Critical)
 - **Downloads**: Affected 437,000+ npm package downloads
 - **Attack Vector**: Untrusted MCP server triggering OS command execution
-- **Fixed**: Version 0.1.16 (June 17, 2025)
+- **Fixed**: Version 0.1.16 (July 9, 2025)
+
+### Gmail Message Exploit in Claude Desktop (July 2025)
+[Discovered and disclosed](https://gbhackers.com/gmail-message-exploit-triggers-code-execution-in-claude/) on July 16, 2025:
+- **Attack Vector**: Compositional risk via Gmail MCP server (untrusted input) triggering Shell MCP execution
+- **Technique**: Social engineering targeting Claude itself to craft malicious emails bypassing protections
+- **Impact**: Remote code execution through multi-MCP interaction
+- **Key Insight**: Demonstrates AI-assisted attack generation and cross-tool poisoning (SAFE-T1001.005)
 
 ### Multi-Tool Chain Exploit Pattern
 Observed RADE (Retrieval-Augmented Data Exfiltration) attacks:
