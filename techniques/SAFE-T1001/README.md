@@ -442,3 +442,4 @@ Exploiting interactions between multiple tools:
 | 1.1 | 2025-01-04 | Added 2024 research on Unicode attacks with academic sources, CaMeL defense | Frederick Kautz |
 | 1.2 | 2025-04-15 | Updated with Invariant Labs discovery, first real-world observation | Frederick Kautz |
 | 1.3 | 2025-07-15 | Major comprehensive update: Fixed chronological inconsistencies, added MCP-specific attack evolution (FSP, ATPA, Rug Pulls), integrated MCP-Scan tool, added EchoLeak reference, created PoC examples, documented real-world incidents, introduced sub-techniques taxonomy, enhanced detection rules, added attack flow diagrams | Frederick Kautz |
+| 1.4 | 2025-07-19 | Fixed mcp-remote CVE date (June→July), added Gmail Message Exploit incident, noted pattern-based detection limitations, inlined attack flow diagram, improved diagram contrast, removed poisoned server example | Frederick Kautz |
