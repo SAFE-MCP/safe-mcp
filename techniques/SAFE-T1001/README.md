@@ -95,19 +95,11 @@ graph TD
 }
 ```
 
-### Proof of Concept Examples
+### Proof of Concept Example
 
-We provide working examples to demonstrate and detect TPA techniques:
+We provide a detection script to help identify TPA techniques:
 
-1. **[Poisoned MCP Server](examples/poisoned-server.py)** - Demonstrates various TPA techniques including:
-   - HTML comment injection
-   - Unicode tag injection
-   - Bidirectional text attacks
-   - Zero-width character injection
-   - Full-Schema Poisoning (FSP)
-   - MCP Rug Pull simulation
-
-2. **[TPA Detection Script](examples/tpa-detector.py)** - Detects poisoning attempts by scanning for:
+**[TPA Detection Script](examples/tpa-detector.py)** - Detects poisoning attempts by scanning for:
    - Hidden HTML comments and system instructions
    - Invisible Unicode characters
    - Homoglyph attacks
