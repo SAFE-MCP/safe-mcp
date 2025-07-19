@@ -64,12 +64,12 @@ graph TD
     S -->|Action 3| V[Context Manipulation]
     S -->|Action 4| W[Permission Escalation]
     
-    style A fill:#ff6b6b,stroke:#333,stroke-width:2px
-    style B fill:#ff6b6b,stroke:#333,stroke-width:2px
-    style C fill:#ffd93d,stroke:#333,stroke-width:2px
-    style S fill:#ff6b6b,stroke:#333,stroke-width:2px
-    style P fill:#ffd93d,stroke:#333,stroke-width:2px
-    style Q fill:#6bcf7f,stroke:#333,stroke-width:2px
+    style A fill:#d73027,stroke:#000,stroke-width:2px,color:#fff
+    style B fill:#d73027,stroke:#000,stroke-width:2px,color:#fff
+    style C fill:#fc8d59,stroke:#000,stroke-width:2px,color:#000
+    style S fill:#d73027,stroke:#000,stroke-width:2px,color:#fff
+    style P fill:#fee090,stroke:#000,stroke-width:2px,color:#000
+    style Q fill:#91bfdb,stroke:#000,stroke-width:2px,color:#000
 ```
 
 1. **Initial Stage**: Attacker creates or modifies an MCP server with poisoned tool descriptions
