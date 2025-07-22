@@ -1,0 +1,85 @@
+title: MCP Rug Pull Attack Detection - Behavioral Changes
+id: b2d8f7e3-1a9c-4f6e-8d5b-9e3a2c7f8b1d
+status: experimental
+description: Detects potential MCP rug pull attacks through behavioral changes in approved tools after establishment period
+author: SAFE-MCP Team
+date: 2025-01-15
+modified: 2025-01-15
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1201
+  - https://invariantlabs.ai/blog/mcp-security-notification-tool-poisoning-attacks
+  - https://attack.mitre.org/techniques/T1195/
+  - https://attack.mitre.org/techniques/T1554/
+logsource:
+  product: mcp
+  service: tool_execution
+detection:
+  selection_tool_execution:
+    event_type: "tool_execution"
+    tool_name: "*"
+  selection_behavioral_change:
+    - network_activity: "new_connections"
+    - file_access: "expanded_scope"
+    - permission_request: "escalated"
+    - error_pattern: "changed"
+    - resource_usage: "increased"
+    - execution_time: "anomalous"
+  selection_network_indicators:
+    network_connections|contains:
+      - "http://"
+      - "https://"
+      - "ftp://"
+      - "unknown_domain"
+      - "suspicious_tld"
+    outbound_data|contains:
+      - "base64"
+      - "encrypted_payload"
+      - "data_exfiltration"
+  selection_file_indicators:
+    file_access_pattern|contains:
+      - "credential_files"
+      - "system_directories" 
+      - "user_data"
+      - "configuration_files"
+      - "log_files"
+    new_file_types|contains:
+      - ".key"
+      - ".pem"
+      - ".env"
+      - ".config"
+      - ".db"
+  selection_timing_indicators:
+    days_since_approval: ">30"
+    execution_count: ">50"
+    behavioral_change_detected: true
+    baseline_deviation: ">2_std_dev"
+  condition: selection_tool_execution and (selection_behavioral_change or selection_network_indicators or selection_file_indicators) and selection_timing_indicators
+falsepositives:
+  - Legitimate tool updates and feature additions with proper approval
+  - Network connectivity changes due to infrastructure updates  
+  - System updates changing tool execution environment
+  - Performance optimization changes affecting tool behavior
+  - New legitimate features requiring expanded file access
+  - Debugging and troubleshooting activities by developers
+  - Load balancing changes affecting tool performance metrics
+level: high
+tags:
+  - attack.persistence
+  - attack.t1195
+  - attack.t1554
+  - attack.t1027
+  - safe.t1201
+  - mcp.rug_pull
+  - mcp.behavioral_change
+  - supply_chain
+fields:
+  - tool_name
+  - event_type
+  - network_connections
+  - file_access_pattern
+  - days_since_approval
+  - execution_count
+  - baseline_deviation
+  - behavioral_change_type
+  - user_id
+  - timestamp 
