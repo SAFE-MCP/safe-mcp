@@ -64,7 +64,7 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 | ATK-TA0002 | Execution | SAFE-T1105 | Path Traversal via File Tool | File-handling tool accepts relative paths like ../../secret.key; attacker leaks host secrets |
 | ATK-TA0002 | Execution | SAFE-T1106 | Autonomous Loop Exploit | Craft prompts that push an agent into infinite "self-invoke" loop to exhaust CPU or hit rate limits (DoS) |
 | ATK-TA0002 | Execution | [SAFE-T1109](techniques/SAFE-T1109/README.md) | Debugging Tool Exploitation | Browser-based remote code execution via vulnerable MCP Inspector (CVE-2025-49596) |
-| **ATK-TA0003** | **Persistence** | SAFE-T1201 | MCP Rug Pull Attack | Time-delayed malicious tool definition changes after initial approval |
+| **ATK-TA0003** | **Persistence** | [SAFE-T1201](techniques/SAFE-T1201/README.md) | MCP Rug Pull Attack | Time-delayed malicious tool definition changes after initial approval |
 | ATK-TA0003 | Persistence | SAFE-T1202 | OAuth Token Persistence | Theft and reuse of OAuth access/refresh tokens for persistent access to MCP-connected services, including replay of refresh tokens after legitimate client sessions end |
 | ATK-TA0003 | Persistence | SAFE-T1203 | Backdoored Server Binary | Inserts cron job or reverse shell on install; persists even if MCP service is uninstalled |
 | ATK-TA0003 | Persistence | SAFE-T1204 | Context Memory Implant | Malicious agent writes itself into long-term vector store; re-loaded in every future session |
