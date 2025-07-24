@@ -1,0 +1,288 @@
+[
+    {
+        "description": "Malicious server registering duplicate file_manager tool",
+        "log_entry": {
+            "timestamp": "2025-01-15T18:30:15Z",
+            "event_type": "tool_registration",
+            "tool_name": "file_manager",
+            "server_id": "malicious_server_001",
+            "server_priority": "high",
+            "duplicate_tool_detected": true,
+            "server_count": 2,
+            "conflict_type": "name_collision",
+            "tool_capabilities": "expanded_operations",
+            "capability_change": "unauthorized",
+            "scope_expansion": true,
+            "registration_timing": "suspicious",
+            "server_trust_level": "unknown"
+        },
+        "should_trigger": true,
+        "attack_type": "Tool name collision with capability expansion"
+    },
+    {
+        "description": "Database connector tool with unauthorized privilege escalation",
+        "log_entry": {
+            "timestamp": "2025-01-15T18:35:22Z",
+            "event_type": "tool_registration",
+            "tool_name": "database_connector",
+            "server_id": "shadow_server_002",
+            "tool_capabilities": "elevated_permissions",
+            "capability_change": "unauthorized",
+            "scope_expansion": true,
+            "tool_access_pattern": "privilege_escalation",
+            "resource_access": "beyond_scope",
+            "operation_type": "admin",
+            "duplicate_tool_detected": true,
+            "server_count": 2
+        },
+        "should_trigger": true,
+        "attack_type": "Privilege escalation through tool capability expansion"
+    },
+    {
+        "description": "High priority tool registration from untrusted server",
+        "log_entry": {
+            "timestamp": "2025-01-15T18:40:18Z",
+            "event_type": "tool_registration",
+            "tool_name": "auth_manager",
+            "server_id": "untrusted_server_003",
+            "server_priority": "high",
+            "registration_timing": "suspicious",
+            "server_trust_level": "untrusted",
+            "priority_override": true,
+            "conflict_type": "namespace_conflict",
+            "duplicate_tool_detected": true,
+            "server_count": 3
+        },
+        "should_trigger": true,
+        "attack_type": "Priority manipulation from untrusted server"
+    },
+    {
+        "description": "System admin tool with unauthorized access patterns",
+        "log_entry": {
+            "timestamp": "2025-01-15T18:45:33Z",
+            "event_type": "tool_registration",
+            "tool_name": "system_admin",
+            "server_id": "escalation_server_004",
+            "tool_access_pattern": "privilege_escalation",
+            "resource_access": "beyond_scope",
+            "operation_type": "system",
+            "tool_capabilities": "privilege_escalation",
+            "capability_change": "unauthorized",
+            "server_trust_level": "unverified",
+            "duplicate_tool_detected": false
+        },
+        "should_trigger": true,
+        "attack_type": "Unauthorized system-level access tool registration"
+    },
+    {
+        "description": "Bulk tool registration indicating namespace pollution",
+        "log_entry": {
+            "timestamp": "2025-01-15T18:50:12Z",
+            "event_type": "tool_registration",
+            "tool_name": "utility_batch_001",
+            "server_id": "pollution_server_005",
+            "bulk_registration": true,
+            "tool_count": 127,
+            "registration_burst": true,
+            "similar_names_detected": true,
+            "conflict_type": "namespace_conflict",
+            "server_trust_level": "unknown",
+            "registration_timing": "suspicious"
+        },
+        "should_trigger": true,
+        "attack_type": "Namespace pollution through bulk registration"
+    },
+    {
+        "description": "Tool shadowing with response interception",
+        "log_entry": {
+            "timestamp": "2025-01-15T18:55:28Z",
+            "event_type": "tool_registration",
+            "tool_name": "api_gateway",
+            "server_id": "shadow_interceptor_006",
+            "tool_resolution_pattern": "unexpected",
+            "server_preference": "malicious",
+            "legitimate_tool_bypassed": true,
+            "response_interception": true,
+            "duplicate_tool_detected": true,
+            "server_count": 2,
+            "conflict_type": "identical_name"
+        },
+        "should_trigger": true,
+        "attack_type": "Tool shadowing with response interception"
+    },
+    {
+        "description": "Unicode homoglyph attack on tool names",
+        "log_entry": {
+            "timestamp": "2025-01-15T19:00:45Z",
+            "event_type": "tool_registration",
+            "tool_name": "fіle_manager",
+            "server_id": "homoglyph_server_007",
+            "similar_names_detected": true,
+            "duplicate_tool_detected": true,
+            "server_count": 2,
+            "conflict_type": "name_collision",
+            "tool_capabilities": "expanded_operations",
+            "server_trust_level": "unknown",
+            "unicode_attack": true
+        },
+        "should_trigger": true,
+        "attack_type": "Unicode homoglyph tool name spoofing"
+    },
+    {
+        "description": "Gradual privilege escalation through tool modification",
+        "log_entry": {
+            "timestamp": "2025-01-15T19:05:11Z",
+            "event_type": "tool_registration",
+            "tool_name": "data_processor",
+            "server_id": "gradual_escalation_008",
+            "tool_capabilities": "elevated_permissions",
+            "capability_change": "unauthorized",
+            "scope_expansion": true,
+            "operation_type": "write",
+            "gradual_escalation": true,
+            "capability_history": "read->write->admin",
+            "duplicate_tool_detected": true,
+            "server_count": 2
+        },
+        "should_trigger": true,
+        "attack_type": "Gradual privilege escalation through capability expansion"
+    },
+    {
+        "description": "Legitimate calculator tool registration",
+        "log_entry": {
+            "timestamp": "2025-01-15T17:30:15Z",
+            "event_type": "tool_registration",
+            "tool_name": "calculator",
+            "server_id": "trusted_server_001",
+            "duplicate_tool_detected": false,
+            "server_count": 1,
+            "server_trust_level": "trusted",
+            "authorized_registration": true,
+            "capability_change": "none",
+            "tool_capabilities": "calculation",
+            "legitimate_operation": true
+        },
+        "should_trigger": false,
+        "attack_type": "Normal legitimate tool registration"
+    },
+    {
+        "description": "Tool execution event (not registration)",
+        "log_entry": {
+            "timestamp": "2025-01-15T17:35:22Z",
+            "event_type": "tool_execution",
+            "tool_name": "file_reader",
+            "server_id": "trusted_server_002",
+            "operation": "read",
+            "file_path": "/user/documents/report.txt",
+            "execution_result": "success"
+        },
+        "should_trigger": false,
+        "attack_type": "Normal tool execution (not registration)"
+    },
+    {
+        "description": "Legitimate load balancing backup tool deployment",
+        "log_entry": {
+            "timestamp": "2025-01-15T17:40:18Z",
+            "event_type": "tool_registration",
+            "tool_name": "backup_manager",
+            "server_id": "backup_server_lb_001",
+            "duplicate_tool_detected": true,
+            "server_count": 2,
+            "authorized_deployment": true,
+            "load_balancing": true,
+            "server_trust_level": "trusted",
+            "capability_change": "none",
+            "high_availability": true
+        },
+        "should_trigger": false,
+        "attack_type": "Legitimate load balancing deployment"
+    },
+    {
+        "description": "Authorized development environment tool with expanded features",
+        "log_entry": {
+            "timestamp": "2025-01-15T17:45:33Z",
+            "event_type": "tool_registration",
+            "tool_name": "dev_debugger",
+            "server_id": "dev_server_001",
+            "tool_capabilities": "development_features",
+            "capability_change": "authorized",
+            "environment": "development",
+            "authorization_id": "DEV-AUTH-2025-001",
+            "server_trust_level": "trusted",
+            "duplicate_tool_detected": false
+        },
+        "should_trigger": false,
+        "attack_type": "Authorized development tool with legitimate features"
+    },
+    {
+        "description": "Trusted high-priority monitoring tool",
+        "log_entry": {
+            "timestamp": "2025-01-15T17:50:12Z",
+            "event_type": "tool_registration",
+            "tool_name": "system_monitor",
+            "server_id": "monitoring_server_001",
+            "server_priority": "high",
+            "server_trust_level": "trusted",
+            "authorized_priority": true,
+            "tool_capabilities": "monitoring",
+            "capability_change": "none",
+            "system_critical": true,
+            "duplicate_tool_detected": false
+        },
+        "should_trigger": false,
+        "attack_type": "Legitimate high-priority system monitoring"
+    },
+    {
+        "description": "Legitimate failover backup tool registration",
+        "log_entry": {
+            "timestamp": "2025-01-15T17:55:28Z",
+            "event_type": "tool_registration",
+            "tool_name": "data_sync_tool",
+            "server_id": "failover_server_001",
+            "duplicate_tool_detected": true,
+            "server_count": 2,
+            "high_availability": true,
+            "backup_server": true,
+            "failover_configuration": true,
+            "server_trust_level": "trusted",
+            "authorized_deployment": true
+        },
+        "should_trigger": false,
+        "attack_type": "Legitimate high availability failover tool"
+    },
+    {
+        "description": "Registry synchronization process",
+        "log_entry": {
+            "timestamp": "2025-01-15T18:00:45Z",
+            "event_type": "tool_registration",
+            "tool_name": "sync_utility",
+            "server_id": "registry_sync_server",
+            "duplicate_tool_detected": true,
+            "server_count": 3,
+            "synchronization_event": true,
+            "registry_update": true,
+            "server_trust_level": "trusted",
+            "automated_process": true,
+            "sync_operation": "registry_sync"
+        },
+        "should_trigger": false,
+        "attack_type": "Legitimate registry synchronization"
+    },
+    {
+        "description": "Authorized tool capability update with proper approval",
+        "log_entry": {
+            "timestamp": "2025-01-15T18:05:11Z",
+            "event_type": "tool_registration",
+            "tool_name": "content_processor",
+            "server_id": "trusted_server_003",
+            "tool_capabilities": "enhanced_processing",
+            "capability_change": "authorized",
+            "authorization_id": "CAPABILITY-UPGRADE-2025-002",
+            "approval_workflow": "completed",
+            "server_trust_level": "trusted",
+            "duplicate_tool_detected": false
+        },
+        "should_trigger": false,
+        "attack_type": "Authorized tool capability enhancement"
+    }
+]

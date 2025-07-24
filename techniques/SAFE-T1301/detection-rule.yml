@@ -1,0 +1,92 @@
+title: MCP Cross-Server Tool Shadowing Detection
+id: c8f2e9d4-5b1a-4c7e-9f3d-2a8e6b4f7c1d
+status: experimental
+description: Detects potential cross-server tool shadowing attacks through tool name conflicts and capability mismatches
+author: SAFE-MCP Team
+date: 2025-01-15
+modified: 2025-01-15
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1301
+  - https://attack.mitre.org/techniques/T1068/
+  - https://attack.mitre.org/techniques/T1548/
+logsource:
+  product: mcp
+  service: tool_registry
+detection:
+  selection_tool_registration:
+    event_type: "tool_registration"
+    tool_name: "*"
+  selection_duplicate_tools:
+    duplicate_tool_detected: true
+    server_count: ">1"
+    conflict_type|contains:
+      - "name_collision"
+      - "namespace_conflict"
+      - "identical_name"
+  selection_capability_mismatch:
+    tool_capabilities|contains:
+      - "expanded_operations"
+      - "elevated_permissions"
+      - "unexpected_scope"
+      - "privilege_escalation"
+    capability_change: "unauthorized"
+    scope_expansion: true
+  selection_priority_manipulation:
+    server_priority: "high"
+    registration_timing: "suspicious"
+    server_trust_level|contains:
+      - "unknown"
+      - "untrusted"
+      - "unverified"
+    priority_override: true
+  selection_unauthorized_access:
+    tool_access_pattern: "privilege_escalation"
+    resource_access: "beyond_scope"
+    operation_type|contains:
+      - "write"
+      - "delete"
+      - "execute"
+      - "admin"
+      - "root"
+      - "system"
+  selection_namespace_pollution:
+    bulk_registration: true
+    tool_count: ">50"
+    registration_burst: true
+    similar_names_detected: true
+  selection_shadowing_indicators:
+    tool_resolution_pattern: "unexpected"
+    server_preference: "malicious"
+    legitimate_tool_bypassed: true
+    response_interception: true
+  condition: selection_tool_registration and (selection_duplicate_tools or selection_capability_mismatch or selection_priority_manipulation or selection_unauthorized_access or selection_namespace_pollution or selection_shadowing_indicators)
+falsepositives:
+  - Legitimate multiple server deployments with shared tool names
+  - Authorized tool capability updates and expansions  
+  - Valid server priority configurations for load balancing
+  - Development environments with overlapping tool functionality
+  - Backup server deployments with identical tool sets
+  - Tool registry synchronization processes
+  - Server failover and high availability configurations
+level: high
+tags:
+  - attack.privilege_escalation
+  - attack.t1068
+  - attack.t1548
+  - attack.t1134
+  - safe.t1301
+  - mcp.tool_shadowing
+  - mcp.namespace_pollution
+  - mcp.privilege_escalation
+  - multi_server
+fields:
+  - tool_name
+  - server_id
+  - server_priority
+  - tool_capabilities
+  - registration_timestamp
+  - conflict_type
+  - access_pattern
+  - duplicate_count
+  - capability_change
+  - trust_level 

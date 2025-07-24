@@ -71,7 +71,7 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 | ATK-TA0003 | Persistence | SAFE-T1205 | Persistent Tool Redefinition | Attacker modifies server's tool metadata to keep hidden commands across restarts |
 | ATK-TA0003 | Persistence | SAFE-T1206 | Credential Implant in Config | Adds attacker's API/SSH keys to server .env, giving re-entry |
 | ATK-TA0003 | Persistence | SAFE-T1207 | Hijack Update Mechanism | Man-in-the-middle an auto-update channel to re-install malicious build later on |
-| **ATK-TA0004** | **Privilege Escalation** | SAFE-T1301 | Cross-Server Tool Shadowing | Malicious MCP servers override legitimate tool calls to gain elevated privileges |
+| **ATK-TA0004** | **Privilege Escalation** | [SAFE-T1301](techniques/SAFE-T1301/README.md) | Cross-Server Tool Shadowing | Malicious MCP servers override legitimate tool calls to gain elevated privileges |
 | ATK-TA0004 | Privilege Escalation | SAFE-T1302 | High-Privilege Tool Abuse | Invoke a VM-level or root tool from normal user context |
 | ATK-TA0004 | Privilege Escalation | SAFE-T1303 | Sandbox Escape via Server Exec | Exploit vulnerable server to break container/seccomp isolation |
 | ATK-TA0004 | Privilege Escalation | SAFE-T1304 | Credential Relay Chain | Use one tool to steal tokens, feed them to second tool with higher privileges |
