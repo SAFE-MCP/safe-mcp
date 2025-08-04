@@ -55,10 +55,10 @@ graph TD
     L -->|Resolves| M[Target File Access]
     
     M -->|Success| N{Data Exfiltration}
-    N -->|Config Files| O[/etc/passwd, /etc/shadow]
-    N -->|SSH Keys| P[~/.ssh/id_rsa, ~/.ssh/id_rsa.pub]
-    N -->|App Configs| Q[.env, config.json, secrets.yaml]
-    N -->|System Files| R[/proc/version, /sys/class/net]
+    N -->|Config Files| O["/etc/passwd, /etc/shadow"]
+    N -->|SSH Keys| P["~/.ssh/id_rsa, ~/.ssh/id_rsa.pub"]
+    N -->|App Configs| Q[".env, config.json, secrets.yaml"]
+    N -->|System Files| R["/proc/version, /sys/class/net"]
     
     O --> S[Privilege Escalation]
     P --> S
