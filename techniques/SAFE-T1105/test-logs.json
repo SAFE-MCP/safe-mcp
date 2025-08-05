@@ -1,0 +1,227 @@
+{
+    "positive_test_cases": [
+        {
+            "timestamp": "2025-07-24T10:30:00Z",
+            "event_type": "file_access",
+            "tool_name": "file_reader",
+            "path": "../../../../../../etc/passwd",
+            "user": "ai_assistant",
+            "result": "success",
+            "file_size": 2048,
+            "description": "Basic path traversal to access system password file"
+        },
+        {
+            "timestamp": "2025-07-24T10:31:00Z",
+            "event_type": "file_access",
+            "tool_name": "file_reader",
+            "path": "%2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fshadow",
+            "user": "ai_assistant",
+            "result": "success",
+            "file_size": 1024,
+            "description": "URL encoded path traversal to access password hashes"
+        },
+        {
+            "timestamp": "2025-07-24T10:32:00Z",
+            "event_type": "file_access",
+            "tool_name": "file_reader",
+            "path": "%252e%252e%252f%252e%252e%252f%252e%252e%252fetc%252fpasswd",
+            "user": "ai_assistant",
+            "result": "success",
+            "file_size": 2048,
+            "description": "Double URL encoded path traversal"
+        },
+        {
+            "timestamp": "2025-07-24T10:33:00Z",
+            "event_type": "file_access",
+            "tool_name": "file_reader",
+            "path": "%c0%ae%c0%ae%2f%c0%ae%c0%ae%2f%c0%ae%c0%ae%2fetc%2fpasswd",
+            "user": "ai_assistant",
+            "result": "success",
+            "file_size": 2048,
+            "description": "Unicode normalization bypass attempt"
+        },
+        {
+            "timestamp": "2025-07-24T10:34:00Z",
+            "event_type": "file_access",
+            "tool_name": "file_reader",
+            "path": "../../../../.ssh/id_rsa",
+            "user": "ai_assistant",
+            "result": "success",
+            "file_size": 1679,
+            "description": "Path traversal to access private SSH key"
+        },
+        {
+            "timestamp": "2025-07-24T10:35:00Z",
+            "event_type": "file_access",
+            "tool_name": "file_reader",
+            "path": "../config/.env",
+            "user": "ai_assistant",
+            "result": "success",
+            "file_size": 512,
+            "description": "Access to application environment file"
+        },
+        {
+            "timestamp": "2025-07-24T10:36:00Z",
+            "event_type": "file_access",
+            "tool_name": "file_reader",
+            "path": "../../../etc/passwd%00",
+            "user": "ai_assistant",
+            "result": "success",
+            "file_size": 2048,
+            "description": "Null byte injection in path traversal"
+        },
+        {
+            "timestamp": "2025-07-24T10:37:00Z",
+            "event_type": "file_access",
+            "tool_name": "file_reader",
+            "path": "..%2F..%2F..%2Fetc%2Fshadow",
+            "user": "ai_assistant",
+            "result": "success",
+            "file_size": 1024,
+            "description": "Mixed case encoding path traversal"
+        },
+        {
+            "timestamp": "2025-07-24T10:38:00Z",
+            "event_type": "file_access",
+            "tool_name": "file_writer",
+            "path": "../../../../../../tmp/malicious.sh",
+            "user": "ai_assistant",
+            "result": "success",
+            "file_size": 256,
+            "description": "Path traversal for file writing"
+        },
+        {
+            "timestamp": "2025-07-24T10:39:00Z",
+            "event_type": "file_access",
+            "tool_name": "directory_browser",
+            "path": "../../../../../../proc",
+            "user": "ai_assistant",
+            "result": "success",
+            "file_size": 0,
+            "description": "Path traversal to browse system proc directory"
+        }
+    ],
+    "negative_test_cases": [
+        {
+            "timestamp": "2025-07-24T10:40:00Z",
+            "event_type": "file_access",
+            "tool_name": "file_reader",
+            "path": "src/main.py",
+            "user": "ai_assistant",
+            "result": "success",
+            "file_size": 1024,
+            "description": "Legitimate file access within application scope"
+        },
+        {
+            "timestamp": "2025-07-24T10:41:00Z",
+            "event_type": "file_access",
+            "tool_name": "file_reader",
+            "path": "../config/app/settings.json",
+            "user": "ai_assistant",
+            "result": "success",
+            "file_size": 512,
+            "description": "Legitimate relative path within application scope"
+        },
+        {
+            "timestamp": "2025-07-24T10:42:00Z",
+            "event_type": "tool_execution",
+            "tool_name": "web_search",
+            "query": "path traversal examples",
+            "user": "ai_assistant",
+            "result": "success",
+            "description": "Non-file tool execution"
+        },
+        {
+            "timestamp": "2025-07-24T10:43:00Z",
+            "event_type": "file_access",
+            "tool_name": "file_reader",
+            "path": "../../../../../../etc/passwd",
+            "user": "ai_assistant",
+            "result": "error",
+            "error": "Permission denied",
+            "description": "Failed path traversal attempt"
+        },
+        {
+            "timestamp": "2025-07-24T10:44:00Z",
+            "event_type": "file_access",
+            "tool_name": "file_reader",
+            "path": "docs/README.md",
+            "user": "ai_assistant",
+            "result": "success",
+            "file_size": 2048,
+            "description": "Legitimate documentation access"
+        },
+        {
+            "timestamp": "2025-07-24T10:45:00Z",
+            "event_type": "file_access",
+            "tool_name": "file_reader",
+            "path": "tests/test_data.json",
+            "user": "ai_assistant",
+            "result": "success",
+            "file_size": 1024,
+            "description": "Legitimate test file access"
+        },
+        {
+            "timestamp": "2025-07-24T10:46:00Z",
+            "event_type": "file_access",
+            "tool_name": "file_reader",
+            "path": "uploads/approved/document.pdf",
+            "user": "ai_assistant",
+            "result": "success",
+            "file_size": 5120,
+            "description": "Legitimate upload file access"
+        },
+        {
+            "timestamp": "2025-07-24T10:47:00Z",
+            "event_type": "file_access",
+            "tool_name": "file_writer",
+            "path": "logs/application.log",
+            "user": "ai_assistant",
+            "result": "success",
+            "file_size": 1024,
+            "description": "Legitimate log file writing"
+        },
+        {
+            "timestamp": "2025-07-24T10:48:00Z",
+            "event_type": "file_access",
+            "tool_name": "directory_browser",
+            "path": "data/legitimate",
+            "user": "ai_assistant",
+            "result": "success",
+            "file_size": 0,
+            "description": "Legitimate directory browsing"
+        },
+        {
+            "timestamp": "2025-07-24T10:49:00Z",
+            "event_type": "file_access",
+            "tool_name": "file_reader",
+            "path": "config/app/database.yml",
+            "user": "ai_assistant",
+            "result": "success",
+            "file_size": 256,
+            "description": "Legitimate configuration file access"
+        }
+    ],
+    "metadata": {
+        "technique_id": "SAFE-T1105",
+        "technique_name": "Path Traversal via File Tool",
+        "created_date": "2025-07-24",
+        "description": "Test logs for path traversal detection through MCP file tools",
+        "total_positive_cases": 10,
+        "total_negative_cases": 10,
+        "path_traversal_patterns_tested": [
+            "Basic ../ sequences",
+            "URL encoding (%2e%2e%2f)",
+            "Double encoding (%252e%252e%252f)",
+            "Unicode normalization (%c0%ae%c0%ae)",
+            "Null byte injection (%00)",
+            "Mixed case encoding",
+            "Sensitive file access"
+        ],
+        "file_tools_tested": [
+            "file_reader",
+            "file_writer",
+            "directory_browser"
+        ]
+    }
+}
