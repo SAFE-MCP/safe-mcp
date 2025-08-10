@@ -1,0 +1,24 @@
+[
+  {
+    "timestamp": "2025-08-10T12:00:00Z",
+    "session_id": "sess-123",
+    "tool_name": "http.get",
+    "args_hash": "9d5f4f7a",
+    "status": "ok"
+  },
+  {
+    "timestamp": "2025-08-10T12:00:20Z",
+    "session_id": "sess-123",
+    "tool_name": "http.get",
+    "args_hash": "9d5f4f7a",
+    "status": "ok"
+  },
+  {
+    "timestamp": "2025-08-10T12:00:40Z",
+    "session_id": "sess-123",
+    "tool_name": "http.get",
+    "args_hash": "9d5f4f7a",
+    "status": "ok"
+  }
+]
+
