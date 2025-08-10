@@ -1,0 +1,24 @@
+title: MCP Autonomous Loop Exploit - Repeated Identical Tool Invocations
+id: b4c4a3c2-0b7a-4d52-9f5c-8b9e1c7c9a5f
+status: experimental
+description: Detects repeated identical MCP tool calls by the same session over a short interval (loop symptom)
+author: Sunil Dhakal
+date: 2025-08-10
+logsource:
+  product: mcp
+  service: host
+detection:
+  selection:
+    tool_name|same: ['*']
+    session_id|same: true
+    args_hash|same: true
+  timeframe: 5m
+  condition: selection | count() by session_id, tool_name, args_hash >= 10
+falsepositives:
+  - Legitimate batch/retry jobs with identical parameters
+level: high
+tags:
+  - attack.execution
+  - attack.t1499.003
+  - safe.t1106
+
