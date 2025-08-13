@@ -9,6 +9,7 @@ This project follows the [CNCF Code of Conduct](CODE_OF_CONDUCT.md). By particip
 ## Licensing
 
 This project uses a dual licensing structure:
+
 - **Documentation** (including threat descriptions, markdown files, and written content) is licensed under [CC BY 4.0](LICENSE-CC-BY-4.0)
 - **Code** (including scripts, detection rules, and software) is licensed under [Apache 2.0](LICENSE-APACHE-2.0)
 
@@ -24,6 +25,12 @@ To sign off your commits, use the `-s` or `--signoff` option when committing:
 
 ```bash
 git commit -s -m "Your commit message"
+```
+
+If you have already opened PR and missed DCO sign off:
+
+```bash
+git commit -s --amend --no-edit
 ```
 
 This will add a sign-off message at the end of your commit message:
@@ -100,13 +107,14 @@ Contributors who make meaningful changes to technique documentation should add t
 Each technique document includes a Version History table. When you make significant contributions, add a new row:
 
 ```markdown
-| Version | Date | Changes | Author |
-|---------|------|---------|--------|
-| 1.0 | 2025-01-02 | Initial documentation | Your Name |
-| 1.1 | 2025-01-15 | Added detection rules and mitigations | Your Name |
+| Version | Date       | Changes                               | Author    |
+| ------- | ---------- | ------------------------------------- | --------- |
+| 1.0     | 2025-01-02 | Initial documentation                 | Your Name |
+| 1.1     | 2025-01-15 | Added detection rules and mitigations | Your Name |
 ```
 
 Include:
+
 - **Version**: Increment the minor version (e.g., 1.0 → 1.1) for additions/improvements, major version (e.g., 1.1 → 2.0) for significant rewrites
 - **Date**: Use YYYY-MM-DD format
 - **Changes**: Brief, clear description of what you added or changed
