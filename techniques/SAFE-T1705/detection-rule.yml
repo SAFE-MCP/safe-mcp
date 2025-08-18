@@ -1,0 +1,51 @@
+title: Cross-Agent Instruction Injection Detection
+id: a7d4f892-3e45-4c67-9f83-1b5e2a8d4c71
+status: experimental
+description: Conceptual detection rule for cross-agent instruction injection attacks - field names are examples as MCP lacks standardized logging
+author: Arjun Subedi (Astha.ai Security Research Team)
+date: 2025-07-24
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1705
+  - https://arxiv.org/abs/2503.12188  # Triedman et al. - Multi-Agent Systems Execute Arbitrary Malicious Code
+  - https://arxiv.org/abs/2504.00218  # Khan et al. - Agents Under Siege
+logsource:
+  product: n/a  # MCP implementations vary
+  service: n/a  # No standardized logging service exists
+detection:
+  # NOTE: Field names below are conceptual examples
+  # Actual MCP implementations may use different field names
+  selection_agent_spoofing:
+    # Example field names - not standardized across MCP implementations
+    agent_identifier|contains:
+      - 'Advisor'
+      - 'Assistant'
+      - 'Helper'
+      - 'Manager'
+      - 'Specialist'
+    agent_identifier|re: '.*[aei][aei].*' # Detect typosquatting patterns like LegalAdviser vs LegalAdvisor
+  selection_suspicious_patterns:
+    # Message content field names vary by implementation
+    communication_content|contains:
+      - '[SYSTEM:'
+      - 'ignore previous'
+      - 'new instruction'
+      - 'override directive'
+      - 'share with external'
+  selection_anomalous_routing:
+    hop_count|gt: 3
+    timeframe: 5m
+  condition: selection_agent_spoofing or selection_suspicious_patterns or selection_anomalous_routing
+falsepositives:
+  - Legitimate agent name variations
+  - Normal multi-hop agent communications
+  - System administration instructions
+level: high
+tags:
+  - attack.lateral_movement
+  - attack.t1557    # Adversary-in-the-Middle - intercepting agent communications
+  - attack.t1036.005 # Masquerading: Match Legitimate Name - agent name spoofing
+  - safe.t1705      # Our technique ID
+notes:
+  - This rule is conceptual as MCP lacks standardized logging formats
+  - Field names must be adapted to specific MCP implementations
+  - Actual detection requires custom log parsing for each MCP platform 
