@@ -13,6 +13,7 @@ Brief description of what this PR adds/changes.
 
 - [ ] DCO sign-off included in commits (`git commit -s`)
 - [ ] For technique contributions: see [TEMPLATE-CHECKLIST.md](techniques/TEMPLATE-CHECKLIST.md)
+- [ ] For mitigation contributions: see [TEMPLATE-CHECKLIST.md](mitigations/TEMPLATE-CHECKLIST.md)
 
 ## Related Issues
 
