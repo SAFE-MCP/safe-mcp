@@ -62,7 +62,7 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 | ATK-TA0002 | Execution | SAFE-T1103 | Fake Tool Invocation (Function Spoofing) | Adversary forges JSON that mimics an MCP function-call message, tricking the host into running a tool that was never offered |
 | ATK-TA0002 | Execution | [SAFE-T1104](techniques/SAFE-T1104/README.md) | Over-Privileged Tool Abuse | Legit tool (e.g. "Shell") runs with broader OS rights than necessary; LLM can be induced to perform arbitrary commands |
 | ATK-TA0002 | Execution | [SAFE-T1105](techniques/SAFE-T1105/README.md) | Path Traversal via File Tool | File-handling tool accepts relative paths like ../../secret.key; attacker leaks host secrets |
-| ATK-TA0002 | Execution | SAFE-T1106 | Autonomous Loop Exploit | Craft prompts that push an agent into infinite "self-invoke" loop to exhaust CPU or hit rate limits (DoS) |
+| ATK-TA0002 | Execution | [SAFE-T1106](techniques/SAFE-T1106/README.md) | Autonomous Loop Exploit | Craft prompts that push an agent into infinite "self-invoke" loop to exhaust CPU or hit rate limits (DoS) |
 | ATK-TA0002 | Execution | [SAFE-T1109](techniques/SAFE-T1109/README.md) | Debugging Tool Exploitation | Browser-based remote code execution via vulnerable MCP Inspector (CVE-2025-49596) |
 | **ATK-TA0003** | **Persistence** | [SAFE-T1201](techniques/SAFE-T1201/README.md) | MCP Rug Pull Attack | Time-delayed malicious tool definition changes after initial approval |
 | ATK-TA0003 | Persistence | SAFE-T1202 | OAuth Token Persistence | Theft and reuse of OAuth access/refresh tokens for persistent access to MCP-connected services, including replay of refresh tokens after legitimate client sessions end |
