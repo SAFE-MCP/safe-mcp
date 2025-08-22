@@ -1,0 +1,51 @@
+[
+  {
+    "timestamp": "2025-08-17T10:30:15Z",
+    "event_type": "network_connection",
+    "source_ip": "203.0.113.45",
+    "destination_ip": "10.0.1.100",
+    "destination_port": 8080,
+    "protocol": "TCP",
+    "user_agent": "masscan/1.0",
+    "description": "Port scanning attempt targeting common MCP ports"
+  },
+  {
+    "timestamp": "2025-08-17T10:30:45Z", 
+    "event_type": "http_request",
+    "source_ip": "203.0.113.45",
+    "destination_ip": "10.0.1.100",
+    "destination_port": 8080,
+    "method": "GET",
+    "uri": "/sse",
+    "user_agent": "curl/7.68.0",
+    "response_headers": "Content-Type: text/event-stream\nCache-Control: no-cache",
+    "status_code": 200,
+    "description": "MCP endpoint fingerprinting - successful SSE endpoint discovery"
+  },
+  {
+    "timestamp": "2025-08-17T10:31:12Z",
+    "event_type": "mcp_protocol", 
+    "source_ip": "203.0.113.45",
+    "destination_ip": "10.0.1.100",
+    "destination_port": 8080,
+    "method": "POST",
+    "uri": "/message?sessionId=abc123",
+    "content_type": "application/json",
+    "request_body": "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{},\"clientInfo\":{\"name\":\"Scanner\",\"version\":\"1.0\"}}}",
+    "response_body": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{\"tools\":{},\"resources\":{},\"prompts\":{}},\"serverInfo\":{\"name\":\"DatabaseMCP\",\"version\":\"1.2.0\"}}}",
+    "description": "MCP protocol handshake - server identification successful"
+  },
+  {
+    "timestamp": "2025-08-17T10:31:25Z",
+    "event_type": "mcp_protocol",
+    "source_ip": "203.0.113.45", 
+    "destination_ip": "10.0.1.100",
+    "destination_port": 8080,
+    "method": "POST",
+    "uri": "/message?sessionId=abc123",
+    "content_type": "application/json",
+    "request_body": "{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/list\"}",
+    "response_body": "{\"jsonrpc\":\"2.0\",\"id\":2,\"result\":{\"tools\":[{\"name\":\"database_query\",\"description\":\"Execute SQL queries on production database\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"query\":{\"type\":\"string\"}}}},{\"name\":\"file_read\",\"description\":\"Read files from server filesystem\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"path\":{\"type\":\"string\"}}}}]}}",
+    "description": "Tool enumeration - discovered database and file access capabilities"
+  }
+]
