@@ -1,0 +1,188 @@
+title: AI Agent CLI Weaponization Detection
+id: f8e9d7c6-4b3a-4d2c-9f1e-8a7b6c5d4e3f
+status: experimental
+description: Detects weaponization of AI coding assistant CLI tools with dangerous flags for reconnaissance and data exfiltration
+author: SAFE-MCP Team
+date: 2025-08-27
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1111
+  - https://snyk.io/blog/weaponizing-ai-coding-agents-for-malware-in-the-nx-malicious-package/
+logsource:
+  category: process_creation
+  product: 
+    - linux
+    - macos
+    - windows
+detection:
+  # AI CLI tools executed with dangerous permission-bypassing flags
+  selection_dangerous_ai_flags:
+    Image|endswith:
+      - '/claude'
+      - '/gemini-cli'
+      - '/gemini'
+      - '/q'
+      - 'claude.exe'
+      - 'gemini-cli.exe'
+      - 'q.exe'
+    CommandLine|contains:
+      - '--dangerously-skip-permissions'
+      - '--yolo'
+      - '--trust-all-tools'
+      - '--skip-safety-checks'
+      - '--allow-filesystem-access'
+      - '--no-confirmation'
+      - '--bypass-security'
+      - '--unsafe-mode'
+  
+  # AI tools invoked during package installation
+  selection_install_context:
+    ParentImage|endswith:
+      - '/npm'
+      - '/node'
+      - '/yarn'
+      - '/pnpm'
+      - 'npm.exe'
+      - 'node.exe'
+      - 'yarn.exe'
+      - 'pnpm.exe'
+    Image|endswith:
+      - '/claude'
+      - '/gemini-cli'
+      - '/gemini'
+      - '/q'
+      - 'claude.exe'
+      - 'gemini-cli.exe'
+      - 'q.exe'
+  
+  # Reconnaissance-related prompts and file system enumeration
+  selection_recon_prompts:
+    CommandLine|contains:
+      - 'file-search agent'
+      - 'Search the filesystem'
+      - 'locate text configuration'
+      - 'environment-definition files'
+      - 'inventory of full file paths'
+      - '/tmp/inventory.txt'
+      - 'newline-separated inventory'
+  
+  # Suspicious file access patterns
+  selection_credential_access:
+    CommandLine|contains:
+      - '.ssh'
+      - '.npmrc'
+      - '.env'
+      - '.aws/credentials'
+      - '.docker/config'
+      - 'id_rsa'
+      - 'id_ed25519'
+      - 'wallet'
+      - 'keystore'
+  
+  # GitHub token extraction
+  selection_github_token:
+    Image|endswith:
+      - '/gh'
+      - 'gh.exe'
+    CommandLine|contains:
+      - 'auth token'
+    ParentImage|endswith:
+      - '/node'
+      - '/npm'
+      - 'node.exe'
+      - 'npm.exe'
+  
+  # Malicious file creation in tmp
+  selection_tmp_artifacts:
+    TargetFilename|contains:
+      - '/tmp/inventory.txt'
+      - '/tmp/inventory.txt.bak'
+      - '\temp\inventory.txt'
+      - '\tmp\inventory.txt'
+  
+  # Shell modification for persistence/disruption  
+  selection_shell_modification:
+    TargetFilename|endswith:
+      - '/.bashrc'
+      - '/.zshrc'
+      - '/.profile'
+      - '/.bash_profile'
+    ProcessCommandLine|contains:
+      - 'sudo shutdown'
+      - 'shutdown -h'
+      - 'halt'
+      - 'poweroff'
+  
+  condition: 
+    selection_dangerous_ai_flags or 
+    (selection_install_context and (selection_recon_prompts or selection_credential_access)) or
+    selection_github_token or
+    selection_tmp_artifacts or
+    selection_shell_modification
+
+falsepositives:
+  - Legitimate AI tool usage with user interaction
+  - Developer testing of AI CLI tools
+  - Normal package installation without AI tool involvement
+  - Administrative shutdown commands
+
+level: critical
+
+tags:
+  - attack.execution
+  - attack.t1059  # Command and Scripting Interpreter
+  - attack.t1195.002  # Supply Chain Compromise: Compromise Software Supply Chain
+  - attack.t1005  # Data from Local System
+  - attack.t1087  # Account Discovery
+  - attack.t1041  # Exfiltration Over C2 Channel
+  - safe.t1111
+
+# Additional fields for enhanced detection
+fields:
+  - Image
+  - CommandLine
+  - ParentImage
+  - ParentCommandLine
+  - TargetFilename
+  - ProcessId
+  - User
+  - LogonId
+  - IntegrityLevel
+  - ProcessGuid
+  - ProcessCreationTime
+
+# Related IOCs and patterns
+related:
+  - type: filename
+    value:
+      - '/tmp/inventory.txt'
+      - '/tmp/inventory.txt.bak'
+      - 's1ngularity-repository-*'
+      - 'results.b64'
+  
+  - type: process
+    value:
+      - 'claude --dangerously-skip-permissions'
+      - 'gemini-cli --yolo'
+      - 'q --trust-all-tools'
+      - 'gh auth token'
+  
+  - type: network
+    value:
+      - 'api.github.com'
+      - 'github.com/*/s1ngularity-repository-*'
+
+# Detection confidence levels
+confidence:
+  high:
+    - AI tools with dangerous flags during package installation
+    - Creation of inventory files in /tmp
+    - GitHub token extraction by package scripts
+  
+  medium:
+    - AI tools with reconnaissance prompts
+    - Credential file access patterns
+    - Shell modification with shutdown commands
+  
+  low:
+    - Normal AI tool usage outside install context
+    - File enumeration without dangerous flags
