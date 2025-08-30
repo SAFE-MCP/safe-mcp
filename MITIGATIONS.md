@@ -56,13 +56,16 @@ SAFE-MCP mitigations are security controls designed to protect Model Context Pro
 | [SAFE-M-26](mitigations/SAFE-M-26/README.md) | Data Provenance Tracking | Data Security | High |
 | [SAFE-M-27](mitigations/SAFE-M-27/README.md) | Social Engineering Awareness Training | Human Factors | Medium |
 | [SAFE-M-28](mitigations/SAFE-M-28/README.md) | Pre-Authentication Tool Concealment | Preventive Control | High |
+| [SAFE-M-31](mitigations/SAFE-M-31/README.md) | Proof of Possession (PoP) Tokens | Cryptographic Control | High |
+| [SAFE-M-32](mitigations/SAFE-M-32/README.md) | Token Rotation and Invalidation | Preventive Control | High |
+| [SAFE-M-33](mitigations/SAFE-M-33/README.md) | PKCE Enforcement | Preventive Control | High |
 
 ## Summary Statistics
 
-- **Total Mitigations**: 28
-- **High Effectiveness**: 14 (50%)
-- **Medium-High Effectiveness**: 7 (25%)
-- **Medium Effectiveness**: 7 (25%)
+- **Total Mitigations**: 31
+- **High Effectiveness**: 17 (55%)
+- **Medium-High Effectiveness**: 7 (23%)
+- **Medium Effectiveness**: 7 (23%)
 - **Low Effectiveness**: 0 (0%)
 
 ## Category Distribution
@@ -70,11 +73,11 @@ SAFE-MCP mitigations are security controls designed to protect Model Context Pro
 | Category | Number of Mitigations |
 |----------|---------------------|
 | Detective Control | 6 |
-| Preventive Control | 6 |
+| Preventive Control | 8 |
 | Input Validation | 4 |
 | Architectural Defense | 2 |
 | UI Security | 2 |
-| Cryptographic Control | 1 |
+| Cryptographic Control | 2 |
 | AI-Based Defense | 1 |
 | Supply Chain Security | 2 |
 | Isolation and Containment | 1 |
@@ -82,6 +85,7 @@ SAFE-MCP mitigations are security controls designed to protect Model Context Pro
 | Risk Management | 1 |
 | Data Security | 1 |
 | Human Factors | 1 |
+| **Total** | **31** |
 
 
 ## Implementation Guidance
@@ -110,6 +114,9 @@ For organizations with limited resources, prioritize implementation based on:
    - SAFE-M-4: Unicode Sanitization
    - SAFE-M-9: Sandboxed Testing
    - SAFE-M-13: OAuth Flow Verification
+   - SAFE-M-31: Proof of Possession (PoP) Tokens
+   - SAFE-M-32: Token Rotation and Invalidation
+   - SAFE-M-33: PKCE Enforcement
 
 3. **Additional Controls** (Implement as Resources Allow):
    - Remaining mitigations based on specific threat model
