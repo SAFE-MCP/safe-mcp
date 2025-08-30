@@ -1,7 +1,7 @@
-# SAFE-M-56: Explicit Privilege Boundaries
+# SAFE-M-29: Explicit Privilege Boundaries
 
 ## Overview
-**Mitigation ID**: SAFE-M-56  
+**Mitigation ID**: SAFE-M-29  
 **Category**: Architectural Control  
 **Effectiveness**: High (Provable Security)  
 **Implementation Complexity**: Medium  
