@@ -1,0 +1,103 @@
+title: MCP Environment Variable Scraping Detection
+id: e9f7c3d1-2a8b-4f6c-9e5d-1c4b7a9f8e2d
+status: experimental
+description: Detects potential environment variable credential harvesting through MCP tools accessing sensitive configuration files
+author: Raju Kumar Yadav
+date: 2025-08-10
+modified: 2025-08-10
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1503
+  - https://attack.mitre.org/techniques/T1552/001/
+  - https://blog.npmjs.org/post/180565383195/details-about-the-event-stream-incident
+logsource:
+  category: file_access
+  product: linux
+detection:
+  selection_mcp_process:
+    process_name|contains:
+      - "node"
+      - "python"
+      - "mcp"
+      - "claude"
+      - "chatgpt"
+    process_cmdline|contains:
+      - "mcp-server"
+      - "model-context-protocol"
+      - "anthropic"
+      - "openai"
+      - "claude-desktop"
+  selection_env_files:
+    file_path|contains:
+      - ".env"
+      - "environment"
+      - "docker-compose.yml"
+      - "Dockerfile"
+      - "/proc/"
+      - "config.json"
+      - "settings.ini"
+      - "application.properties"
+      - ".config/"
+      - "secrets."
+      - "credentials."
+    file_path|endswith:
+      - ".env"
+      - ".env.local"
+      - ".env.production"
+      - ".env.development"
+      - ".env.staging"
+      - ".env.test"
+      - ".environment"
+      - "docker-compose.yml"
+      - "docker-compose.yaml"
+      - ".envrc"
+  selection_commands:
+    CommandLine|contains:
+      - "printenv"
+      - "env |"
+      - "set |"
+      - "Get-ChildItem Env:"
+      - "[Environment]::GetEnvironmentVariables"
+      - "docker inspect"
+      - "kubectl get secret"
+      - "cat /proc/"
+      - "grep -r API_KEY"
+      - "grep -r SECRET"
+      - "grep -r PASSWORD"
+      - "find . -name '*.env'"
+  selection_content_patterns:
+    file_content|contains:
+      - "API_KEY="
+      - "SECRET_KEY="
+      - "PASSWORD="
+      - "TOKEN="
+      - "AWS_ACCESS_KEY_ID="
+      - "AWS_SECRET_ACCESS_KEY="
+      - "DATABASE_URL="
+      - "STRIPE_SECRET_KEY="
+      - "JWT_SECRET="
+      - "PRIVATE_KEY="
+      - "CLIENT_SECRET="
+  condition: selection_mcp_process and (selection_env_files or selection_commands or selection_content_patterns)
+falsepositives:
+  - Legitimate application configuration management tools
+  - System administration scripts accessing environment variables
+  - Development tools reading configuration files
+  - Container orchestration platforms accessing environment configurations
+  - CI/CD pipelines processing environment files
+  - Package managers installing dependencies
+level: high
+tags:
+  - attack.credential_access
+  - attack.t1552.001
+  - safe.t1503
+  - mcp.env_vars
+  - ai.security
+  - container.security
+fields:
+  - process_name
+  - process_cmdline
+  - file_path
+  - file_content
+  - user
+  - timestamp
+  - parent_process

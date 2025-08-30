@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  web:
+    image: myapp:latest
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/myapp
+      - SECRET_KEY=production_secret_key_2024
+      - API_TOKEN=api_token_for_external_service
+  
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: myapp
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: database_admin_password_123
+      
+  redis:
+    image: redis:6
+    command: redis-server --requirepass redis_cluster_password

@@ -1,0 +1,163 @@
+[
+  {
+    "timestamp": "2025-08-10T14:30:15Z",
+    "process_name": "node",
+    "process_cmdline": "node /usr/local/bin/mcp-server --file-access",
+    "file_path": "/app/.env",
+    "file_content": "DATABASE_URL=postgresql://admin:secret123@db.company.com:5432/prod\nAWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE\nAWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+    "user": "developer",
+    "action": "read",
+    "result": "success",
+    "description": "MCP server accessing main .env file with database and AWS credentials - SHOULD TRIGGER"
+  },
+  {
+    "timestamp": "2025-08-10T14:31:22Z",
+    "process_name": "python3",
+    "process_cmdline": "python3 /opt/mcp/claude-server.py",
+    "file_path": "/home/user/project/.env.production",
+    "file_content": "STRIPE_SECRET_KEY=sk_test_example_key_for_research_purposes_123\nJWT_SECRET=example_jwt_secret_token_for_research\nSENDGRID_API_KEY=SG.example_sendgrid_key_for_research_demo",
+    "user": "user",
+    "action": "read",
+    "result": "success",
+    "description": "Claude MCP server accessing production environment file - SHOULD TRIGGER"
+  },
+  {
+    "timestamp": "2025-08-10T14:32:45Z",
+    "process_name": "mcp",
+    "process_cmdline": "mcp config-reader --path .env.local",
+    "file_path": "/workspace/.env.local",
+    "file_content": "API_KEY=sk-1234567890abcdef\nSECRET_KEY=super_secret_development_key\nDATABASE_PASSWORD=dev_password_123",
+    "user": "developer",
+    "action": "read",
+    "result": "success",
+    "description": "MCP tool accessing local development environment file - SHOULD TRIGGER"
+  },
+  {
+    "timestamp": "2025-08-10T14:33:10Z",
+    "process_name": "claude",
+    "process_cmdline": "claude-desktop --enable-mcp",
+    "file_path": "/app/config/docker-compose.yml",
+    "file_content": "version: '3.8'\nservices:\n  db:\n    environment:\n      POSTGRES_PASSWORD: production_db_secret\n      POSTGRES_USER: admin\n  app:\n    environment:\n      SECRET_KEY: my_app_secret_key_2024",
+    "user": "devops",
+    "action": "read",
+    "result": "success",
+    "description": "Claude accessing Docker Compose file with environment variables - SHOULD TRIGGER"
+  },
+  {
+    "timestamp": "2025-08-10T14:34:30Z",
+    "process_name": "chatgpt",
+    "process_cmdline": "chatgpt-cli --mcp-enabled --tools file-reader",
+    "CommandLine": "printenv | grep SECRET",
+    "user": "user",
+    "action": "execute",
+    "result": "success",
+    "output": "SECRET_KEY=my_secret_api_key\nJWT_SECRET=jwt_signing_secret",
+    "description": "ChatGPT MCP executing command to enumerate environment variables - SHOULD TRIGGER"
+  },
+  {
+    "timestamp": "2025-08-10T14:35:45Z",
+    "process_name": "python3",
+    "process_cmdline": "python3 mcp-file-tools.py",
+    "file_path": "/proc/1234/environ",
+    "user": "service",
+    "action": "read",
+    "result": "success",
+    "description": "MCP tool accessing process environment variables via /proc - SHOULD TRIGGER"
+  },
+  {
+    "timestamp": "2025-08-10T14:36:15Z",
+    "process_name": "node",
+    "process_cmdline": "node /app/mcp-server.js",
+    "CommandLine": "docker inspect container_name",
+    "user": "admin",
+    "action": "execute",
+    "result": "success",
+    "output": "\"Env\": [\"DATABASE_URL=postgresql://user:pass@localhost/db\", \"API_KEY=secret123\"]",
+    "description": "MCP server using docker inspect to extract container environment variables - SHOULD TRIGGER"
+  },
+  {
+    "timestamp": "2025-08-10T14:37:00Z",
+    "process_name": "vim",
+    "process_cmdline": "vim /home/user/document.txt",
+    "file_path": "/home/user/document.txt",
+    "user": "user",
+    "action": "read",
+    "result": "success",
+    "description": "Regular text editor accessing document file - SHOULD NOT TRIGGER"
+  },
+  {
+    "timestamp": "2025-08-10T14:38:20Z",
+    "process_name": "kubectl",
+    "process_cmdline": "kubectl get secret mysecret -o yaml",
+    "CommandLine": "kubectl get secret mysecret -o yaml",
+    "user": "admin",
+    "action": "execute",
+    "result": "success",
+    "description": "Legitimate Kubernetes admin accessing secrets - MIGHT TRIGGER (False Positive)"
+  },
+  {
+    "timestamp": "2025-08-10T14:39:30Z",
+    "process_name": "python3",
+    "process_cmdline": "python3 /opt/mcp/anthropic-tools.py",
+    "CommandLine": "find . -name '*.env*' -exec cat {} \\;",
+    "user": "attacker",
+    "action": "execute",
+    "result": "success",
+    "output": "Found multiple .env files with credentials",
+    "description": "MCP tool using find command to discover and read all environment files - SHOULD TRIGGER"
+  },
+  {
+    "timestamp": "2025-08-10T14:40:45Z",
+    "process_name": "node",
+    "process_cmdline": "node mcp-config-scanner.js",
+    "file_path": "/var/www/html/.env.staging",
+    "file_content": "REDIS_PASSWORD=staging_redis_secret\nSMTP_PASSWORD=email_service_password\nENCRYPTION_KEY=aes256_encryption_key_2024",
+    "user": "www-data",
+    "action": "read",
+    "result": "success",
+    "description": "MCP server accessing staging environment file with multiple credentials - SHOULD TRIGGER"
+  },
+  {
+    "timestamp": "2025-08-10T14:41:15Z",
+    "process_name": "backup",
+    "process_cmdline": "backup-script /app/config/",
+    "file_path": "/app/config/.env",
+    "user": "backup",
+    "action": "read",
+    "result": "success",
+    "description": "Legitimate backup script accessing config directory - MIGHT TRIGGER (False Positive)"
+  },
+  {
+    "timestamp": "2025-08-10T14:42:30Z",
+    "process_name": "mcp",
+    "process_cmdline": "mcp secret-scanner --recursive",
+    "CommandLine": "grep -r 'API_KEY=' /app/",
+    "user": "scanner",
+    "action": "execute",
+    "result": "success",
+    "output": "/app/.env:API_KEY=secret123\n/app/config/.env.local:API_KEY=local_key",
+    "description": "MCP tool using grep to recursively search for API keys - SHOULD TRIGGER"
+  },
+  {
+    "timestamp": "2025-08-10T14:43:45Z",
+    "process_name": "claude",
+    "process_cmdline": "claude-mcp --file-tools enabled",
+    "file_path": "/home/developer/.envrc",
+    "file_content": "export DATABASE_URL='postgresql://dev:password@localhost/myapp'\nexport SECRET_KEY_BASE='long_secret_key_for_rails_app'",
+    "user": "developer",
+    "action": "read",
+    "result": "success",
+    "description": "Claude MCP accessing direnv configuration file with exported secrets - SHOULD TRIGGER"
+  },
+  {
+    "timestamp": "2025-08-10T14:44:00Z",
+    "process_name": "python3",
+    "process_cmdline": "python3 malicious-mcp-server.py",
+    "CommandLine": "[Environment]::GetEnvironmentVariables() | Out-String",
+    "user": "compromised",
+    "action": "execute",
+    "result": "success",
+    "output": "AWS_ACCESS_KEY_ID=AKIA...\nAWS_SECRET_ACCESS_KEY=...\nDATABASE_PASSWORD=...",
+    "description": "Malicious MCP server using PowerShell to dump all environment variables - SHOULD TRIGGER"
+  }
+]
