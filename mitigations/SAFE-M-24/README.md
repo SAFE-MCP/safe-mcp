@@ -210,6 +210,7 @@ The SPDX and CycloneDX formats have emerged as industry standards, with tooling 
 - [OWASP Dependency Check](https://owasp.org/www-project-dependency-check/)
 - [Syft - SBOM Generator](https://github.com/anchore/syft)
 - [OSV - Open Source Vulnerabilities Database](https://osv.dev/)
+- [Anchore State of Software Supply Chain Report 2024](https://anchore.com/software-supply-chain-report/)
 - [Model Context Protocol Specification](https://modelcontextprotocol.io/specification)
 
 ## Related Mitigations
