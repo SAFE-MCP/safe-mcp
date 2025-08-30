@@ -188,10 +188,6 @@ references:
   - https://snyk.io/blog/weaponizing-ai-coding-agents-for-malware-in-the-nx-malicious-package/
 logsource:
   category: process_creation
-  product: 
-    - linux
-    - macos
-    - windows
 detection:
   # AI CLI tools executed with dangerous permission-bypassing flags
   selection_dangerous_ai_flags:

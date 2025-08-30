@@ -1,0 +1,47 @@
+title: AI Agent CLI Weaponization File Artifacts
+id: safe-t1111-file-artifacts
+status: experimental
+description: Detects tmp inventory artifacts and shell rc modifications associated with AI Agent CLI weaponization
+author: SAFE-MCP Team
+date: 2025-08-27
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1111
+  - https://snyk.io/blog/weaponizing-ai-coding-agents-for-malware-in-the-nx-malicious-package/
+logsource:
+  category: file_event
+detection:
+  # Malicious file creation in tmp
+  selection_tmp_artifacts:
+    TargetFilename|contains:
+      - '/tmp/inventory.txt'
+      - '/tmp/inventory.txt.bak'
+      - '\temp\inventory.txt'
+      - '\tmp\inventory.txt'
+
+  # Shell modification for persistence/disruption
+  selection_shell_modification_targets:
+    TargetFilename|endswith:
+      - '/.bashrc'
+      - '/.zshrc'
+      - '/.profile'
+      - '/.bash_profile'
+
+  selection_shutdown_content:
+    TargetContent|contains:
+      - 'sudo shutdown'
+      - 'shutdown -h'
+      - 'halt'
+      - 'poweroff'
+
+  condition: selection_tmp_artifacts or (selection_shell_modification_targets and selection_shutdown_content)
+
+falsepositives:
+  - Legitimate edits to shell rc files by administrators
+  - Temporary inventory files created during diagnostics
+
+level: high
+
+tags:
+  - attack.execution
+  - safe.t1111
+
