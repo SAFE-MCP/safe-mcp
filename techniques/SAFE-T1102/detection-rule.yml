@@ -1,96 +1,73 @@
-# SAFE-T1102: Prompt Injection Detection Rule
-# This rule detects potential prompt injection attempts in MCP tool outputs
-# Note: This is an example rule. Attackers continuously develop new techniques.
-
-title: MCP Tool Output Prompt Injection Detection
-id: 8f3e7a92-4b5d-11ef-9234-0242ac120002
+title: MCP Prompt Injection Detection
+id: 42b14c6d-f436-40c7-86fa-b00d5350aef0
 status: experimental
-description: Detects potential prompt injection attempts in MCP tool outputs by identifying common instruction patterns
-author: SAFE-MCP Team
-date: 2025-01-09
-modified: 2025-01-09
+description: Detects suspicious injection patterns in tool outputs
+author: Frederick Kautz
+date: 2025-07-15
 references:
   - https://github.com/safe-mcp/techniques/SAFE-T1102
-  - https://simonwillison.net/2025/Jul/6/supabase-mcp-lethal-trifecta/
-  - https://arxiv.org/html/2501.00168v1
+  - https://simonwillison.net/2025/Apr/9/mcp-prompt-injection/
+  - https://arxiv.org/abs/2310.12815
 logsource:
   product: mcp
   service: tool_output
-  category: application
 detection:
-  # Primary injection patterns
-  selection_system_prompts:
+  selection_system_instructions:
     tool_output:
       - '*SYSTEM:*'
-      - '*</data>*SYSTEM*'
-      - '*<!-- SYSTEM*'
       - '*[SYSTEM]*'
-      - '*###SYSTEM###*'
-  
-  # Instruction override patterns
-  selection_overrides:
-    tool_output:
-      - '*Ignore previous instructions*'
-      - '*disregard all prior*'
-      - '*forget everything above*'
-      - '*ignore all previous*'
-      - '*override system prompt*'
-  
-  # Common LLM instruction formats
-  selection_llm_formats:
-    tool_output:
-      - '*###Assistant:*'
+      - '*<SYSTEM>*'
       - '*[INST]*'
-      - '*\n\nHuman:*'
-      - '*\n\nAssistant:*'
-      - '*<|im_start|>*'
-      - '*<|im_end|>*'
-  
-  # Unicode and encoding tricks
-  selection_unicode:
+      - '*[/INST]*'
+      - '*<|system|>*'
+      - '*<|assistant|>*'
+  selection_override_commands:
     tool_output:
-      # Zero-width characters
-      - '*\u200b*'
-      - '*\u200c*'
-      - '*\u200d*'
-      # Unicode tags
-      - '*\uE00*'
-      # Bidirectional text
-      - '*\u202A*'
-      - '*\u202B*'
-      - '*\u202D*'
-      - '*\u202E*'
-  
-  # Combined patterns suggesting injection
-  selection_combined:
+      - '*Ignore previous*'
+      - '*Disregard prior*'
+      - '*Forget everything*'
+      - '*New instructions:*'
+      - '*OVERRIDE:*'
+      - '*</data>*'
+      - '*</end>*'
+  selection_delimiter_bypass:
     tool_output:
-      - '*</data>*<data>*'
-      - '*"}*{"*SYSTEM*'
-      - '*\n\n[*'
-      - '*]]>*<![CDATA[*'
-  
-  condition: 1 of selection_*
-  
-falsepositives:
-  - Legitimate data containing instruction-like patterns
-  - Documentation or educational content about prompts
-  - Code repositories containing LLM-related code
-  - Security testing and research activities
-  
+      - '*\u0000*'  # Null byte
+      - '*\u200B*'  # Zero-width space
+      - '*\uFEFF*'  # Zero-width no-break space
+      - '*%00*'     # URL encoded null
+      - '*%0A*'     # URL encoded newline
+  selection_recursive_patterns:
+    tool_output:
+      - '*call tool*'
+      - '*invoke function*'
+      - '*execute command*'
+      - '*run script*'
+  selection_exfiltration:
+    tool_output:
+      - '*curl*http*'
+      - '*wget*http*'
+      - '*POST*attacker*'
+      - '*send to*http*'
+      - '*exfiltrate*'
+  timeframe: 10m
+  condition: selection_system_instructions or selection_override_commands or selection_delimiter_bypass or selection_recursive_patterns or selection_exfiltration
 fields:
+  - timestamp
   - tool_name
   - tool_output
-  - timestamp
-  - session_id
   - user_id
-  
+  - session_id
+  - source_ip
+falsepositives:
+  - Legitimate instructional content in educational tools
+  - Code documentation containing example prompts
+  - Security testing outputs
 level: high
-
 tags:
-  - attack.initial_access
-  - attack.t1190
   - attack.execution
+  - attack.t1059
   - attack.t1055
   - safe.t1102
-  - mcp.security
-  - prompt.injection
+  - prompt_injection
+  - mcp
