@@ -27,8 +27,8 @@ In MCP environments, compromised or malicious tools/servers that orchestrate con
 
 ### Attack Flow
 1. **Access**: Attacker gains control of an MCP tool/server or tricks an operator into using a malicious one.
-2. **Parameter Control**: Attacker sets `exec` working directory to a traversal path (for example, `../../..`).
-3. **Runtime Invocation**: MCP workload triggers container runtime `exec` with the crafted `-w`/working directory.
+2. **Parameter Control**: Attacker sets `exec` current working directory (cwd) to a traversal path (for example, `../../..`).
+3. **Runtime Invocation**: MCP workload triggers container runtime `exec` with the crafted working directory parameter.
 4. **Boundary Violation**: Runtime resolves paths outside the container filesystem, breaking isolation.
 5. **Post-Exploitation**: Attacker reads/writes host files, enumerates processes, or installs persistence.
 
@@ -38,7 +38,7 @@ In MCP environments, compromised or malicious tools/servers that orchestrate con
   "runtime": "runc",
   "action": "exec",
   "args": [
-    "--workdir", "../../..",
+    "--cwd", "../../..",
     "--", "sh", "-c", "id; cat /etc/hostname"
   ],
   "note": "Illustrative only; actual exploitation depends on runtime/version"
