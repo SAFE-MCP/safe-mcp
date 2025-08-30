@@ -119,6 +119,25 @@ POSITIVE_EVENTS: List[Dict[str, Any]] = [
             }
         }
     },
+
+    # D) Surface and use by same user but different sessions (should alert)
+    {
+        "timestamp": "2025-08-30T12:30:00Z",
+        "event_type": "tool_output",
+        "tool_name": "debug_dumper",
+        "session_id": "S9",
+        "user": "ai_assistant",
+        "output": "Authorization: Bearer eyJ.more.token"
+    },
+    {
+        "timestamp": "2025-08-30T12:32:00Z",
+        "event_type": "tool_invocation",
+        "tool_name": "data_exporter",
+        "session_id": "S9b",
+        "user": "ai_assistant",
+        "action": "export_dataset",
+        "result": "success"
+    },
 ]
 
 NEGATIVE_EVENTS: List[Dict[str, Any]] = [
@@ -313,9 +332,10 @@ def correlate_surface_to_use(events: List[Dict[str, Any]]) -> List[Tuple[Dict[st
             u_time = ts(u["timestamp"])
             if not (s_time <= u_time <= s_time + FIVE_MIN):
                 continue
-            if sid and u.get("session_id") == sid:
-                pairs.append((s, u))
-            elif not sid and user and u.get("user") == user:
+            # Correlate by session_id OR by user (fallback), regardless of whether a session_id exists
+            same_session = (sid is not None and u.get("session_id") == sid)
+            same_user = (user is not None and u.get("user") == user)
+            if same_session or same_user:
                 pairs.append((s, u))
     return pairs
 
@@ -343,7 +363,7 @@ def test_positive_sequences() -> bool:
     by_path = {"surface->use": 0, "token-exchange": 0}
     for a in alerts:
         by_path[a["path"]] = by_path.get(a["path"], 0) + 1
-    return by_path.get("surface->use", 0) == 2 and by_path.get("token-exchange", 0) == 1
+    return by_path.get("surface->use", 0) == 3 and by_path.get("token-exchange", 0) == 1
 
 def test_negative_sequences() -> bool:
     alerts = detect_alerts(NEGATIVE_EVENTS)
