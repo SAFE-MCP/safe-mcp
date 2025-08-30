@@ -45,13 +45,16 @@ detection:
       # JWT-ish (very simplified)
       - "*eyJ*.*.*"
       # Common API key/token prefixes
-      - "*AKIA*[A-Z0-9]*"        # AWS Access Key ID (simplified)
       - "*ghp_*"                 # GitHub PAT
       - "*xoxb-*"
       - "*xoxp-*"
       - "*xoxa-*"
       - "*ya29.*"                # Google short-lived access token
       - "*eyJraWQi*eyJhbGci*"    # JWS header+payload hint
+  selection_token_surface_patterns_re:
+    output|re:
+      # AWS Access Key ID: AKIA followed by 16 uppercase alnum
+      - "AKIA[0-9A-Z]{16}"
   selection_sensitive_files:
     # If tokens are read from files
     path:
@@ -99,6 +102,10 @@ detection:
   selection_sequence_marker_use:
     event_type: "tool_invocation"
     result: "success"
+  selection_has_session:
+    session_id: "*"
+  selection_has_user:
+    user: "*"
   filter_benign_tools:
     tool_name:
       - unit_test_runner
@@ -113,16 +120,34 @@ detection:
     (
       selection_sequence_marker_surface
       and selection_token_surface_tools
-      and (selection_token_surface_outputs or selection_token_surface_patterns or selection_sensitive_files)
+      and (selection_token_surface_outputs or selection_token_surface_patterns or selection_token_surface_patterns_re or selection_sensitive_files)
       and not filter_benign_tools
       and not filter_mock_tokens
+      and selection_has_session
     )
     followed_by
     (
       selection_sequence_marker_use
       and selection_privileged_tools
       and selection_privileged_actions
-    ) within 5m
+      and selection_has_session
+    ) within 5m by session_id
+    or
+    (
+      selection_sequence_marker_surface
+      and selection_token_surface_tools
+      and (selection_token_surface_outputs or selection_token_surface_patterns or selection_token_surface_patterns_re or selection_sensitive_files)
+      and not filter_benign_tools
+      and not filter_mock_tokens
+      and selection_has_user
+    )
+    followed_by
+    (
+      selection_sequence_marker_use
+      and selection_privileged_tools
+      and selection_privileged_actions
+      and selection_has_user
+    ) within 5m by user
     or
     (
       selection_sequence_marker_use

@@ -103,3 +103,8 @@ falsepositives:
   - Test data containing mock tokens
   - Masked tokens that match patterns but are unusable
 level: high
+```
+
+## Testing
+- Install dev deps: `pip install -r requirements-dev.txt`
+- Run: `python techniques/SAFE-T1304/test_detection_rule.py`
