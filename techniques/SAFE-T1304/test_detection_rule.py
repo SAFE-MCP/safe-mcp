@@ -10,6 +10,7 @@ This validates the Sigma-like rule semantics for:
 It also checks rule structure and required tags.
 """
 
+import os
 import yaml
 import re
 from datetime import datetime, timedelta
@@ -213,8 +214,11 @@ NEGATIVE_EVENTS: List[Dict[str, Any]] = [
 # Rule loading & structure checks
 # ----------------------------
 
-def load_rule(path: str = "detection-rule.yml") -> Dict[str, Any]:
+def load_rule(path: str | None = None) -> Dict[str, Any]:
     try:
+        if path is None:
+            base_dir = os.path.dirname(__file__)
+            path = os.path.join(base_dir, "detection-rule.yml")
         with open(path, "r") as f:
             return yaml.safe_load(f)
     except FileNotFoundError:
