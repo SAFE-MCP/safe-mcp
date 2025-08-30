@@ -1,0 +1,50 @@
+title: MCP Sandbox Escape via Server Exec Detection
+id: 5d559ca7-d75c-4cd0-b0d7-9d2222b62dd3
+status: experimental
+description: Detects potential container sandbox escapes via server exec vulnerabilities (e.g., CVE-2024-21626) by monitoring "runc exec" invocations with path-traversal working directories.
+author: Shekhar Chaudhary
+date: 2025-08-16
+modified: 2025-08-16
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1303
+  - https://nvd.nist.gov/vuln/detail/CVE-2024-21626
+  - https://securitywiz.example/leaky-vessels
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection_runtime_process:
+    Image|contains:
+      - 'runc'
+    CommandLine|contains:
+      - 'runc exec'
+  selection_workdir_escape:
+    CommandLine|contains:
+      - '../'
+      - '..\\'
+      - '/../../'
+  condition: selection_runtime_process and selection_workdir_escape
+falsepositives:
+  - Legitimate use of relative directories within container boundaries
+  - Developer testing scenarios that intentionally use path traversal in safe environments
+level: high
+tags:
+  - attack.privilege_escalation
+  - attack.t1611
+  - safe.t1303
+  - cve.2024.21626
+fields:
+  - Image
+  - CommandLine
+  - CurrentDirectory
+  - ProcessId
+notes: |
+  This rule monitors `runc exec` commands that include path‑traversal sequences such as
+  `../` or `..\\`.  It aims to detect attempts to escape a container sandbox by
+  manipulating the working directory, based on CVE‑2024‑21626 and related research.
+  False positives may occur when developers legitimately use relative paths inside
+  containers or during testing.  Attackers may obfuscate traversal using encoding
+  or alternate container runtimes; therefore, organisations should supplement
+  this rule with behavioural monitoring and anomaly detection.
+  - ParentImage
+  - ParentCommandLine
