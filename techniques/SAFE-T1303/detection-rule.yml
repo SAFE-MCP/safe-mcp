@@ -20,8 +20,9 @@ detection:
       - ' exec'
   selection_workdir_traversal_flag:
     # Focus on the working directory flag only to reduce noise
+    # Handle both space-separated and equals-assignment forms
     CommandLine|re:
-      - '(^|\s)(--workdir|-w)\s+["\'']?\.\.([/\\])'
+      - '(^|\s)(?:--workdir(?:=|\s+)|-w\s+)["\']?\.\.(?:[/\\])'
   condition: selection_runtime_process and selection_workdir_traversal_flag
 falsepositives:
   - Legitimate use of relative directories within container boundaries
