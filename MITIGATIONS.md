@@ -17,6 +17,7 @@ SAFE-MCP mitigations are security controls designed to protect Model Context Pro
 - **Preventive Control**: Controls that prevent attacks before they occur
 - **Architectural Control**: System design patterns for security
 
+
 ### Effectiveness Ratings
 
 - **High**: Highly effective control, prevents 80%+ of targeted attacks
@@ -56,13 +57,15 @@ SAFE-MCP mitigations are security controls designed to protect Model Context Pro
 | [SAFE-M-26](mitigations/SAFE-M-26/README.md) | Data Provenance Tracking | Data Security | High |
 | [SAFE-M-27](mitigations/SAFE-M-27/README.md) | Social Engineering Awareness Training | Human Factors | Medium |
 | [SAFE-M-28](mitigations/SAFE-M-28/README.md) | Pre-Authentication Tool Concealment | Preventive Control | High |
+| [SAFE-M-29](mitigations/SAFE-M-29/README.md) | AI Code Validation | Input Validation | High |
+| [SAFE-M-30](mitigations/SAFE-M-30/README.md) | AI Code User Confirmation | Preventive Control | High |
 
 ## Summary Statistics
 
-- **Total Mitigations**: 28
-- **High Effectiveness**: 14 (50%)
-- **Medium-High Effectiveness**: 7 (25%)
-- **Medium Effectiveness**: 7 (25%)
+- **Total Mitigations**: 30
+- **High Effectiveness**: 16 (53%)
+- **Medium-High Effectiveness**: 7 (23%)
+- **Medium Effectiveness**: 7 (23%)
 - **Low Effectiveness**: 0 (0%)
 
 ## Category Distribution
@@ -70,8 +73,8 @@ SAFE-MCP mitigations are security controls designed to protect Model Context Pro
 | Category | Number of Mitigations |
 |----------|---------------------|
 | Detective Control | 6 |
-| Preventive Control | 6 |
-| Input Validation | 4 |
+| Preventive Control | 7 |
+| Input Validation | 5 |
 | Architectural Defense | 2 |
 | UI Security | 2 |
 | Cryptographic Control | 1 |
@@ -82,6 +85,7 @@ SAFE-MCP mitigations are security controls designed to protect Model Context Pro
 | Risk Management | 1 |
 | Data Security | 1 |
 | Human Factors | 1 |
+
 
 
 ## Implementation Guidance
