@@ -125,7 +125,8 @@ detection:
     ) within 5m
     or
     (
-      selection_privileged_tools
+      selection_sequence_marker_use
+      and selection_privileged_tools
       and selection_token_exchange
       and selection_privileged_actions
     )
