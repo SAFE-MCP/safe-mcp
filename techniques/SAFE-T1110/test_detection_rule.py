@@ -15,10 +15,16 @@ class SAFET1110DetectionTest(unittest.TestCase):
     
     def setUp(self):
         """Load test logs for validation"""
+        import os
+        # Get the directory where this script is located
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        test_logs_path = os.path.join(script_dir, 'test-logs.json')
+        
         try:
-            with open('test-logs.json', 'r') as f:
+            with open(test_logs_path, 'r') as f:
                 self.test_logs = json.load(f)
         except FileNotFoundError:
+            print(f"Warning: test-logs.json not found at {test_logs_path}")
             self.test_logs = []
     
     def test_multimodal_content_detection(self):
@@ -202,4 +208,6 @@ def run_detection_tests():
     return result.wasSuccessful()
 
 if __name__ == "__main__":
-    run_detection_tests()
+    import sys
+    success = run_detection_tests()
+    sys.exit(0 if success else 1)
