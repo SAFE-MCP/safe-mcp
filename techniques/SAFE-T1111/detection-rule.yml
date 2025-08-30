@@ -9,10 +9,6 @@ references:
   - https://snyk.io/blog/weaponizing-ai-coding-agents-for-malware-in-the-nx-malicious-package/
 logsource:
   category: process_creation
-  product: 
-    - linux
-    - macos
-    - windows
 detection:
   # AI CLI tools executed with dangerous permission-bypassing flags
   selection_dangerous_ai_flags:
@@ -91,33 +87,12 @@ detection:
       - 'node.exe'
       - 'npm.exe'
   
-  # Malicious file creation in tmp
-  selection_tmp_artifacts:
-    TargetFilename|contains:
-      - '/tmp/inventory.txt'
-      - '/tmp/inventory.txt.bak'
-      - '\temp\inventory.txt'
-      - '\tmp\inventory.txt'
-  
-  # Shell modification for persistence/disruption  
-  selection_shell_modification:
-    TargetFilename|endswith:
-      - '/.bashrc'
-      - '/.zshrc'
-      - '/.profile'
-      - '/.bash_profile'
-    ProcessCommandLine|contains:
-      - 'sudo shutdown'
-      - 'shutdown -h'
-      - 'halt'
-      - 'poweroff'
+  # (file artifact detections moved to a dedicated file_event rule)
   
   condition: 
     selection_dangerous_ai_flags or 
     (selection_install_context and (selection_recon_prompts or selection_credential_access)) or
-    selection_github_token or
-    selection_tmp_artifacts or
-    selection_shell_modification
+    selection_github_token
 
 falsepositives:
   - Legitimate AI tool usage with user interaction

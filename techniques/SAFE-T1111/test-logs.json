@@ -301,7 +301,7 @@
         "technique_name": "AI Agent CLI Weaponization",
         "test_framework": "sigma_rules",
         "total_test_cases": 15,
-        "positive_cases": 9,
+        "positive_cases": 10,
         "negative_cases": 5,
         "pattern_cases": 1
     }
