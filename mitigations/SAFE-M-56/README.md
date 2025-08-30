@@ -36,34 +36,13 @@ All privilege boundary decisions, privilege escalations, and boundary violations
 Privilege boundaries must be enforced at runtime during tool execution, not just at configuration time. This ensures that privilege controls remain effective even as tool execution contexts change and real-time revocations can be made in emergencies.
 
 ### Privilege Level Hierarchy
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    SYSTEM ADMIN (Level 5)                   │
-│  - Full system access                                      │
-│  - User management                                         │
-│  - Security configuration                                  │
-├─────────────────────────────────────────────────────────────┤
-│                  ADMINISTRATIVE (Level 4)                   │
-│  - Service management                                      │
-│  - Configuration changes                                   │
-│  - Log access                                              │
-├─────────────────────────────────────────────────────────────┤
-│                    OPERATIONAL (Level 3)                    │
-│  - Data processing                                         │
-│  - Business logic execution                                │
-│  - Limited system access                                   │
-├─────────────────────────────────────────────────────────────┤
-│                      USER (Level 2)                         │
-│  - Data access                                             │
-│  - Basic operations                                        │
-│  - No system modifications                                 │
-├─────────────────────────────────────────────────────────────┤
-│                     READ-ONLY (Level 1)                     │
-│  - Data retrieval only                                     │
-│  - No modifications                                        │
-│  - No system access                                        │
-└─────────────────────────────────────────────────────────────┘
-```
+| **Role**                     | **Level** | **Permissions**                                                                 |
+|-----------------------------|-----------|---------------------------------------------------------------------------------|
+| **SYSTEM ADMIN**            | **5**     | • Full system access <br> • User management <br> • Security configuration        |
+| **ADMINISTRATIVE**          | **4**     | • Service management <br> • Configuration changes <br> • Log access              |
+| **OPERATIONAL**             | **3**     | • Data processing <br> • Business logic execution <br> • Limited system access   |
+| **USER**                    | **2**     | • Data access <br> • Basic operations <br> • No system modifications            |
+| **READ-ONLY**               | **1**     | • Data retrieval only <br> • No modifications <br> • No system access           |
 
 ### Architecture Components
 
@@ -260,7 +239,7 @@ privilege_boundaries:
         - incident_declared: true
         - approval: "incident_commander"
         - time_limit: "4_hours"
-                 - logging: "enhanced"
+        - logging: "enhanced"
 ```
 
 ## Deployment Considerations
