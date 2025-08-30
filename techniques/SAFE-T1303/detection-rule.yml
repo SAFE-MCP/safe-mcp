@@ -17,13 +17,12 @@ detection:
     Image|contains:
       - 'runc'
     CommandLine|contains:
-      - 'runc exec'
-  selection_workdir_escape:
-    CommandLine|contains:
-      - '../'
-      - '..\\'
-      - '/../../'
-  condition: selection_runtime_process and selection_workdir_escape
+      - ' exec'
+  selection_workdir_traversal_flag:
+    # Focus on the working directory flag only to reduce noise
+    CommandLine|re:
+      - '(^|\s)(--workdir|-w)\s+["\'']?\.\.([/\\])'
+  condition: selection_runtime_process and selection_workdir_traversal_flag
 falsepositives:
   - Legitimate use of relative directories within container boundaries
   - Developer testing scenarios that intentionally use path traversal in safe environments
