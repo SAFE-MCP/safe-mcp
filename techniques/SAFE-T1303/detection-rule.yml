@@ -18,12 +18,12 @@ detection:
       - 'runc'
     CommandLine|contains:
       - ' exec'
-  selection_workdir_traversal_flag:
-    # Focus on the working directory flag only to reduce noise
-    # Handle both space-separated and equals-assignment forms
+  selection_cwd_traversal_flag:
+    # Focus on runc's actual working directory flag (--cwd) to reduce noise
+    # Handle both space-separated and equals-assignment forms and optional quotes
     CommandLine|re:
-      - '(^|\s)(?:--workdir(?:=|\s+)|-w\s+)["\']?\.\.(?:[/\\])'
-  condition: selection_runtime_process and selection_workdir_traversal_flag
+      - '(^|\s)--cwd(?:=|\s+)["\']?\.\.(?:[/\\])'
+  condition: selection_runtime_process and selection_cwd_traversal_flag
 falsepositives:
   - Legitimate use of relative directories within container boundaries
   - Developer testing scenarios that intentionally use path traversal in safe environments
