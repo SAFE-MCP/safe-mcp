@@ -8,7 +8,7 @@ modified: 2025-08-16
 references:
   - https://github.com/safe-mcp/techniques/SAFE-T1303
   - https://nvd.nist.gov/vuln/detail/CVE-2024-21626
-  - https://securitywiz.example/leaky-vessels
+  - https://www.wiz.io/blog/leaky-vessels-container-escape-vulnerabilities
 logsource:
   category: process_creation
   product: linux
@@ -38,6 +38,8 @@ fields:
   - CommandLine
   - CurrentDirectory
   - ProcessId
+  - ParentImage
+  - ParentCommandLine
 notes: |
   This rule monitors `runc exec` commands that include path‑traversal sequences such as
   `../` or `..\\`.  It aims to detect attempts to escape a container sandbox by
@@ -46,5 +48,3 @@ notes: |
   containers or during testing.  Attackers may obfuscate traversal using encoding
   or alternate container runtimes; therefore, organisations should supplement
   this rule with behavioural monitoring and anomaly detection.
-  - ParentImage
-  - ParentCommandLine
