@@ -46,23 +46,73 @@ Privilege boundaries must be enforced at runtime during tool execution, not just
 
 ### Architecture Components
 
-The privilege boundary system consists of several key architectural components:
+## Configuration Control Plane (Version-Controlled, Auditable)
+Defines and distributes signed policies for privilege levels, tool assignments, and escalation rules.
 
-#### Privilege Level Hierarchy
-The system implements a 5-tier privilege hierarchy from read-only (Level 1) to system administrator (Level 5), with each level having defined capabilities and restrictions.
+    +----------------------+      +----------------------+      +----------------------------+
+    | Privilege Levels     |      | Tool Privilege       |      | Escalation Rules           |
+    | (YAML definitions)   | ---> | Assignments (YAML)   | ---> | Approvals, conditions,     |
+    | L1..L5 + capabilities|      | tool -> level, caps  |      | time limits, logging       |
+    +----------------------+      +----------------------+      +----------------------------+
+                \                     |                     /
+                 \                    |                    /
+                  \                   v                   /
+                   +--------------------------------------+
+                   | Policy Build & Distribution Pipeline |
+                   | - schema checks                      |
+                   | - signatures & versioning            |
+                   +--------------------------------------+
 
-#### Privilege Boundary Chokepoint
-A data plane that enforces access control policies at runtime (e.g. validates all tool interactions and enforces capabilities)
+Outputs signed/validated policies → distributed to MCP client.
 
-#### Configuration Control Plane
-A control plane for configuring privilege definitions, tool assignments, and access control policies that can be version-controlled and audited.
+---
 
-#### Implementation Requirements
-The system requires three core implementation components:
+## Data Plane (Runtime Enforcement)
 
-1. **Privilege Level Definition**: YAML-based configuration defining each privilege level with capabilities and restrictions
-2. **Tool Privilege Assignment**: Configuration mapping tools to privilege levels with specific capabilities and resource access
-3. **Privilege Boundary Enforcement**: Runtime enforcement logic implemented in the MCP client
+### MCP Client
+Executes tools while embedding **Privilege Boundary Enforcement**.
+
+    +---------------------------------------+
+    | MCP CLIENT                            |
+    |                                       |
+    |  +---------------------------------+  |
+    |  | Privilege Boundary Chokepoint   |<-----------------+
+    |  |  - deny-by-default              |  |               |
+    |  |  - tool-to-tool allowlist       |  |               | Immutable logs, metrics, alerts
+    |  |  - resource access validation   |  |               |
+    |  +---------------------------------+  |               |
+    |                                       |          +---------------------------+
+    |                                       |          | Monitoring & Audit System |
+    |                                       |          |  - boundary violations    |
+    |                                       |          |  - escalation attempts    |
+    |                                       |          |  - blocked interactions   |
+    |                                       |          +---------------------------+
+    +---------------------------------------+
+                    |
+                    | authorized requests only
+                    v
+                          (tool execution at different privilege levels)
+    +-------------------+   +-------------------+   +-------------------+   +--------------------+
+    | TOOLS: Level 1    |   | TOOLS: Level 2    |   | TOOLS: Level 3    |   | TOOLS: Level 4/5   |
+    | READ-ONLY         |   | USER              |   | OPERATIONAL       |   | ADMIN / SYS ADMIN  |
+    +-------------------+   +-------------------+   +-------------------+   +--------------------+
+             |                    |                     |                        |
+             |                    |                     |                        |
+             v                    v                     v                        v
+    +-------------------+   +--------------------+   +--------------------+   +---------------------+
+    | Resource: public  |   | Resource: user     |   | Resource: processed|   | Resource: user_db   |
+    | data / logs       |   | data (PII)         |   | data / storage     |   | (create/update/del) |
+    +-------------------+   +--------------------+   +--------------------+   +---------------------+
+                                        (Protected resources)
+
+**NOTE:** All resource access paths are mediated by the **Privilege Boundary Chokepoint**.
+
+### LEGEND
+- **Control Plane**: defines & distributes signed policy (levels, assignments, escalation rules).
+- **Data Plane**: MCP Client executes tools; the Privilege Boundary Chokepoint enforces:
+    * deny-by-default, explicit allowlists, capability checks, resource operation checks
+    * tool→tool interaction rules and escalation gating
+- **Monitoring/Audit**: receives immutable logs/metrics; drives alerts & investigations.
 
 ### Prerequisites
 
