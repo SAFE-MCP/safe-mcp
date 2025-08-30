@@ -1,0 +1,155 @@
+title: SAFE-T1304 Credential Relay Chain (Token Surfaced → Privileged Use)
+id: safe-t1304-credential-relay
+status: experimental
+description: Detects token/credential strings surfaced in one MCP tool and subsequently used to perform privileged actions in another tool within a short window.
+author: SAFE-MCP Team
+date: 2025-08-30
+tags:
+  - attack.privilege_escalation
+  - safe-mcp
+  - safe-t1304
+  - credential-reuse
+  - oauth-token-exchange
+  - cross-tool-abuse
+references:
+  - https://www.rfc-editor.org/rfc/rfc8693            # OAuth 2.0 Token Exchange
+  - https://www.rfc-editor.org/rfc/rfc8252            # OAuth for Browser-Based Apps
+  - https://datatracker.ietf.org/doc/draft-ietf-oauth-dpop/  # DPoP
+logsource:
+  category: mcp_tool_pipeline
+  product: mcp
+  service: tool_execution
+# Note: Some SIEMs require correlation modules for "followed_by".
+# If unsupported, deploy as two rules (surface + privileged use) and correlate in the backend.
+detection:
+  selection_token_surface_tools:
+    tool_name:
+      - log_reader
+      - file_reader
+      - debug_dumper
+      - http_client
+      - browser
+      - code_search
+      - notes_reader
+      - clipboard_reader
+  selection_token_surface_outputs:
+    output|contains:
+      - "access_token"
+      - "refresh_token"
+      - "Authorization:"
+      - "Set-Cookie"
+      - "subject_token"
+      - "id_token"
+  selection_token_surface_patterns:
+    output:
+      # JWT-ish (very simplified)
+      - "*eyJ*.*.*"
+      # Common API key/token prefixes
+      - "*AKIA*[A-Z0-9]*"        # AWS Access Key ID (simplified)
+      - "*ghp_*"                 # GitHub PAT
+      - "*xoxb-*"
+      - "*xoxp-*"
+      - "*xoxa-*"
+      - "*ya29.*"                # Google short-lived access token
+      - "*eyJraWQi*eyJhbGci*"    # JWS header+payload hint
+  selection_sensitive_files:
+    # If tokens are read from files
+    path:
+      - "*/.env*"
+      - "*/.aws/credentials*"
+      - "*/config*.json*"
+      - "*/secrets*.y*ml*"
+      - "*/.npmrc*"
+      - "*/.pypirc*"
+      - "*/.docker/config.json*"
+  selection_privileged_tools:
+    tool_name:
+      - cloud_admin
+      - config_admin
+      - data_exporter
+      - iam_admin
+      - payments_admin
+      - gh_admin
+      - k8s_admin
+      - vault_admin
+  selection_privileged_actions:
+    action:
+      - "assume_role"
+      - "create_*"
+      - "delete_*"
+      - "rotate_*"
+      - "update_policy"
+      - "grant_*"
+      - "export_*"
+      - "transfer_*"
+      - "add_deploy_key"
+      - "mint_token"
+  selection_token_exchange:
+    # Signals an OAuth 2.0 Token Exchange or scope/audience reshaping
+    request.params.grant_type:
+      - "urn:ietf:params:oauth:grant-type:token-exchange"
+    request.params.subject_token: "*"
+  selection_bearing_without_pop:
+    # Indicators that PoP/MTLS was not used or failed before success
+    auth.mechanism:
+      - "bearer"
+    pop.enforced: false
+  selection_sequence_marker_surface:
+    event_type: "tool_output"
+  selection_sequence_marker_use:
+    event_type: "tool_invocation"
+    result: "success"
+  filter_benign_tools:
+    tool_name:
+      - unit_test_runner
+      - docs_builder
+      - linter
+  filter_mock_tokens:
+    output|contains:
+      - "TEST_TOKEN"
+      - "FAKE_TOKEN"
+      - "DUMMY"
+  condition: >
+    (
+      selection_sequence_marker_surface
+      and selection_token_surface_tools
+      and (selection_token_surface_outputs or selection_token_surface_patterns or selection_sensitive_files)
+      and not filter_benign_tools
+      and not filter_mock_tokens
+    )
+    followed_by
+    (
+      selection_sequence_marker_use
+      and selection_privileged_tools
+      and selection_privileged_actions
+    ) within 5m
+    or
+    (
+      selection_privileged_tools
+      and selection_token_exchange
+      and selection_privileged_actions
+    )
+falsepositives:
+  - Redacted or dummy tokens in test logs
+  - Security drills or tabletop exercises producing synthetic secrets
+  - Migration/backup jobs that legitimately move short-lived tokens between components under strong guardrails
+level: high
+fields:
+  - timestamp
+  - event_id
+  - session_id
+  - tool_name
+  - event_type
+  - action
+  - path
+  - result
+  - output
+  - request.params.grant_type
+  - request.params.subject_token
+  - auth.mechanism
+  - pop.enforced
+  - client.ip
+  - client.user_agent
+  - token.aud
+  - token.iss
+  - token.client_id

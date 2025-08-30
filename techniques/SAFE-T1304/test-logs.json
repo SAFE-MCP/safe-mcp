@@ -1,0 +1,228 @@
+{
+    "positive_test_cases": [
+      {
+        "timestamp": "2025-08-30T10:00:00Z",
+        "event_type": "tool_output",
+        "tool_name": "log_reader",
+        "user": "ai_assistant",
+        "output": "Found access_token=ya29.A0ARfoobar and some logs...",
+        "result": "success",
+        "description": "Token surfaced in logs (Google-style access token)"
+      },
+      {
+        "timestamp": "2025-08-30T10:02:00Z",
+        "event_type": "tool_invocation",
+        "tool_name": "cloud_admin",
+        "user": "ai_assistant",
+        "action": "create_user",
+        "result": "success",
+        "description": "Privileged action using relayed token (surface→use chain)"
+      },
+      {
+        "timestamp": "2025-08-30T11:00:00Z",
+        "event_type": "tool_output",
+        "tool_name": "file_reader",
+        "user": "ai_assistant",
+        "output": "JWT: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.xx.yy",
+        "result": "success",
+        "description": "JWT token surfaced from file read"
+      },
+      {
+        "timestamp": "2025-08-30T11:04:00Z",
+        "event_type": "tool_invocation",
+        "tool_name": "gh_admin",
+        "user": "ai_assistant",
+        "action": "add_deploy_key",
+        "result": "success",
+        "description": "Privileged GitHub action using relayed token"
+      },
+      {
+        "timestamp": "2025-08-30T12:00:00Z",
+        "event_type": "tool_invocation",
+        "tool_name": "cloud_admin",
+        "user": "ai_assistant",
+        "action": "update_policy",
+        "result": "success",
+        "request": {
+          "params": {
+            "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
+            "subject_token": "eyJ.some.subject.token"
+          }
+        },
+        "description": "Token exchange path: privileged action with exchanged token"
+      },
+      {
+        "timestamp": "2025-08-30T12:05:00Z",
+        "event_type": "tool_output",
+        "tool_name": "debug_dumper",
+        "user": "ai_assistant",
+        "output": "Set-Cookie: sessionid=abc123; Authorization: Bearer eyJhbGci...",
+        "result": "success",
+        "description": "Cookie and bearer token surfaced via debug tool"
+      },
+      {
+        "timestamp": "2025-08-30T12:07:00Z",
+        "event_type": "tool_invocation",
+        "tool_name": "payments_admin",
+        "user": "ai_assistant",
+        "action": "transfer_funds",
+        "result": "success",
+        "description": "Privileged payments action with relayed bearer token"
+      },
+      {
+        "timestamp": "2025-08-30T13:00:00Z",
+        "event_type": "tool_output",
+        "tool_name": "clipboard_reader",
+        "user": "ai_assistant",
+        "output": "ghp_abcd1234efgh5678ijklmnopqrstuvwx", 
+        "result": "success",
+        "description": "GitHub PAT surfaced from clipboard"
+      },
+      {
+        "timestamp": "2025-08-30T13:03:00Z",
+        "event_type": "tool_invocation",
+        "tool_name": "gh_admin",
+        "user": "ai_assistant",
+        "action": "mint_token",
+        "result": "success",
+        "description": "Privileged GitHub action with relayed PAT"
+      },
+      {
+        "timestamp": "2025-08-30T14:00:00Z",
+        "event_type": "tool_invocation",
+        "tool_name": "vault_admin",
+        "user": "ai_assistant",
+        "action": "rotate_keys",
+        "result": "success",
+        "request": {
+          "params": {
+            "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
+            "subject_token": "AKIAIOSFODNN7EXAMPLE"
+          }
+        },
+        "description": "AWS-style key reused via token exchange for vault operations"
+      }
+    ],
+    "negative_test_cases": [
+      {
+        "timestamp": "2025-08-30T15:00:00Z",
+        "event_type": "tool_output",
+        "tool_name": "log_reader",
+        "user": "ai_assistant",
+        "output": "This is a TEST_TOKEN for unit testing",
+        "result": "success",
+        "description": "Mock token surfaced (filtered by rule)"
+      },
+      {
+        "timestamp": "2025-08-30T15:03:00Z",
+        "event_type": "tool_invocation",
+        "tool_name": "cloud_admin",
+        "user": "ai_assistant",
+        "action": "create_user",
+        "result": "success",
+        "description": "Privileged action but based on mock token (no alert)"
+      },
+      {
+        "timestamp": "2025-08-30T16:00:00Z",
+        "event_type": "tool_output",
+        "tool_name": "unit_test_runner",
+        "user": "ai_assistant",
+        "output": "access_token=ya29.TESTONLY",
+        "result": "success",
+        "description": "Token surfaced from benign tool (filtered)"
+      },
+      {
+        "timestamp": "2025-08-30T16:05:00Z",
+        "event_type": "tool_invocation",
+        "tool_name": "cloud_admin",
+        "user": "ai_assistant",
+        "action": "create_user",
+        "result": "success",
+        "description": "Privileged action but preceded by benign surface (no alert)"
+      },
+      {
+        "timestamp": "2025-08-30T17:00:00Z",
+        "event_type": "tool_output",
+        "tool_name": "file_reader",
+        "user": "ai_assistant",
+        "output": "Authorization: Bearer eyJ.token",
+        "result": "success",
+        "description": "Token surfaced but used after 10 minutes (outside window)"
+      },
+      {
+        "timestamp": "2025-08-30T17:11:00Z",
+        "event_type": "tool_invocation",
+        "tool_name": "cloud_admin",
+        "user": "ai_assistant",
+        "action": "create_user",
+        "result": "success",
+        "description": "Privileged action too late (no correlation)"
+      },
+      {
+        "timestamp": "2025-08-30T18:00:00Z",
+        "event_type": "tool_invocation",
+        "tool_name": "vault_admin",
+        "user": "ai_assistant",
+        "action": "rotate_keys",
+        "result": "success",
+        "description": "Privileged action without token surface or exchange"
+      },
+      {
+        "timestamp": "2025-08-30T18:30:00Z",
+        "event_type": "tool_output",
+        "tool_name": "notes_reader",
+        "user": "ai_assistant",
+        "output": "Random note data without tokens",
+        "result": "success",
+        "description": "Non-credential output from notes tool"
+      },
+      {
+        "timestamp": "2025-08-30T19:00:00Z",
+        "event_type": "tool_invocation",
+        "tool_name": "gh_admin",
+        "user": "ai_assistant",
+        "action": "open_repo",
+        "result": "success",
+        "description": "Non-privileged GitHub action (open repo)"
+      },
+      {
+        "timestamp": "2025-08-30T19:30:00Z",
+        "event_type": "tool_output",
+        "tool_name": "debug_dumper",
+        "user": "ai_assistant",
+        "output": "Environment variables: DEBUG=True, VERSION=1.2.3",
+        "result": "success",
+        "description": "Debug output with no sensitive token data"
+      }
+    ],
+    "metadata": {
+      "technique_id": "SAFE-T1304",
+      "technique_name": "Credential Relay Chain",
+      "created_date": "2025-08-30",
+      "description": "Test logs for credential relay chain detection across MCP tools",
+      "total_positive_cases": 10,
+      "total_negative_cases": 10,
+      "credential_patterns_tested": [
+        "Bearer tokens",
+        "JWT tokens",
+        "GitHub PAT",
+        "Google access token",
+        "AWS key ID",
+        "Cookie-based auth",
+        "Token exchange flow"
+      ],
+      "file_tools_tested": [
+        "log_reader",
+        "file_reader",
+        "debug_dumper",
+        "clipboard_reader"
+      ],
+      "privileged_tools_tested": [
+        "cloud_admin",
+        "gh_admin",
+        "payments_admin",
+        "vault_admin"
+      ]
+    }
+  }
+  
