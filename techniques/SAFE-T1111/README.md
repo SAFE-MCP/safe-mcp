@@ -8,35 +8,37 @@
 **Last Updated**: 2025-08-27
 
 ## Description
-AI Agent CLI Weaponization is an advanced execution technique where adversaries exploit local AI coding assistants and command-line interface (CLI) tools to perform automated reconnaissance, data collection, and exfiltration. This technique represents a significant evolution in supply chain attacks, turning helpful AI development tools into malicious autonomous agents through crafted prompts and dangerous flag combinations.
+AI Agent CLI Weaponization is an advanced execution technique where adversaries programmatically abuse locally-installed AI coding assistants and command-line interface (CLI) tools to perform automated reconnaissance, data collection, and exfiltration. This technique emerged from supply chain attacks where compromised packages contain malicious scripts that automatically weaponize AI development tools without user interaction, bypassing their safety controls through dangerous flag combinations.
 
-The technique leverages the trust users place in AI coding assistants by executing them with bypassed safety guardrails (using flags like `--dangerously-skip-permissions`, `--yolo`, `--trust-all-tools`) and providing carefully crafted prompts designed to inventory sensitive files and exfiltrate data. This attack exploits the fundamental design of AI coding assistants that are built to be helpful and execute file operations, turning their capabilities against the user's security posture.
+The technique operates by exploiting the presence of AI coding assistants on developer machines, invoking them programmatically with security-bypassing flags (like `--dangerously-skip-permissions`, `--yolo`, `--trust-all-tools`) during package installation or other automated processes. The malicious code provides carefully crafted prompts that instruct AI agents to inventory sensitive files and assist in data exfiltration. This attack vector is particularly insidious because it occurs automatically through trusted package installation workflows, requiring no user interaction or social engineering, and transforms legitimate development tools into reconnaissance and exfiltration agents.
 
 ## Attack Vectors
-- **Primary Vector**: Malicious package postinstall scripts that invoke AI CLI tools with dangerous flags
+- **Primary Vector**: Supply chain compromise via malicious package postinstall scripts that programmatically invoke AI CLI tools
 - **Secondary Vectors**: 
-  - Social engineering to convince users to run AI tools with bypassed safety flags
-  - Compromised development environment configurations that auto-invoke AI tools
-  - Supply chain compromise of AI CLI tool distributions
-  - Malicious IDE extensions or plugins that invoke AI tools programmatically
+  - Vulnerable GitHub Actions workflows enabling package takeover (as seen in Nx incident)
+  - Malicious IDE extensions that auto-install compromised packages
   - Compromised CI/CD pipelines that execute AI tools during build processes
+  - Social engineering to install malicious packages containing AI weaponization code
+  - Typosquatting attacks on popular packages to deliver AI weaponization payloads
 
 ## Technical Details
 
 ### Prerequisites
 - Local installation of AI coding assistant CLI tools (Claude Code, Gemini CLI, Amazon Q, etc.)
-- Ability to execute system commands (typically through malicious package install scripts)
-- File system access permissions for the AI tools
+- Package installation process that executes postinstall scripts automatically
+- Standard user permissions (no elevated privileges required)
 - Network connectivity for data exfiltration
 
 ### Attack Flow
-1. **Tool Discovery**: Attacker code enumerates available AI CLI tools on the target system
-2. **Guardrail Bypass**: AI tools are invoked with dangerous flags that bypass safety mechanisms
-3. **Reconnaissance Prompt**: Carefully crafted prompts instruct AI agents to inventory sensitive files
-4. **Data Collection**: AI agents recursively scan filesystem for target file types and paths
-5. **Inventory Creation**: Results are written to temporary files (e.g., `/tmp/inventory.txt`)
-6. **Exfiltration**: Sensitive data is collected and transmitted to attacker-controlled infrastructure
-7. **Persistence/Disruption**: Optional destructive elements (e.g., shell modification for system shutdown)
+1. **Package Compromise**: Attackers publish malicious package versions to npm registry
+2. **Automatic Execution**: Postinstall script runs automatically during `npm install`
+3. **Tool Discovery**: Malicious script checks for installed AI CLI tools using `which` command
+4. **Guardrail Bypass**: AI tools are invoked programmatically with dangerous flags
+5. **Reconnaissance Prompt**: Crafted prompts instruct AI agents to inventory sensitive files
+6. **Data Collection**: AI agents scan filesystem and write results to `/tmp/inventory.txt`
+7. **Credential Harvesting**: Script directly collects GitHub tokens, SSH keys, npm tokens
+8. **Exfiltration**: Creates public GitHub repository and uploads base64-encoded data
+9. **Persistence/Disruption**: Modifies shell rc files to cause system shutdown on terminal launch
 
 ### Example Attack Implementation
 Based on the Nx malicious package incident:
@@ -127,17 +129,19 @@ The technique typically targets:
 - `--no-confirmation` (Generic)
 
 ## Impact Assessment
-- **Confidentiality**: Critical - Complete credential theft and sensitive data exposure
-- **Integrity**: High - Shell modification and potential system corruption
-- **Availability**: High - System shutdown mechanisms and service disruption
-- **Scope**: Workstation/CI-wide - Affects entire development environment and connected services
+- **Confidentiality**: Critical - Automated credential harvesting without user awareness (GitHub tokens, npm tokens, SSH keys, API keys)
+- **Integrity**: High - Compromised package supply chain and malicious system configuration modifications
+- **Availability**: High - System disruption through shell modifications or destructive payloads
+- **Scope**: Supply chain-wide - Can affect any package ecosystem; impacts development environments, CI/CD pipelines, and downstream consumers
 
-### Real-World Impact (Nx Incident)
-- **Timeline**: Attack was live for ~5 hours 20 minutes before detection
-- **Affected Packages**: 8 malicious releases across multiple Nx packages
-- **Data Theft**: GitHub tokens, npm tokens, SSH keys, environment variables
-- **Persistence**: Shell modification causing immediate shutdown on new terminal sessions
-- **Exfiltration**: Data uploaded to public GitHub repositories with encoded names
+### Real-World Impact (Nx Incident - August 2025)
+- **Root Cause**: Vulnerable GitHub Actions workflow with bash injection via PR titles
+- **Timeline**: Malicious packages live for ~5 hours 20 minutes (August 26-27, 2025)
+- **Affected Packages**: 8 malicious versions across nx, @nx/devkit, @nx/js, @nx/workspace, @nx/node, @nx/eslint, @nx/key, @nx/enterprise-cloud
+- **Attack Method**: Postinstall script (`telemetry.js`) automatically executed during installation
+- **Data Theft**: GitHub tokens (via `gh auth token`), npm tokens, SSH keys, environment variables
+- **Exfiltration**: Created public GitHub repos named `s1ngularity-repository-*` with triple-base64 encoded data
+- **Disruption**: Modified `.bashrc`/`.zshrc` with `shutdown -h now` command
 
 ## Detection Methods
 
@@ -157,16 +161,17 @@ The technique typically targets:
   - Upload activity to newly created public repositories
   - Base64-encoded data transmission patterns
 
-- **GitHub Account Artifacts**:
-  - Public repositories named `s1ngularity-repository-*` with numeric suffixes
-  - Files named `results.b64` containing triple-base64 encoded data
+- **GitHub Account Artifacts** (Nx incident example):
+  - Public repositories with unusual naming patterns (e.g., `s1ngularity-repository-*`)
+  - Files containing multi-layer encoded data (e.g., `results.b64` with triple-base64 encoding)
 
 ### Behavioral Indicators
-- AI CLI tools running during package installation without user interaction
-- Systematic file enumeration across user directories
-- Credential extraction commands executed by package install scripts
-- Unexpected GitHub repository creation and data upload
-- Shell environment modification affecting terminal startup
+- AI CLI tools invoked by package manager processes (npm, yarn, pnpm) during installation
+- Package postinstall scripts checking for AI tool availability (e.g., `which claude`, `which gemini-cli`)
+- Credential extraction commands (`gh auth token`, `aws configure list`) executed programmatically
+- Creation of inventory files in temporary directories (e.g., `/tmp/inventory.txt`)
+- Unexpected public repository creation for data exfiltration
+- System configuration file modifications affecting shell startup or system behavior
 
 ### Detection Rules
 
@@ -360,22 +365,34 @@ shell_monitoring:
 
 ### Response Procedures
 1. **Immediate Actions**:
-   - Disconnect affected system from network to prevent further exfiltration
-   - Check GitHub account for `s1ngularity-repository-*` repositories
-   - Suspend all active authentication tokens and API keys
-   - Scan for `/tmp/inventory.txt` and review contents
+   - Identify the compromised package and affected versions (check package manager logs and lock files)
+   - Search for exfiltration artifacts (e.g., in Nx case: `s1ngularity-repository-*` repositories)
+   - Check for inventory files in temporary directories (`/tmp/inventory.txt` or similar)
+   - Verify shell configuration files (`.bashrc`, `.zshrc`, `.profile`) for malicious modifications
 
 2. **Investigation Steps**:
-   - Analyze package installation logs for suspicious AI tool executions
-   - Review shell history for dangerous flag usage
-   - Check file access logs for sensitive credential locations
-   - Examine network logs for GitHub API calls during installation
+   - Review package installation logs for AI tool invocations during the incident timeframe
+   - Check process logs for AI tools executed with dangerous flags by package manager processes
+   - Examine API logs and audit trails for unauthorized token usage or repository creation
+   - Analyze the malicious package's postinstall script if available for forensic analysis
 
 3. **Remediation**:
-   - Rotate all potentially compromised credentials (GitHub, npm, SSH, API keys)
-   - Remove malicious packages and reinstall from legitimate sources
-   - Restore shell configuration files from clean backups
-   - Implement AI tool usage policies and monitoring
+   - Immediately rotate all potentially compromised credentials (GitHub, npm, SSH, cloud provider tokens, API keys)
+   - Uninstall the compromised package and any dependent packages: `npm uninstall <malicious-package>`
+   - Clear package manager caches to prevent reinstallation of cached malicious versions
+   - Restore modified system configuration files from backups or remove malicious entries
+   - Reinstall required packages from verified sources, ensuring versions are post-compromise
+   - Enable package manager security features (e.g., `npm config set ignore-scripts true`)
+   
+   **Example for Nx incident**:
+   ```bash
+   # Remove affected packages
+   npm uninstall nx @nx/devkit @nx/js @nx/workspace
+   # Clear npm cache
+   npm cache clean --force
+   # Reinstall safe versions
+   npm install nx@latest
+   ```
 
 ## Related Techniques
 - [SAFE-T1001](../SAFE-T1001/README.md): Tool Poisoning Attack - Similar supply chain compromise vector
