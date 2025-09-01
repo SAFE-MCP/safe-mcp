@@ -1,0 +1,60 @@
+title: OAuth Authorization Server Mix-up Detection
+id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+status: experimental
+description: Detects potential mix-up attacks via look-alike domains in OAuth flows
+author: Frederick Kautz
+date: 2025-07-15
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1008
+  - https://publ.sec.uni-stuttgart.de/fettkuestersschmitz-ccs-2016.pdf
+  - https://www.rfc-editor.org/rfc/rfc9700
+logsource:
+  product: mcp
+  service: oauth_integration
+detection:
+  selection_lookalike_domains:
+    oauth_redirect_url:
+      - '*accounts-google.com*'
+      - '*account-google.com*'
+      - '*google-accounts.com*'
+      - '*login-microsoftonline.com*'
+      - '*microsoftonline-login.com*'
+      - '*auth-amazon.com*'
+      - '*amazon-auth.com*'
+      - '*github-auth.com*'
+      - '*auth-github.com*'
+      - '*facebook-login.com*'
+      - '*login-facebook.com*'
+  selection_suspicious_patterns:
+    oauth_redirect_url|contains:
+      - 'xn--'  # Punycode domains
+      - '%2F'   # URL encoded slashes
+      - '@'     # Username in URL
+  selection_issuer_mismatch:
+    token_issuer: '*'
+    expected_issuer: '*'
+    condition: token_issuer != expected_issuer
+  timeframe: 10m
+  condition: selection_lookalike_domains or selection_suspicious_patterns or selection_issuer_mismatch
+fields:
+  - timestamp
+  - user_id
+  - client_id
+  - oauth_redirect_url
+  - token_issuer
+  - expected_issuer
+  - source_ip
+  - user_agent
+falsepositives:
+  - Legitimate custom domains that appear similar
+  - Typographical errors in configurations
+  - Development/testing environments with non-standard domains
+level: high
+tags:
+  - attack.initial_access
+  - attack.t1190
+  - attack.credential_access
+  - attack.t1539
+  - safe.t1008
+  - oauth
+  - mcp
