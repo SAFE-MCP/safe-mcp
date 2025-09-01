@@ -1,0 +1,27 @@
+# Envoy HTTP local rate limit (minimal example)
+# Attach this filter on the HTTP connection manager or per-route.
+
+http_filters:
+- name: envoy.filters.http.local_ratelimit
+  typed_config:
+    "@type": type.googleapis.com/envoy.extensions.filters.http.local_ratelimit.v3.LocalRateLimit
+    stat_prefix: local_rate_limit
+    token_bucket:
+      max_tokens: 60
+      tokens_per_fill: 60
+      fill_interval: 60s
+    filter_enabled:
+      runtime_key: local_rate_limit_enabled
+      default_value:
+        numerator: 100
+        denominator: HUNDRED
+    filter_enforced:
+      default_value:
+        numerator: 100
+        denominator: HUNDRED
+    response_headers_to_add:
+    - header:
+        key: x-rate-limit-bucket
+        value: per_tool
+      append_action: APPEND_IF_EXISTS_OR_ADD
+# For per-client, add a second LocalRateLimit at a lower route stage with header-based descriptors

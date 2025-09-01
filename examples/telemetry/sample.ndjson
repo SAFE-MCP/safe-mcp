@@ -1,0 +1,2 @@
+{"trace_id":"tr_001","ts":"2025-08-16T19:20:30Z","tool":"mcp://tool/ingest","client_id":"agent-42","sub_or_user":"user-123","aud":"mcp://tool/ingest","jti":"jti-001","dpop_jkt":"thp-abc123","method":"POST","target":"/tools/ingest","result":"success"}
+{"trace_id":"tr_001","ts":"2025-08-16T19:20:31Z","tool":"mcp://tool/ingest","client_id":"agent-42","sub_or_user":"user-123","aud":"mcp://tool/ingest","jti":"jti-002","dpop_jkt":"thp-abc123","method":"POST","target":"/tools/ingest","result":"success"}
