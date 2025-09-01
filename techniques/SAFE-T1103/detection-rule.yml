@@ -1,0 +1,65 @@
+title: Fake MCP Tool Invocation Detection
+id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+status: experimental
+description: Detects forged JSON payloads mimicking unregistered tool calls
+author: Frederick Kautz
+date: 2025-07-15
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1103
+  - https://arxiv.org/html/2412.10198v1
+  - https://attack.mitre.org/techniques/T1059/
+logsource:
+  product: mcp
+  service: invocation_handler
+detection:
+  selection_suspicious_names:
+    tool_call.name:
+      - '*exec_*'
+      - '*shell*'
+      - '*system*'
+      - '*cmd*'
+      - '*unauthorized*'
+      - '*fake_*'
+      - '*backdoor*'
+  selection_dangerous_patterns:
+    tool_call.arguments:
+      - '*rm -rf*'
+      - '*curl*|*bash*'
+      - '*wget*|*sh*'
+      - '*/bin/bash*'
+      - '*/bin/sh*'
+      - '*nc -e*'
+      - '*base64 -d*'
+  selection_unregistered:
+    event_type: tool_invocation
+    registered: false
+  selection_schema_mismatch:
+    event_type: tool_invocation
+    schema_validation: failed
+  selection_spoofing_indicators:
+    tool_call.metadata:
+      - '*spoofed*'
+      - '*injected*'
+      - '*forged*'
+  timeframe: 5m
+  condition: selection_unregistered or (selection_suspicious_names and not whitelisted_tools) or selection_dangerous_patterns or selection_schema_mismatch or selection_spoofing_indicators
+fields:
+  - timestamp
+  - tool_call.name
+  - tool_call.arguments
+  - user_id
+  - session_id
+  - source_ip
+  - registered_tools
+falsepositives:
+  - Misconfigured tool registrations
+  - Testing environments with dynamic tool creation
+  - Development environments with experimental tools
+level: high
+tags:
+  - attack.execution
+  - attack.t1059
+  - attack.t1204
+  - safe.t1103
+  - function_spoofing
+  - mcp
