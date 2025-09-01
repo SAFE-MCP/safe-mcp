@@ -1,0 +1,69 @@
+title: MCP Command Injection Detection
+id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+status: experimental
+description: Detects potential command injection in MCP tool parameters
+author: SAFE-MCP Team
+date: 2025-07-15
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1101
+  - https://jfrog.com/blog/2025-6514-critical-mcp-remote-rce-vulnerability/
+  - https://attack.mitre.org/techniques/T1059/
+logsource:
+  product: mcp
+  service: tool_execution
+detection:
+  selection_command_separators:
+    tool_parameter:
+      - '*; *'
+      - '*;*'
+      - '*| *'
+      - '*|*'
+      - '*&& *'
+      - '*&&*'
+      - '*|| *'
+      - '*||*'
+      - '*` *`'
+      - '*$(*'
+      - '*)*'
+  selection_shell_redirects:
+    tool_parameter:
+      - '*>*'
+      - '*>>*'
+      - '*<*'
+      - '*2>&1*'
+  selection_dangerous_commands:
+    tool_parameter:
+      - '*rm -rf*'
+      - '*curl*|*bash*'
+      - '*wget*|*sh*'
+      - '*/bin/bash*'
+      - '*/bin/sh*'
+      - '*nc -e*'
+      - '*netcat*'
+  selection_url_encoding:
+    tool_parameter:
+      - '*%3B*'  # ; encoded
+      - '*%7C*'  # | encoded
+      - '*%26*'  # & encoded
+      - '*%60*'  # ` encoded
+  timeframe: 5m
+  condition: selection_command_separators or selection_shell_redirects or selection_dangerous_commands or selection_url_encoding
+fields:
+  - timestamp
+  - user_id
+  - tool_name
+  - tool_parameter
+  - source_ip
+  - mcp_server_version
+falsepositives:
+  - Legitimate complex commands in authorized tools
+  - Development or testing environments
+  - Tools designed for shell execution
+level: high
+tags:
+  - attack.execution
+  - attack.t1059
+  - attack.t1059.004
+  - safe.t1101
+  - command_injection
+  - mcp
