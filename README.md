@@ -159,3 +159,34 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 - Map these techniques to your specific MCP deployment for risk assessment
 - Prioritize mitigation based on your threat model and the techniques most relevant to your environment
 - Regular review as new techniques emerge in the rapidly evolving MCP threat landscape
+
+## Authentication
+
+See **[SAFE-AUTH for MCP](./docs/auth/overview.md)** for baseline flows and the MUST/SHOULD checklist.
+
+### Authentication – Telemetry Schema & Validators
+- [docs/auth/telemetry-schema.md](docs/auth/telemetry-schema.md)
+- [docs/auth/telemetry-validators.md](docs/auth/telemetry-validators.md)
+- Examples: [examples/telemetry/README.md](examples/telemetry/README.md), [examples/telemetry/sample.ndjson](examples/telemetry/sample.ndjson)
+
+### Authentication – JWKS Hygiene
+- [docs/auth/jwks-hygiene.md](docs/auth/jwks-hygiene.md)
+- Runbook: [runbooks/jwks-rotation-sop.md](runbooks/jwks-rotation-sop.md)
+- Alert: [alerts/jwks-hygiene.md](alerts/jwks-hygiene.md)
+
+### Authentication – DPoP Gateway Policy
+- [docs/auth/dpop-policy.md](docs/auth/dpop-policy.md)
+- Example pseudo: [examples/gateway/dpop-verify-pseudo.md](examples/gateway/dpop-verify-pseudo.md)
+
+### Authentication – Per-Hop Delegation Mitigations
+- [mitigations/SAFE-M1001-auth-delegation.md](mitigations/SAFE-M1001-auth-delegation.md)
+
+### Authentication – Abuse Controls (rate limits & backoff)
+- [docs/auth/abuse-controls.md](docs/auth/abuse-controls.md)
+- Gateway examples:  
+  [examples/gateway/rate-limit-pseudo.md](examples/gateway/rate-limit-pseudo.md),  
+  [examples/gateway/rate-limit-envoy.yaml](examples/gateway/rate-limit-envoy.yaml),  
+  [examples/gateway/rate-limit-nginx.conf](examples/gateway/rate-limit-nginx.conf)
+
+### Authentication – JWT Lint Rules
+- [docs/auth/jwt-lint.md](docs/auth/jwt-lint.md)

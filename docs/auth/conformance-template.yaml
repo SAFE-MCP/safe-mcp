@@ -1,0 +1,67 @@
+# SAFE-AUTH Conformance Template
+# status: todo | partial | done
+meta:
+  system: "<name>"
+  owner: "<team-or-contact>"
+  reviewed_at: "<YYYY-MM-DD>"
+
+controls:
+  - id: AUTH-001
+    name: OIDC Authorization Code + PKCE
+    level: MUST
+    status: todo
+    evidence: ["<oidc client config>"]
+
+  - id: AUTH-002
+    name: state + nonce + issuer pinning
+    level: MUST
+    status: todo
+    evidence: []
+
+  - id: AUTH-003
+    name: DPoP or mTLS token binding
+    level: MUST
+    status: todo
+    evidence: ["<gateway/policy link>"]
+
+  - id: AUTH-004
+    name: aud = exact next tool/service
+    level: MUST
+    status: todo
+    evidence: ["<JWT sample showing aud>"]
+
+  - id: AUTH-005
+    name: Access token TTL ≤ 10 minutes
+    level: MUST
+    status: todo
+    evidence: []
+
+  - id: AUTH-006
+    name: JWKS cache ≤ 15 minutes + rotation SOP
+    level: MUST
+    status: todo
+    evidence: ["<rotation runbook link>"]
+
+  - id: AUTH-007
+    name: Structured telemetry fields present per call
+    level: MUST
+    status: todo
+    evidence: ["<log sample>"]
+
+  - id: AUTH-008
+    name: RFC 8693 Token Exchange per hop
+    level: SHOULD
+    status: partial
+    evidence: []
+
+  - id: AUTH-009
+    name: Deny on context loss (missing aud/trace_id)
+    level: SHOULD
+    status: partial
+    evidence: []
+
+  - id: AUTH-010
+    name: Rate-limit auth endpoints & tool calls
+    level: SHOULD
+    status: partial
+    evidence: []
