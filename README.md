@@ -159,3 +159,12 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 - Map these techniques to your specific MCP deployment for risk assessment
 - Prioritize mitigation based on your threat model and the techniques most relevant to your environment
 - Regular review as new techniques emerge in the rapidly evolving MCP threat landscape
+
+## Documentation
+
+- **Authentication – JWT Lint**: [docs/auth/jwt-lint.md](docs/auth/jwt-lint.md)
+- **Authentication – Headless & Multi-Hop SAFE-AUTH Flows**: [docs/auth/flows/headless-agent.md](docs/auth/flows/headless-agent.md)
+- **Authentication – SAFE-AUTH Threat/Control Matrix & Conformance**:  
+  [docs/auth/threat-control-matrix.md](docs/auth/threat-control-matrix.md) and  
+  [docs/auth/conformance-template.yaml](docs/auth/conformance-template.yaml)
+- **Authentication – DPoP Gateway Policy**: [docs/auth/dpop-policy.md](docs/auth/dpop-policy.md)
