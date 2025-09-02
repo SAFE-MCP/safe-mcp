@@ -1,0 +1,42 @@
+title: MCP Credential Relay Chain Detection
+id: 7B67EA0A-2966-4251-8522-77FCA3434801
+status: experimental
+description: Detects potential credential relay attacks between MCP tools where stolen tokens are used to escalate privileges
+author: SAFE-MCP Team
+date: 2025-01-02
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1304
+  - https://attack.mitre.org/techniques/T1550/
+logsource:
+  product: mcp
+  service: authentication
+detection:
+  selection:
+    token_usage:
+      - '*oauth_token*'
+      - '*bearer_token*'
+      - '*jwt_token*'
+      - '*access_token*'
+    cross_tool_usage:
+      - '*different_tool_same_token*'
+      - '*token_scope_violation*'
+      - '*cross_service_auth*'
+    privilege_escalation:
+      - '*rapid_privilege_increase*'
+      - '*admin_operations_after_token_theft*'
+      - '*unauthorized_elevated_access*'
+    suspicious_patterns:
+      - '*token_relay*'
+      - '*credential_chain*'
+      - '*privilege_escalation*'
+  condition: selection
+falsepositives:
+  - Legitimate cross-service authentication with proper authorization
+  - Normal token refresh operations
+  - Authorized privilege escalation workflows
+  - Multi-tool authentication for legitimate business processes
+level: high
+tags:
+  - attack.privilege_escalation
+  - attack.t1550
+  - safe.t1304
