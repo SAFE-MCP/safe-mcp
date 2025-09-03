@@ -110,7 +110,9 @@ description: Detects potential prompt injection patterns in third‑party conten
 author: SAFE-MCP Team
 date: 2025-09-03
 references:
-  - https://github.com/safe-mcp/techniques/SAFE-T1103
+  - https://modelcontextprotocol.io/specification
+  - https://genai.owasp.org/llmrisk/llm01-prompt-injection/
+  - https://arxiv.org/abs/2302.12173
 logsource:
   product: mcp
   service: fetcher
@@ -188,4 +190,3 @@ tags:
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
 | 1.0 | 2025-09-03 | Initial comprehensive documentation | The SAFE-MCP Authors |
-
