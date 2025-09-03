@@ -1,0 +1,30 @@
+title: MCP Indirect Prompt Injection in Retrieved Content
+id: 1ba31550-01eb-4b3b-b10f-211af6eeb3f3
+status: experimental
+description: Detects potential prompt injection patterns in third-party content fetched by MCP tools
+author: SAFE-MCP Team
+date: 2025-09-03
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1103
+logsource:
+  product: mcp
+  service: fetcher
+detection:
+  selection:
+    retrieved_content:
+      - '*<!-- SYSTEM:*'      # Source: OWASP LLM01
+      - '*Ignore previous instructions*'
+      - '*</data>*SYSTEM*'
+      - '*[INST]*'
+      - '*\\u200b*'          # Zero-width space
+      - '*\\u202E*'          # RTL override
+  condition: selection
+falsepositives:
+  - Legitimate instructional text in documentation/tutorials
+  - Internationalized content using bidi characters
+level: high
+tags:
+  - attack.initial_access
+  - attack.t1190
+  - safe.t1103
+
