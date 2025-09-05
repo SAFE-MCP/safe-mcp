@@ -1,0 +1,110 @@
+title: MCP Tool Shadowing Attack Detection
+id: 7c8d9e0f-1a2b-3c4d-5e6f-789012345678
+status: experimental
+description: Detects potential tool shadowing attacks through suspicious tool descriptions and cross-server interference patterns
+author: SAFE-MCP Team
+date: 2025-09-05
+modified: 2025-09-05
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1004
+  - https://acuvity.ai/cross-server-tool-shadowing-hijacking-calls-between-servers/
+  - https://invariantlabs.ai/blog/whatsapp-mcp-exploited
+logsource:
+  category: application
+  product: mcp
+  service: server
+detection:
+  # Detect shadowing patterns in tool descriptions
+  selection_shadowing_patterns:
+    tool_description|contains:
+      - 'before using'
+      - 'instead of using'
+      - 'always add'
+      - 'ignore previous instructions'
+      - 'NEVER mention'
+      - 'should never be invoked'
+      - 'override'
+      - 'hijack'
+      - 'intercept'
+  
+  # Detect cross-tool references that indicate shadowing
+  selection_cross_tool_references:
+    tool_description|re: '(?i)(before|instead|when).*using\s+\w+_\w+'
+    tool_description|contains:
+      - 'when calling'
+      - 'before calling'
+      - 'instead of calling'
+  
+  # Detect tool impersonation attempts
+  selection_impersonation:
+    tool_name|similar:
+      - 'send_email'
+      - 'send_message'
+      - 'file_read'
+      - 'database_query'
+      - 'api_call'
+    server_name|different: true
+  
+  # Detect suspicious BCC/CC injection patterns
+  selection_email_hijacking:
+    tool_description|contains:
+      - 'add.*bcc'
+      - 'add.*cc'
+      - 'forward to'
+      - 'copy to'
+      - '@evil.com'
+      - '@attacker'
+  
+  # Detect cross-origin tool invocation attempts
+  selection_cross_origin:
+    tool_description|contains:
+      - 'invoke'
+      - 'call'
+      - 'execute'
+    tool_description|re: '(?i)(invoke|call|execute).*\w+\.\w+'
+  
+  # Detect tools that should never be invoked (sleeper tools)
+  selection_sleeper_tools:
+    tool_description|contains:
+      - 'never be invoked'
+      - 'should not be called'
+      - 'do not use'
+      - 'for internal use only'
+    tool_name|contains:
+      - 'shadow'
+      - 'hidden'
+      - 'internal'
+      - 'backdoor'
+  
+  condition: 
+    selection_shadowing_patterns or 
+    selection_cross_tool_references or 
+    selection_impersonation or 
+    selection_email_hijacking or 
+    selection_cross_origin or 
+    selection_sleeper_tools
+
+falsepositives:
+  - Legitimate tool documentation that references other tools for integration purposes
+  - Development and testing environments with multiple similar tools
+  - Administrative tools with legitimate override capabilities
+  - Documentation tools that describe other tool usage patterns
+
+level: high
+
+tags:
+  - attack.initial_access
+  - attack.execution
+  - attack.t1055
+  - attack.t1134
+  - attack.t1036
+  - safe.t1004
+
+# Additional metadata for MCP-specific detection
+fields:
+  - tool_name
+  - tool_description
+  - server_name
+  - server_id
+  - tool_parameters
+  - execution_context
