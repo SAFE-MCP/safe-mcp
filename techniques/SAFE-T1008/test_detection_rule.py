@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test cases for SAFE-T1004 Tool Shadowing Attack detection rule.
+Test cases for SAFE-T1008 Tool Shadowing Attack detection rule.
 
 This script tests the detection rule against various tool shadowing scenarios
 based on real-world research from Akto, Acuvity, and Invariant Labs.
@@ -11,7 +11,7 @@ import re
 from pathlib import Path
 
 def load_detection_rule():
-    """Load the SAFE-T1004 detection rule patterns."""
+    """Load the SAFE-T1008 detection rule patterns."""
     # Define detection patterns based on the YAML rule
     return {
         "shadowing_patterns": [
@@ -31,7 +31,7 @@ def load_detection_rule():
     }
 
 def load_test_logs():
-    """Load test logs for SAFE-T1004 scenarios."""
+    """Load test logs for SAFE-T1008 scenarios."""
     logs_path = Path(__file__).parent / "test-logs.json"
     with open(logs_path, 'r') as f:
         return json.load(f)
@@ -143,8 +143,8 @@ def test_sleeper_tools():
     return detected_count > 0
 
 def run_all_tests():
-    """Run all SAFE-T1004 detection tests."""
-    print("Running SAFE-T1004 Tool Shadowing Attack detection tests...")
+    """Run all SAFE-T1008 detection tests."""
+    print("Running SAFE-T1008 Tool Shadowing Attack detection tests...")
     print("=" * 60)
     
     tests = [
@@ -173,7 +173,7 @@ def run_all_tests():
     print(f"Test Results: {passed}/{total} tests passed")
     
     if passed == total:
-        print("🎉 All SAFE-T1004 detection tests passed!")
+        print("🎉 All SAFE-T1008 detection tests passed!")
         return True
     else:
         print("⚠️  Some tests failed. Review detection rules and test cases.")

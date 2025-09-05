@@ -1,4 +1,4 @@
-title: MCP Tool Shadowing Attack Detection
+title: MCP Tool Shadowing Attack Detection (SAFE-T1008)
 id: 7c8d9e0f-1a2b-3c4d-5e6f-789012345678
 status: experimental
 description: Detects potential tool shadowing attacks through suspicious tool descriptions and cross-server interference patterns
@@ -6,7 +6,7 @@ author: SAFE-MCP Team
 date: 2025-09-05
 modified: 2025-09-05
 references:
-  - https://github.com/safe-mcp/techniques/SAFE-T1004
+  - https://github.com/safe-mcp/techniques/SAFE-T1008
   - https://acuvity.ai/cross-server-tool-shadowing-hijacking-calls-between-servers/
   - https://invariantlabs.ai/blog/whatsapp-mcp-exploited
 logsource:
@@ -98,7 +98,7 @@ tags:
   - attack.t1055
   - attack.t1134
   - attack.t1036
-  - safe.t1004
+  - safe.t1008
 
 # Additional metadata for MCP-specific detection
 fields:

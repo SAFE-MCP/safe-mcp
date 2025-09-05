@@ -1,8 +1,8 @@
-# SAFE-T1004: Tool Shadowing Attack
+# SAFE-T1008: Tool Shadowing Attack
 
 ## Overview
 **Tactic**: Initial Access (ATK-TA0001)  
-**Technique ID**: SAFE-T1004  
+**Technique ID**: SAFE-T1008  
 **Severity**: High  
 **First Observed**: Early 2025 (Demonstrated by security researchers with WhatsApp MCP server exploitation)  
 **Last Updated**: 2025-09-05
@@ -120,7 +120,7 @@ description: Detects potential tool shadowing attacks through suspicious tool de
 author: SAFE-MCP Team
 date: 2025-01-15
 references:
-  - https://github.com/safe-mcp/techniques/SAFE-T1004
+  - https://github.com/safe-mcp/techniques/SAFE-T1008
   - https://www.akto.io/mcp-attack-matrix/tool-shadowing
   - https://acuvity.ai/cross-server-tool-shadowing-hijacking-calls-between-servers/
 logsource:
@@ -149,7 +149,7 @@ tags:
   - attack.initial_access
   - attack.execution
   - attack.t1055
-  - safe.t1004
+  - safe.t1008
 ```
 
 ### Behavioral Indicators
