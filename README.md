@@ -126,7 +126,7 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 | ATK-TA0040 | Impact | SAFE-T2102 | Service Disruption | Flood external API causing rate-limit or DoS |
 | ATK-TA0040 | Impact | SAFE-T2103 | Code Sabotage | Agent commits malicious PR into repo |
 | ATK-TA0040 | Impact | SAFE-T2104 | Fraudulent Transactions | Payment-tool instructed to move funds |
-| ATK-TA0040 | Impact | SAFE-T2105 | Disinformation Output | Manipulate LLM to generate false or harmful content to downstream consumers |
+| ATK-TA0040 | Impact | [SAFE-T2105](techniques/SAFE-T2105/README.md) | Disinformation Output | Manipulate LLM to generate false or harmful content to downstream consumers |
 
 ## Summary Statistics
 

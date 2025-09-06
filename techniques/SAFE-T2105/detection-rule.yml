@@ -1,0 +1,150 @@
+title: MCP Disinformation Output Generation
+id: a7f8e2d1-9b4c-4e5f-8a2d-1c3e5f7a9b2d
+status: experimental
+description: |
+  Detects potential disinformation generation through MCP tools by identifying
+  adversarial role assignments, content manipulation requests, and fabrication
+  indicators in tool parameters. This rule focuses on detecting attempts to
+  generate false or misleading content that could be used for influence operations.
+author: SAFE-MCP Security Team
+date: 2025/01/17
+modified: 2025/01/17
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T2105
+  - https://pmc.ncbi.nlm.nih.gov/articles/PMC11913289/
+  - https://arxiv.org/abs/2411.06120v5
+logsource:
+  product: mcp
+  service: tool_execution
+  category: application
+detection:
+  # Detect adversarial role assignments commonly used in disinformation generation
+  selection_roles:
+    tool_parameters|contains:
+      - 'assume the role of'
+      - 'pretend to be'
+      - 'act as a journalist'
+      - 'act as an expert'
+      - 'information operations'
+      - 'fiction writer'
+      - 'investigative reporter'
+      - 'social media influencer'
+      - 'you are a reporter'
+      - 'roleplay as'
+  
+  # Detect content types commonly associated with disinformation
+  selection_content_types:
+    tool_parameters|contains:
+      - 'breaking news'
+      - 'urgent update'
+      - 'exclusive report'
+      - 'leaked information'
+      - 'insider reveals'
+      - 'shocking discovery'
+      - 'authorities confirm'
+      - 'sources say'
+      - 'whistleblower claims'
+  
+  # Detect explicit fabrication requests
+  selection_fabrication:
+    tool_parameters|contains:
+      - 'fabricate'
+      - 'make up'
+      - 'invent'
+      - 'create false'
+      - 'generate fake'
+      - 'misleading'
+      - 'false claim'
+      - 'disinformation'
+      - 'propaganda'
+  
+  # Detect requests for credibility-enhancing elements
+  selection_credibility:
+    tool_parameters|contains:
+      - 'include quotes from'
+      - 'add statistics'
+      - 'cite experts'
+      - 'reference studies'
+      - 'make it believable'
+      - 'sound authoritative'
+      - 'appear credible'
+      - 'add data'
+      - 'include numbers'
+      - 'expert opinions'
+  
+  # Detect emotional manipulation tactics
+  selection_manipulation:
+    tool_parameters|contains:
+      - 'create outrage'
+      - 'spark controversy'
+      - 'cause alarm'
+      - 'urgent action needed'
+      - 'immediate threat'
+      - 'public safety'
+      - 'cover-up'
+      - 'conspiracy'
+      - 'hidden truth'
+  
+  # Detect requests targeting specific sensitive topics
+  selection_sensitive_topics:
+    tool_parameters|contains:
+      - 'election'
+      - 'voting'
+      - 'vaccine'
+      - 'pandemic'
+      - 'government'
+      - 'political'
+      - 'health crisis'
+      - 'climate change'
+      - 'immigration'
+      - 'terrorism'
+  
+  # Main detection logic
+  condition: |
+    (selection_roles and (selection_content_types or selection_credibility)) or
+    selection_fabrication or
+    (selection_manipulation and selection_sensitive_topics)
+
+falsepositives:
+  - Legitimate creative writing or fiction generation tools with proper disclaimers
+  - Educational content about disinformation for training purposes
+  - Journalism training exercises in controlled environments
+  - Academic research on misinformation with ethical oversight
+  - Content moderation testing with appropriate safeguards
+  - Satirical or parody content generation with clear labeling
+
+level: high
+
+tags:
+  - attack.impact
+  - attack.t2105
+  - technique.disinformation
+  - mcp.content_generation
+  - mcp.manipulation
+
+# Additional metadata for SIEM integration
+fields:
+  - tool_name
+  - tool_parameters
+  - user_id
+  - session_id
+  - generated_content_length
+  - output_classification
+
+# Custom detection thresholds
+timeframe: 24h
+threshold:
+  count: 3
+  field: user_id
+  
+# Severity scoring based on combination of indicators
+severity_matrix:
+  high:
+    - selection_fabrication
+    - (selection_roles and selection_manipulation and selection_sensitive_topics)
+  medium:
+    - (selection_roles and selection_credibility)
+    - (selection_content_types and selection_sensitive_topics)
+  low:
+    - selection_roles
+    - selection_credibility

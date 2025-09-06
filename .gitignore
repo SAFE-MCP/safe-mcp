@@ -72,3 +72,14 @@ local_settings.py
 *.p12
 secrets/
 credentials/
+
+# Analysis and Utility Scripts - Per community guidelines
+generate_technique_report.py
+generate_cursor_prompt.py
+report.sh
+prompt.sh
+technique_status_report.md
+SCRIPTS_README.md
+cursor_prompt_*.txt
+*_report.md
+*_analysis.py
