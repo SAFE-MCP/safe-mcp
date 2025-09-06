@@ -245,4 +245,6 @@ tags:
 [T1583 - Acquire Infrastructure](https://attack.mitre.org/techniques/T1583/) - Acquiring AI generation capabilities for malicious purposes
 
 ## Version History
-- **v1.0** (2025-01-17): Initial documentation by Smaran Dhungana based on 2024-2025 research findings
+| Version | Date | Changes | Author |
+|---------|------|---------|--------|
+| 1.0 | 2025-01-17 | Initial documentation based on 2024-2025 research findings with comprehensive detection rules and test suite | Smaran Dhungana |
