@@ -6,7 +6,7 @@ description: |
   adversarial role assignments, content manipulation requests, and fabrication
   indicators in tool parameters. This rule focuses on detecting attempts to
   generate false or misleading content that could be used for influence operations.
-author: SAFE-MCP Security Team
+author: Smaran Dhungana <smarandhg@gmail.com>
 date: 2025/09/06
 modified: 2025/09/06
 references:
