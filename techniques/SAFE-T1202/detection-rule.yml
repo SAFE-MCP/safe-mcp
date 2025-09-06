@@ -1,0 +1,132 @@
+title: OAuth Token Persistence Attack Detection
+id: 865daa77-a8fc-4c72-a221-e1715da7ee9a
+status: experimental
+description: |
+  Detects potential OAuth token persistence attacks through suspicious token usage patterns,
+  including token reuse after logout, impossible travel scenarios, and concurrent token usage
+  from multiple locations. This rule focuses on identifying stolen OAuth refresh tokens being
+  used for persistent unauthorized access to MCP-connected services.
+author: Smaran Dhungana <smarandhg@gmail.com>
+date: 2025-09-06
+modified: 2025-09-06
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1202
+  - https://attack.mitre.org/techniques/T1528/
+  - https://github.com/secureworks/family-of-client-ids-research
+  - https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics
+logsource:
+  product: oauth
+  service: authentication
+detection:
+  # Token usage after user logout
+  selection_post_logout:
+    event_type: 'token_usage'
+    user_session_status: 'logged_out'
+    time_since_logout: '>300'  # More than 5 minutes after logout
+  
+  # Impossible travel - token usage from distant locations within short timeframe
+  selection_impossible_travel:
+    event_type: 
+      - 'token_refresh'
+      - 'api_access'
+    geographic_distance: '>1000'  # Miles from previous access location
+    time_delta: '<3600'  # Within 1 hour
+  
+  # Concurrent token usage from multiple locations
+  selection_concurrent_usage:
+    event_type: 'token_refresh'
+    token_type: 'refresh_token'
+    concurrent_sessions: '>1'
+  
+  # Token refresh after password change
+  selection_post_password_change:
+    event_type: 'token_refresh'
+    account_password_changed: true
+    time_since_password_change: '<86400'  # Within 24 hours
+  
+  # Unusual API access patterns
+  selection_unusual_patterns:
+    event_type: 'api_access'
+    access_time: 
+      - 'outside_business_hours'
+      - 'weekend'
+    api_call_volume: '>normal_baseline'
+  
+  # Token usage from new/untrusted devices
+  selection_new_device:
+    event_type: 'token_usage'
+    device_trust_level: 
+      - 'unknown'
+      - 'untrusted'
+    device_first_seen: '<24h'
+  
+  # Family of Client IDs (FOCI) abuse
+  selection_foci_abuse:
+    event_type: 'token_exchange'
+    client_family: 'microsoft_foci'
+    token_scope_expansion: true
+    original_client_id: '!=current_client_id'
+  
+  # Primary Refresh Token (PRT) suspicious usage
+  selection_prt_abuse:
+    event_type: 'prt_usage'
+    device_binding_validation: false
+    conditional_access_bypass: true
+  
+  condition: any of selection_*
+
+falsepositives:
+  - Legitimate users accessing services from multiple locations during travel
+  - Mobile applications with background refresh mechanisms
+  - Shared accounts or service accounts with multiple concurrent access points
+  - Users working across multiple time zones
+  - Legitimate device replacements or new device registrations
+  - Emergency access scenarios requiring immediate service access
+  - Automated systems or bots with legitimate OAuth tokens
+  - Network infrastructure changes affecting geographic IP detection
+
+level: high
+
+tags:
+  - attack.persistence
+  - attack.credential_access
+  - attack.t1528
+  - attack.t1539
+  - safe.t1202
+  - oauth
+  - token_theft
+  - mcp
+
+fields:
+  - event_type
+  - user_id
+  - client_id
+  - token_type
+  - source_ip
+  - geographic_location
+  - device_id
+  - user_agent
+  - api_endpoint
+  - token_scope
+  - session_id
+  - timestamp
+
+# Additional detection logic for advanced scenarios
+additional_rules:
+  # Detect token binding bypass attempts
+  token_binding_bypass:
+    event_type: 'token_validation_failure'
+    failure_reason: 'device_binding_mismatch'
+    retry_attempts: '>3'
+  
+  # Detect refresh token rotation failures
+  refresh_token_rotation_failure:
+    event_type: 'token_refresh'
+    rotation_status: 'failed'
+    error_code: 'invalid_grant'
+    
+  # Detect suspicious OAuth scope escalation
+  scope_escalation:
+    event_type: 'token_request'
+    requested_scope: 'broader_than_original'
+    scope_change_percentage: '>50'
