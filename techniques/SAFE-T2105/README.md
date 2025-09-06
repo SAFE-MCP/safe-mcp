@@ -5,7 +5,7 @@
 **Technique ID**: SAFE-T2105  
 **Severity**: High  
 **First Observed**: March 2025 (F-Secure Research)  
-**Last Updated**: 2025-01-17
+**Last Updated**: 2025-09-06
 
 ## Description
 Disinformation Output is an attack technique where adversaries manipulate Large Language Models (LLMs) through Model Context Protocol (MCP) to generate false, misleading, or harmful content that appears credible to downstream consumers. This technique exploits the natural language generation capabilities of LLMs to produce convincing disinformation at scale, potentially impacting public opinion, decision-making processes, and trust in information systems.
@@ -247,4 +247,4 @@ tags:
 ## Version History
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
-| 1.0 | 2025-01-17 | Initial documentation based on 2024-2025 research findings with comprehensive detection rules and test suite | Smaran Dhungana |
+| 1.0 | 2025-09-06 | Initial documentation based on 2024-2025 research findings with comprehensive detection rules and test suite | Smaran Dhungana |

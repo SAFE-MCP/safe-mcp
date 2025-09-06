@@ -7,8 +7,8 @@ description: |
   indicators in tool parameters. This rule focuses on detecting attempts to
   generate false or misleading content that could be used for influence operations.
 author: SAFE-MCP Security Team
-date: 2025/01/17
-modified: 2025/01/17
+date: 2025/09/06
+modified: 2025/09/06
 references:
   - https://github.com/safe-mcp/techniques/SAFE-T2105
   - https://pmc.ncbi.nlm.nih.gov/articles/PMC11913289/
