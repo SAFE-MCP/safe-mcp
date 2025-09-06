@@ -247,4 +247,4 @@ tags:
 ## Version History
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
-| 1.0 | 2025-09-06 | Initial documentation based on 2024-2025 research findings with comprehensive detection rules and test suite | Smaran Dhungana |
+| 1.0 | 2025-09-06 | Initial documentation based on 2024-2025 research findings with comprehensive detection rules and test suite | Smaran Dhungana <smarandhg@gmail.com> |
