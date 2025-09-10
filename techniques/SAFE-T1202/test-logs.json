@@ -1,0 +1,206 @@
+{
+  "test_scenarios": [
+    {
+      "scenario_id": "oauth_token_post_logout",
+      "description": "OAuth token usage after user logout",
+      "attack_type": "token_persistence",
+      "logs": [
+        {
+          "timestamp": "2025-09-06T14:30:00Z",
+          "event_type": "user_logout",
+          "user_id": "user123",
+          "session_id": "sess_abc123",
+          "source_ip": "192.168.1.100",
+          "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        },
+        {
+          "timestamp": "2025-09-06T14:35:00Z",
+          "event_type": "token_usage",
+          "user_id": "user123",
+          "token_type": "refresh_token",
+          "api_endpoint": "https://graph.microsoft.com/v1.0/me/messages",
+          "source_ip": "203.0.113.45",
+          "user_agent": "python-requests/2.28.1",
+          "user_session_status": "logged_out",
+          "time_since_logout": 300,
+          "response_code": 200
+        }
+      ],
+      "expected_detection": true,
+      "detection_reason": "Token usage 5 minutes after logout from different IP"
+    },
+    {
+      "scenario_id": "impossible_travel",
+      "description": "OAuth token usage from geographically impossible locations",
+      "attack_type": "token_theft",
+      "logs": [
+        {
+          "timestamp": "2025-09-06T14:00:00Z",
+          "event_type": "token_refresh",
+          "user_id": "user456",
+          "token_type": "refresh_token",
+          "source_ip": "198.51.100.10",
+          "geographic_location": "New York, US",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"
+        },
+        {
+          "timestamp": "2025-09-06T14:15:00Z",
+          "event_type": "api_access",
+          "user_id": "user456",
+          "api_endpoint": "https://graph.microsoft.com/v1.0/me/drive/items",
+          "source_ip": "103.28.248.5",
+          "geographic_location": "Mumbai, India",
+          "geographic_distance": 7918,
+          "time_delta": 900,
+          "user_agent": "curl/7.68.0"
+        }
+      ],
+      "expected_detection": true,
+      "detection_reason": "7918 miles traveled in 15 minutes (impossible travel)"
+    },
+    {
+      "scenario_id": "concurrent_token_usage",
+      "description": "Concurrent OAuth token usage from multiple locations",
+      "attack_type": "token_reuse",
+      "logs": [
+        {
+          "timestamp": "2025-09-06T15:00:00Z",
+          "event_type": "token_refresh",
+          "user_id": "user789",
+          "token_type": "refresh_token",
+          "source_ip": "192.168.1.50",
+          "session_id": "sess_legitimate",
+          "concurrent_sessions": 2
+        },
+        {
+          "timestamp": "2025-09-06T15:00:30Z",
+          "event_type": "token_refresh",
+          "user_id": "user789",
+          "token_type": "refresh_token",
+          "source_ip": "198.51.100.100",
+          "session_id": "sess_malicious",
+          "concurrent_sessions": 2
+        }
+      ],
+      "expected_detection": true,
+      "detection_reason": "Simultaneous token refresh from different IPs"
+    },
+    {
+      "scenario_id": "post_password_change",
+      "description": "OAuth token usage after password change",
+      "attack_type": "token_persistence",
+      "logs": [
+        {
+          "timestamp": "2025-09-06T16:00:00Z",
+          "event_type": "password_change",
+          "user_id": "user101",
+          "source_ip": "192.168.1.75",
+          "account_password_changed": true
+        },
+        {
+          "timestamp": "2025-09-06T16:30:00Z",
+          "event_type": "token_refresh",
+          "user_id": "user101",
+          "token_type": "refresh_token",
+          "source_ip": "203.0.113.200",
+          "time_since_password_change": 1800,
+          "user_agent": "AttackerBot/1.0"
+        }
+      ],
+      "expected_detection": true,
+      "detection_reason": "Token refresh 30 minutes after password change from different IP"
+    },
+    {
+      "scenario_id": "foci_abuse",
+      "description": "Family of Client IDs token abuse",
+      "attack_type": "token_escalation",
+      "logs": [
+        {
+          "timestamp": "2025-09-06T17:00:00Z",
+          "event_type": "token_exchange",
+          "user_id": "user202",
+          "client_family": "microsoft_foci",
+          "original_client_id": "d3590ed6-52b3-4102-aeff-aad2292ab01c",
+          "current_client_id": "1950a258-227b-4e31-a9cf-717495945fc2",
+          "token_scope_expansion": true,
+          "original_scope": "https://graph.microsoft.com/User.Read",
+          "new_scope": "https://graph.microsoft.com/Mail.ReadWrite"
+        }
+      ],
+      "expected_detection": true,
+      "detection_reason": "Token scope expansion using FOCI family tokens"
+    },
+    {
+      "scenario_id": "prt_abuse",
+      "description": "Primary Refresh Token suspicious usage",
+      "attack_type": "prt_theft",
+      "logs": [
+        {
+          "timestamp": "2025-09-06T18:00:00Z",
+          "event_type": "prt_usage",
+          "user_id": "user303",
+          "device_id": "device_abc123",
+          "device_binding_validation": false,
+          "conditional_access_bypass": true,
+          "source_ip": "198.51.100.250",
+          "tpm_attestation": false
+        }
+      ],
+      "expected_detection": true,
+      "detection_reason": "PRT usage without device binding validation and TPM attestation"
+    }
+  ],
+  "benign_scenarios": [
+    {
+      "scenario_id": "legitimate_travel",
+      "description": "Legitimate user traveling across time zones",
+      "logs": [
+        {
+          "timestamp": "2025-09-06T10:00:00Z",
+          "event_type": "token_refresh",
+          "user_id": "user_traveler",
+          "source_ip": "192.168.1.100",
+          "geographic_location": "San Francisco, US"
+        },
+        {
+          "timestamp": "2025-09-06T22:00:00Z",
+          "event_type": "api_access",
+          "user_id": "user_traveler",
+          "source_ip": "203.0.113.50",
+          "geographic_location": "Tokyo, Japan",
+          "geographic_distance": 5135,
+          "time_delta": 43200,
+          "flight_duration_reasonable": true
+        }
+      ],
+      "expected_detection": false,
+      "detection_reason": "12-hour gap allows for reasonable flight time"
+    },
+    {
+      "scenario_id": "mobile_background_refresh",
+      "description": "Mobile app background token refresh",
+      "logs": [
+        {
+          "timestamp": "2025-09-06T12:00:00Z",
+          "event_type": "token_refresh",
+          "user_id": "user_mobile",
+          "token_type": "refresh_token",
+          "source_ip": "192.168.1.200",
+          "user_agent": "MobileApp/2.1.0 (iOS 17.0)",
+          "background_refresh": true
+        }
+      ],
+      "expected_detection": false,
+      "detection_reason": "Legitimate mobile background refresh"
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "created_date": "2025-09-06",
+    "author": "Smaran Dhungana <smarandhg@gmail.com>",
+    "description": "Test data for SAFE-T1202 OAuth Token Persistence detection rule",
+    "total_scenarios": 8,
+    "malicious_scenarios": 6,
+    "benign_scenarios": 2
+  }
+}
