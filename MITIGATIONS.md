@@ -56,13 +56,14 @@ SAFE-MCP mitigations are security controls designed to protect Model Context Pro
 | [SAFE-M-26](mitigations/SAFE-M-26/README.md) | Data Provenance Tracking | Data Security | High |
 | [SAFE-M-27](mitigations/SAFE-M-27/README.md) | Social Engineering Awareness Training | Human Factors | Medium |
 | [SAFE-M-28](mitigations/SAFE-M-28/README.md) | Pre-Authentication Tool Concealment | Preventive Control | High |
+| [SAFE-M-29](mitigations/SAFE-M-29/README.md) | Explicit Privilege Boundaries | Architectural Control | High |
 
 ## Summary Statistics
 
-- **Total Mitigations**: 28
-- **High Effectiveness**: 14 (50%)
-- **Medium-High Effectiveness**: 7 (25%)
-- **Medium Effectiveness**: 7 (25%)
+- **Total Mitigations**: 29
+- **High Effectiveness**: 15 (52%)
+- **Medium-High Effectiveness**: 7 (24%)
+- **Medium Effectiveness**: 7 (24%)
 - **Low Effectiveness**: 0 (0%)
 
 ## Category Distribution
@@ -78,7 +79,7 @@ SAFE-MCP mitigations are security controls designed to protect Model Context Pro
 | AI-Based Defense | 1 |
 | Supply Chain Security | 2 |
 | Isolation and Containment | 1 |
-| Architectural Control | 1 |
+| Architectural Control | 2 |
 | Risk Management | 1 |
 | Data Security | 1 |
 | Human Factors | 1 |
