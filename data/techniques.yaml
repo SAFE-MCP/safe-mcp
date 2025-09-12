@@ -1,0 +1,44 @@
+pas- id: "SAFE-T0001"
+  version: "0.1.0"
+  name: "Prompt Injection"
+  tactic: "Execution"
+  description: "Attacker crafts inputs that steer the model or tools to perform unintended actions, exfiltrate secrets, or bypass guardrails."
+  tags: ["llm", "injection", "tooling"]
+  mitre_mappings: ["T1565.001"]
+  detections:
+    - type: "Heuristic"
+      ref: "prompt-injection-keywords"
+      notes: "Keyword/structure based checks"
+  mitigations:
+    - "System prompt hardening"
+    - "Input/output validation"
+    - "Tool allow-lists"
+  references:
+    - "https://mitre.org/"
+  provenance:
+    created: "2025-09-11"
+    authors: ["bochristopher"]
+    source_of_truth: "Both"
+  status: "draft"
+
+- id: "SAFE-T0002"
+  version: "0.1.0"
+  name: "Model Evasion"
+  tactic: "Evasion"
+  description: "Inputs are manipulated to bypass filters or safety checks, avoiding detection while achieving disallowed outputs or behaviors."
+  tags: ["evasion", "safety"]
+  mitre_mappings: ["T1070"]
+  detections:
+    - type: "Query"
+      ref: "anomaly-scoring-outbound"
+  mitigations:
+    - "Adversarial training"
+    - "Rate limiting"
+    - "Multi-stage moderation"
+  references:
+    - "https://arxiv.org/"
+  provenance:
+    created: "2025-09-11"
+    authors: ["bochristopher"]
+    source_of_truth: "Both"
+  status: "draft"te
