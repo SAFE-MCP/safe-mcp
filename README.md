@@ -75,7 +75,7 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 | **ATK-TA0004** | **Privilege Escalation** | SAFE-T1301 | Cross-Server Tool Shadowing | Malicious MCP servers override legitimate tool calls to gain elevated privileges |
 | ATK-TA0004 | Privilege Escalation | SAFE-T1302 | High-Privilege Tool Abuse | Invoke a VM-level or root tool from normal user context |
 | ATK-TA0004 | Privilege Escalation | SAFE-T1303 | Sandbox Escape via Server Exec | Exploit vulnerable server to break container/seccomp isolation |
-| ATK-TA0004 | Privilege Escalation | SAFE-T1304 | Credential Relay Chain | Use one tool to steal tokens, feed them to second tool with higher privileges |
+| ATK-TA0004 | Privilege Escalation | [SAFE-T1304](techniques/SAFE-T1304/README.md) | Credential Relay Chain | Use one tool to steal tokens, feed them to second tool with higher privileges |
 | ATK-TA0004 | Privilege Escalation | SAFE-T1305 | Host OS Priv-Esc (RCE) | Achieve root via misconfigured service running as root, then alter host |
 | ATK-TA0004 | Privilege Escalation | SAFE-T1306 | Rogue Authorization Server | Malicious MCP server redirects OAuth flows to attacker-controlled AS that ignores audience restrictions and Proof of Possession (PoP), minting overly-permissive "super-tokens" with expanded scopes |
 | ATK-TA0004 | Privilege Escalation | SAFE-T1307 | Confused Deputy Attack | MCP server receives token for one user (Alice) and forwards it to another user's (Bob) MCP instance, allowing Bob to perform actions as Alice by exploiting the server's trusted position |
