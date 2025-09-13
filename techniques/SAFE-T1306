@@ -50,8 +50,8 @@ json
 Advanced Attack Techniques (2025 Research Published)
 According to research from University of Stuttgart and Palo Alto Networks Unit42, attackers have developed sophisticated variations:
 
-Audience Injection Attacks: Manipulation of audience parameters in JWT assertions to bypass authorization validation (University of Stuttgart, 2025)
-OAuth Device Flow Exploitation: Abuse of device authorization grant to obtain broad-scope tokens without user interaction (WithSecure Research)
+Audience Injection Attacks: Manipulation of audience parameters in JWT assertions to bypass authorization validation (University of Stuttgart, 2025) https://www.microsoft.com/en-us/security/blog/2023/12/12/threat-actors-misuse-oauth-applications-to-automate-financially-driven-attacks/
+OAuth Device Flow Exploitation: Abuse of device authorization grant to obtain broad-scope tokens without user interaction (WithSecure Research) https://www.ietf.org/archive/id/draft-ietf-oauth-rfc7523bis-01.html 
 Impact Assessment
 Confidentiality: Critical - Complete access to enterprise data through super-tokens
 Integrity: High - Ability to modify data using elevated token permissions
