@@ -133,7 +133,7 @@ description: Detects potential credential relay attacks between MCP tools
 author: SAFE-MCP Team
 date: 2025-01-02
 references:
-  - https://github.com/safe-mcp/techniques/SAFE-T1304
+  - https://github.com/pritikabista/safe-mcp/blob/main/techniques/SAFE-T1304/README.md
 logsource:
   product: mcp
   service: authentication
