@@ -23,6 +23,7 @@ This approach implements industry-standard SBOM formats (SPDX, CycloneDX) with a
 1. **Complete Dependency Visibility**: Generate comprehensive inventories of all software components and dependencies
 2. **Automated Vulnerability Detection**: Continuously scan SBOM components against known vulnerability databases
 3. **Integrity Verification**: Cryptographically verify component authenticity and detect tampering
+4. **Build Provenance**: Establish verifiable chain of custody using SLSA framework and attestations
 
 ### Architecture Components
 ```
@@ -64,7 +65,7 @@ This approach implements industry-standard SBOM formats (SPDX, CycloneDX) with a
    - Establish monitoring and alerting
 
 ## Benefits
-- **Proactive Threat Detection**: Identify vulnerable dependencies before deployment with 95%+ accuracy for known CVEs
+- **Proactive Threat Detection**: Identify vulnerable dependencies before deployment with high accuracy for known CVEs, varying by ecosystem (NPM, PyPI, Go, etc.)
 - **Supply Chain Transparency**: Complete visibility into all components and their provenance
 - **Automated Risk Assessment**: Continuous evaluation of component risk scores and vulnerability exposure
 - **Compliance Support**: Simplified compliance with security frameworks (NIST SSDF, EO 14028)
@@ -85,9 +86,26 @@ def deploy_mcp_server(package_path):
     return install_package(package_path)
 
 # Protected approach with SBOM verification
-def deploy_mcp_server_with_sbom(package_path, sbom_path):
-    # Verify SBOM exists and is signed
-    sbom = load_and_verify_sbom(sbom_path)
+def deploy_mcp_server_with_sbom(package_path, sbom_path, attestation_path):
+    # Verify SBOM signature using Sigstore/cosign
+    # Trust model: Fulcio certificate authority with OIDC identity
+    verify_result = cosign_verify(
+        sbom_path,
+        certificate_oidc_issuer="https://accounts.google.com",
+        certificate_identity="release@example.com"
+    )
+    
+    # Verify build provenance via Rekor transparency log
+    rekor_entry = verify_rekor_inclusion(attestation_path)
+    if not rekor_entry:
+        raise SecurityError("No transparency log entry found")
+    
+    # Load and parse SBOM
+    sbom = load_sbom(sbom_path)
+    
+    # Verify SLSA build level requirements
+    if not verify_slsa_provenance(attestation_path, required_level=3):
+        raise SecurityError("Insufficient SLSA build level")
     
     # Scan for vulnerabilities
     vulnerabilities = scan_sbom_vulnerabilities(sbom)
@@ -97,7 +115,7 @@ def deploy_mcp_server_with_sbom(package_path, sbom_path):
         raise SecurityError("Package fails security policy")
     
     # Log deployment with component tracking
-    log_deployment(package_path, sbom, vulnerabilities)
+    log_deployment(package_path, sbom, vulnerabilities, rekor_entry)
     
     return install_package(package_path)
 ```
@@ -119,9 +137,19 @@ def deploy_mcp_server_with_sbom(package_path, sbom_path):
       "versionInfo": "1.2.0",
       "downloadLocation": "https://github.com/example/mcp-file-server",
       "filesAnalyzed": true,
-      "packageVerificationCode": {
-        "packageVerificationCodeValue": "d6a770ba38583ed4bb4525bd96e50461655d2758"
-      },
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "3b907c86c05e9d0f7f2e8b9c1e9f8e3d5b5e9c5f5e8b9c1e9f8e3d5b5e9c5f5e8b9"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/mcp-file-server@1.2.0"
+        }
+      ],
       "copyrightText": "Copyright 2025 ACME Corp"
     },
     {
@@ -130,11 +158,17 @@ def deploy_mcp_server_with_sbom(package_path, sbom_path):
       "versionInfo": "4.18.2",
       "downloadLocation": "https://registry.npmjs.org/express/-/express-4.18.2.tgz",
       "filesAnalyzed": false,
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "bb0ffd43a84e3a92f2f9c1e9f8e3d5b5e9c5f5e8b9c1e9f8e3d5b5e9c5f5e8b9"
+        }
+      ],
       "externalRefs": [
         {
           "referenceCategory": "PACKAGE-MANAGER",
-          "referenceType": "npm",
-          "referenceLocator": "express@4.18.2"
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/express@4.18.2"
         }
       ]
     }
@@ -160,6 +194,8 @@ def deploy_mcp_server_with_sbom(package_path, sbom_path):
    - Test with tampered SBOMs to ensure integrity verification
    - Validate policy enforcement prevents deployment of high-risk components
    - Verify SBOM signature validation rejects unauthorized modifications
+   - Test SLSA-style provenance attestations (in-toto/SLSA v1.0) to prove build authenticity
+   - Validate DSSE-wrapped attestations with Sigstore cosign keys for artifact verification
 
 2. **Functional Testing**:
    - Ensure SBOM generation covers all dependency types (direct, transitive, dev)
@@ -182,7 +218,7 @@ def deploy_mcp_server_with_sbom(package_path, sbom_path):
 - **Network**: Regular updates from vulnerability databases (100MB/day typical)
 
 ### Performance Impact
-- **Latency**: 30-60 seconds additional deployment time for SBOM verification
+- **Latency**: 30-60 seconds additional build time for SBOM verification
 - **Throughput**: Minimal impact on runtime performance, affects build pipeline only
 - **Resource Usage**: Background vulnerability scanning consumes 1-2 CPU cores
 
@@ -212,6 +248,13 @@ The SPDX and CycloneDX formats have emerged as industry standards, with tooling 
 - [OSV - Open Source Vulnerabilities Database](https://osv.dev/)
 - [Anchore State of Software Supply Chain Report 2024](https://anchore.com/software-supply-chain-report/)
 - [Model Context Protocol Specification](https://modelcontextprotocol.io/specification)
+- [SLSA - Supply chain Levels for Software Artifacts](https://slsa.dev/)
+- [Sigstore - Keyless signing for software artifacts](https://www.sigstore.dev/)
+- [in-toto - A framework to secure software supply chains](https://in-toto.io/)
+- [DSSE - Dead Simple Signing Envelope](https://github.com/secure-systems-lab/dsse)
+- [Fulcio - Free Root CA for Code Signing](https://github.com/sigstore/fulcio)
+- [Rekor - Transparency Log for Software Supply Chain](https://github.com/sigstore/rekor)
+- [Package URL (purl) Specification](https://github.com/package-url/purl-spec)
 
 ## Related Mitigations
 - [SAFE-M-6](../SAFE-M-6/README.md): Tool Registry Verification - Complementary registry-based controls
