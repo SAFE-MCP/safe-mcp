@@ -1,0 +1,151 @@
+SAFE-T[1306]: [Rogue Authorization Server]
+Overview
+Tactic: [Initial Access (TA0001) / Credential Access (TA0006)]
+Technique ID: SAFE-T[1306] [Note: This is a theoretical designation based on documented attack patterns]
+Severity: Critical
+First Observed: August 2025 (Salesloft Drift incident)
+Last Updated: September 13, 2025
+
+Description
+Malicious Model Context Protocol (MCP) servers exploit OAuth 2.0 authorization flows by redirecting authentication requests to attacker-controlled Authorization Servers (AS). These rogue AS implementations deliberately ignore critical security mechanisms including audience restrictions (aud claim validation) and Proof of Possession (PoP) requirements, enabling the creation of overly-permissive "super-tokens" with expanded scopes beyond the originally requested permissions.
+
+This attack leverages the trust relationship between MCP clients and OAuth providers, exploiting implementation gaps in audience validation and authorization server verification. The rogue AS mints tokens with artificially broad scopes (such as api refresh_token full) while bypassing standard OAuth security controls, resulting in unauthorized access to sensitive enterprise resources and data.
+
+Attack Vectors
+Primary Vector: OAuth flow redirection to malicious authorization server
+Secondary Vectors:
+MCP server impersonation with legitimate-appearing OAuth endpoints
+DNS hijacking to redirect OAuth flows to attacker infrastructure
+Compromised third-party integrations serving as OAuth proxy
+Technical Details
+Prerequisites
+Target organization using MCP-enabled applications with OAuth integration
+Ability to register or compromise MCP server endpoints
+Network position to intercept or redirect OAuth authorization requests
+Attack Flow
+Initial Stage: Attacker deploys malicious MCP server or compromises existing server
+OAuth Hijacking Stage: MCP server redirects OAuth authorization requests to attacker-controlled AS
+Token Minting Stage: Rogue AS ignores aud restrictions and PoP requirements
+Scope Escalation Stage: Malicious AS issues tokens with expanded scopes (e.g., api refresh_token full)
+Post-Exploitation: Attacker uses super-tokens to access enterprise resources, export data, and maintain persistence
+Example Scenario
+json
+// Legitimate OAuth request
+{
+  "response_type": "code",
+  "client_id": "mcp_client_123",
+  "redirect_uri": "https://legitimate-mcp.com/callback",
+  "scope": "read:profile",
+  "audience": "https://api.enterprise.com"
+}
+
+// Rogue AS response (ignoring audience/scope restrictions)
+{
+  "access_token": "malicious_super_token_xyz",
+  "token_type": "Bearer",
+  "scope": "api refresh_token full admin:write",
+  "audience": "https://api.enterprise.com https://admin.enterprise.com",
+  "expires_in": 31536000
+}
+Advanced Attack Techniques (2025 Research Published)
+According to research from University of Stuttgart and Palo Alto Networks Unit42, attackers have developed sophisticated variations:
+
+Audience Injection Attacks: Manipulation of audience parameters in JWT assertions to bypass authorization validation (University of Stuttgart, 2025)
+OAuth Device Flow Exploitation: Abuse of device authorization grant to obtain broad-scope tokens without user interaction (WithSecure Research)
+Impact Assessment
+Confidentiality: Critical - Complete access to enterprise data through super-tokens
+Integrity: High - Ability to modify data using elevated token permissions
+Availability: Medium - Potential for service disruption through resource abuse
+Scope: Network-wide - Tokens can access multiple integrated services and APIs
+Current Status (2025)
+According to security researchers, organizations are beginning to implement mitigations:
+
+Microsoft has documented OAuth application abuse patterns affecting hundreds of organizations
+IETF has published security updates for OAuth 2.0 audience restrictions in response to documented attacks
+Detection Methods
+Indicators of Compromise (IoCs)
+OAuth authorization requests redirecting to non-standard AS endpoints
+Tokens with unexpectedly broad scopes (e.g., api refresh_token full)
+User-agent strings indicating automated OAuth flows: Python/3.11 aiohttp/3.12.15
+Mass data export activities following OAuth authentication
+OAuth flows originating from Tor exit nodes
+Detection Rules
+Important: The following rule is written in Sigma format and contains example patterns only. Attackers continuously develop new injection techniques and obfuscation methods. Organizations should:
+
+Use AI-based anomaly detection to identify novel attack patterns
+Regularly update detection rules based on threat intelligence
+Implement multiple layers of detection beyond pattern matching
+Consider semantic analysis of OAuth request parameters
+yaml
+# EXAMPLE SIGMA RULE - Not comprehensive
+title: Rogue OAuth Authorization Server Detection
+id: a1b2c3d4-e5f6-7890-1234-567890abcdef
+status: experimental
+description: Detects potential OAuth flow redirection to malicious authorization servers
+author: Security Research Team
+date: 2025-09-13
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1306
+logsource:
+  product: mcp
+  service: oauth
+detection:
+  selection:
+    event_type: 'oauth_authorization'
+    authorization_server:
+      - '*non-standard-as.com*'
+      - '*suspicious-oauth.net*'
+    scope:
+      - '*api refresh_token full*'
+      - '*admin:*'
+    user_agent:
+      - 'Python/3.11 aiohttp/*'
+      - 'Salesforce-Multi-Org-Fetcher/*'
+  condition: selection
+falsepositives:
+  - Legitimate administrative OAuth applications with broad scopes
+  - Authorized API automation tools
+level: high
+tags:
+  - attack.initial_access
+  - attack.credential_access
+  - attack.t1528
+  - safe.t1306
+Behavioral Indicators
+Unusual OAuth application creation by recently compromised accounts
+Token usage patterns indicating automated data exfiltration
+Cross-platform authentication anomalies across integrated SaaS services
+Mitigation Strategies
+Preventive Controls
+SAFE-M-001: OAuth Server Validation: Implement strict allowlist of authorized OAuth AS endpoints with certificate pinning
+SAFE-M-002: Audience Restriction Enforcement: Mandatory validation of aud claims in all OAuth tokens according to IETF security updates
+SAFE-M-003: Proof of Possession Implementation: Deploy DPoP (RFC 9449) or Mutual TLS for sender-constrained tokens
+Detective Controls
+SAFE-M-004: OAuth Flow Monitoring: Real-time analysis of OAuth authorization requests and token characteristics
+SAFE-M-005: Scope Anomaly Detection: Machine learning-based detection of abnormal token scope patterns
+Response Procedures
+Immediate Actions:
+Revoke all tokens issued by suspected rogue authorization servers
+Block network access to identified malicious AS endpoints
+Investigation Steps:
+Analyze OAuth flow logs for redirection patterns
+Inventory all tokens with suspicious scope combinations
+Remediation:
+Update OAuth client configurations to use verified AS endpoints
+Implement enhanced OAuth security controls (PKCE, DPoP)
+Related Techniques
+SAFE-T1205: MCP Server Impersonation
+SAFE-T1401: OAuth Token Theft and Replay
+References
+Model Context Protocol Specification
+OWASP Top 10 for LLM Applications
+A Comprehensive Formal Security Analysis of OAuth 2.0 - Li et al., ACM CCS 2016
+Updates to Audience Values for OAuth 2.0 Authorization Servers - IETF Draft 2025
+Threat Brief: Salesloft Drift Integration Used To Compromise Salesforce Instances - Unit42, 2025
+Malicious OAuth Applications Abuse - Microsoft Security Blog, 2022
+MITRE ATT&CK Mapping
+T1528 - Steal Application Access Token
+T1078 - Valid Accounts (if applicable)
+Version History
+Version	Date	Changes	Author
+1.0	2025-09-13	Initial documentation based on Salesloft Drift incident analysis	Security Research Team
