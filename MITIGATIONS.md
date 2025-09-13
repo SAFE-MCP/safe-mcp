@@ -57,12 +57,16 @@ SAFE-MCP mitigations are security controls designed to protect Model Context Pro
 | [SAFE-M-27](mitigations/SAFE-M-27/README.md) | Social Engineering Awareness Training | Human Factors | Medium |
 | [SAFE-M-28](mitigations/SAFE-M-28/README.md) | Pre-Authentication Tool Concealment | Preventive Control | High |
 | [SAFE-M-29](mitigations/SAFE-M-29/README.md) | Explicit Privilege Boundaries | Architectural Control | High |
+| [SAFE-M-30](mitigations/SAFE-M-30/README.md) | Vector Store Integrity Verification | Cryptographic Control | High |
+| [SAFE-M-31](mitigations/SAFE-M-31/README.md) | Embedding Sanitization and Validation | Input Validation | Medium-High |
+| [SAFE-M-32](mitigations/SAFE-M-32/README.md) | Vector Store Isolation and Containment | Architectural Defense | High |
+| [SAFE-M-33](mitigations/SAFE-M-33/README.md) | Continuous Vector Store Monitoring | Detective Control | Medium-High |
 
 ## Summary Statistics
 
-- **Total Mitigations**: 29
-- **High Effectiveness**: 15 (52%)
-- **Medium-High Effectiveness**: 7 (24%)
+- **Total Mitigations**: 33
+- **High Effectiveness**: 17 (52%)
+- **Medium-High Effectiveness**: 9 (27%)
 - **Medium Effectiveness**: 7 (24%)
 - **Low Effectiveness**: 0 (0%)
 
@@ -70,12 +74,12 @@ SAFE-MCP mitigations are security controls designed to protect Model Context Pro
 
 | Category | Number of Mitigations |
 |----------|---------------------|
-| Detective Control | 6 |
+| Detective Control | 7 |
 | Preventive Control | 6 |
-| Input Validation | 4 |
-| Architectural Defense | 2 |
+| Input Validation | 5 |
+| Architectural Defense | 3 |
 | UI Security | 2 |
-| Cryptographic Control | 1 |
+| Cryptographic Control | 2 |
 | AI-Based Defense | 1 |
 | Supply Chain Security | 2 |
 | Isolation and Containment | 1 |
