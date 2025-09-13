@@ -2,7 +2,7 @@ title: MCP Credential Relay Chain Detection
 id: 7B67EA0A-2966-4251-8522-77FCA3434801
 status: experimental
 description: Detects potential credential relay attacks between MCP tools where stolen tokens are used to escalate privileges
-author: SAFE-MCP Team
+author: pritikabista
 date: 2025-01-02
 references:
   - https://github.com/safe-mcp/techniques/SAFE-T1304
