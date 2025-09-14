@@ -1,0 +1,108 @@
+# SIGMA RULE: Malicious MCP Server Detection
+# WARNING: This rule contains example patterns only. Organizations should:
+# - Regularly update patterns based on threat intelligence
+# - Implement behavioral analysis beyond pattern matching
+# - Use AI-based anomaly detection for novel attack vectors
+# - Consider environment-specific customizations
+
+title: Malicious MCP Server Installation and Activity
+id: b8c5d7f2-34e6-47a9-8bc1-def234567890
+status: experimental
+description: Detects indicators of malicious MCP server installation and execution
+author: SAFE-MCP Team
+date: 2025-09-14
+modified: 2025-09-14
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1003
+  - https://attack.mitre.org/techniques/T1566/
+  - https://attack.mitre.org/techniques/T1204/
+logsource:
+  product: mcp
+  service: server_runtime
+detection:
+  # Suspicious installation patterns
+  selection_installation:
+    EventID: 4688  # Process creation
+    ProcessName|endswith:
+      - '\npm.exe'
+      - '\docker.exe'
+      - '\pip.exe'
+      - '\yarn.exe'
+    CommandLine|contains:
+      - 'productivity-tools'
+      - 'advanced-mcp'
+      - 'enhanced-mcp'
+      - 'professional-tools'
+      - 'ultimate-mcp'
+      - 'premium-tools'
+
+  # Suspicious network activity
+  selection_network:
+    EventID: 3  # Network connection
+    ProcessName|contains: 'mcp'
+    DestinationHostname|contains:
+      - 'analytics'
+      - 'metrics'
+      - 'backup-service'
+      - 'health-check'
+      - 'telemetry'
+      - 'stats'
+    DestinationHostname|endswith:
+      - '.tk'
+      - '.ml'
+      - '.ga'
+      - '.cf'
+
+  # Persistence mechanisms
+  selection_persistence:
+    EventID: 11  # File creation
+    TargetFilename|contains:
+      - 'health-check'
+      - 'mcp-monitor'
+      - '.mcp-backup'
+      - '.productivity'
+    TargetFilename|endswith:
+      - '/crontab'
+      - '/systemd/system/'
+      - '.service'
+      - '.timer'
+
+  # Privilege escalation attempts
+  selection_privilege:
+    EventID: 4672  # Special privileges assigned
+    ProcessName|contains: 'mcp'
+    PrivilegeList|contains:
+      - 'SeDebugPrivilege'
+      - 'SeSystemtimePrivilege'
+      - 'SeBackupPrivilege'
+      - 'SeRestorePrivilege'
+
+  # Suspicious file access patterns
+  selection_file_access:
+    EventID: 4663  # File access
+    ProcessName|contains: 'mcp'
+    ObjectName|contains:
+      - '.ssh/'
+      - '.aws/'
+      - '.env'
+      - 'secrets'
+      - 'credentials'
+      - 'id_rsa'
+      - 'id_dsa'
+
+  condition: selection_installation or selection_network or selection_persistence or selection_privilege or selection_file_access
+
+falsepositives:
+  - Legitimate MCP servers with external integrations
+  - Development and testing environments
+  - MCP servers with legitimate analytics or monitoring features
+  - Containers with legitimate health check mechanisms
+  - Administrative tools that legitimately require elevated privileges
+
+level: high
+tags:
+  - attack.initial_access
+  - attack.t1566
+  - attack.t1204
+  - attack.t1204.002
+  - safe.t1003
