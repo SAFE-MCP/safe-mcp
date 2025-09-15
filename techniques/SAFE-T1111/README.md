@@ -186,7 +186,7 @@ title: AI Agent CLI Weaponization Detection
 id: f8e9d7c6-4b3a-4d2c-9f1e-8a7b6c5d4e3f
 status: experimental
 description: Detects weaponization of AI coding assistant CLI tools with dangerous flags for reconnaissance and data exfiltration
-author: SAFE-MCP Team
+author: bishnu bista
 date: 2025-08-27
 references:
   - https://github.com/safe-mcp/techniques/SAFE-T1111
@@ -416,4 +416,4 @@ shell_monitoring:
 ## Version History
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
-| 1.0 | 2025-08-27 | Initial documentation based on Nx malicious package incident analysis | AI Security Researcher |
+| 1.0 | 2025-08-27 | Initial documentation based on Nx malicious package incident analysis | bishnu bista |

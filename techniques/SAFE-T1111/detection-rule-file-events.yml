@@ -2,7 +2,7 @@ title: AI Agent CLI Weaponization File Artifacts
 id: safe-t1111-file-artifacts
 status: experimental
 description: Detects tmp inventory artifacts and shell rc modifications associated with AI Agent CLI weaponization
-author: SAFE-MCP Team
+author: bishnu bista
 date: 2025-08-27
 references:
   - https://github.com/safe-mcp/techniques/SAFE-T1111
@@ -44,4 +44,3 @@ level: high
 tags:
   - attack.execution
   - safe.t1111
-
