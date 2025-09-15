@@ -97,7 +97,7 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 | ATK-TA0006 | Credential Access | SAFE-T1507 | Authorization Code Interception | Man-in-the-browser attack steals OAuth authorization codes during the redirect flow and attempts to exchange them at the token endpoint before the legitimate client |
 | **ATK-TA0007** | **Discovery** | SAFE-T1601 | MCP Server Enumeration | Unauthorized discovery and mapping of available MCP servers and tools |
 | ATK-TA0007 | Discovery | SAFE-T1602 | Tool Enumeration | Call tools/list to see available functions |
-| ATK-TA0007 | Discovery | SAFE-T1603 | System-Prompt Disclosure | Coax model into printing its system prompt/tool JSON |
+| ATK-TA0007 | Discovery | [SAFE-T1603](techniques/SAFE-T1603/README.md) | System-Prompt Disclosure | Coax model into printing its system prompt/tool JSON |
 | ATK-TA0007 | Discovery | SAFE-T1604 | Server Version Enumeration | GET /version or header analysis for vulnerable builds |
 | ATK-TA0007 | Discovery | SAFE-T1605 | Capability Mapping | Ask "what can you do?"; model outlines high-value tools |
 | ATK-TA0007 | Discovery | SAFE-T1606 | Directory Listing via File Tool | List root dir to find sensitive paths |
