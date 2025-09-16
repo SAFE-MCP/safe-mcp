@@ -1,0 +1,73 @@
+title: Malicious MCP Server Data Exfiltration Detection
+id: b9e4c3d2-5f6a-7b8c-9d0e-1f2a3b4c5d6e
+status: experimental
+description: Detects potential data exfiltration from malicious MCP servers through suspicious network activity, file access patterns, and credential harvesting behavior
+author: SAFE-MCP Team
+date: 2025-09-15
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T3002
+  - https://securelist.com
+logsource:
+  product: mcp
+  service: server_monitoring
+detection:
+  suspicious_network:
+    process_name: '*mcp*'
+    network_connection:
+      - '*github-api-v4*'
+      - '*api-github*'
+      - '*gitlab-api*'
+      - '*.herokuapp.com*'
+      - '*.ngrok.io*'
+      - '*.requestbin.com*'
+      - '*.webhook.site*'
+      - '*pastebin.com*'
+  file_enumeration:
+    process_name: '*mcp*'
+    file_access:
+      - '*/.env'
+      - '*/.aws/credentials'
+      - '*/.ssh/id_rsa'
+      - '*/.ssh/id_ed25519'
+      - '*/etc/passwd'
+      - '*/.gitconfig'
+      - '*/.npmrc'
+      - '*/.pypirc'
+      - '*api_key*'
+      - '*secret*'
+      - '*token*'
+      - '*password*'
+  env_harvesting:
+    process_name: '*mcp*'
+    command_line:
+      - '*os.environ*'
+      - '*getenv*'
+      - '*API_KEY*'
+      - '*SECRET*'
+      - '*TOKEN*'
+      - '*PASSWORD*'
+      - '*OPENAI_API_KEY*'
+      - '*ANTHROPIC_API_KEY*'
+      - '*GITHUB_TOKEN*'
+  data_exfiltration:
+    process_name: '*mcp*'
+    network_activity:
+      - '*base64*POST*'
+      - '*json.dumps*POST*'
+      - '*curl -d*'
+      - '*requests.post*'
+      - '*fetch*POST*'
+  condition: any of them
+falsepositives:
+  - Legitimate MCP servers accessing configuration files for normal operation
+  - Authorized environment variable usage for server configuration
+  - Normal API calls to documented external services
+  - Legitimate credential file access for authentication purposes
+level: high
+tags:
+  - attack.initial_access
+  - attack.t1195
+  - attack.t1552
+  - safe.t3002
+  - supply_chain.compromise
+  - credential.harvesting
