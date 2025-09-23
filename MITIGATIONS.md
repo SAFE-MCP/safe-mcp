@@ -56,11 +56,11 @@ SAFE-MCP mitigations are security controls designed to protect Model Context Pro
 | [SAFE-M-26](mitigations/SAFE-M-26/README.md) | Data Provenance Tracking | Data Security | High |
 | [SAFE-M-27](mitigations/SAFE-M-27/README.md) | Social Engineering Awareness Training | Human Factors | Medium |
 | [SAFE-M-28](mitigations/SAFE-M-28/README.md) | Pre-Authentication Tool Concealment | Preventive Control | High |
-| [SAFE-M-33](mitigations/SAFE-M-33/README.md) | Training Data Provenance Verification | Data Security | High |
-| [SAFE-M-34](mitigations/SAFE-M-34/README.md) | AI Model Integrity Validation | Cryptographic Control | High |
-| [SAFE-M-35](mitigations/SAFE-M-35/README.md) | Adversarial Training Data Detection | AI-Based Defense | Medium-High |
-| [SAFE-M-36](mitigations/SAFE-M-36/README.md) | Model Behavior Monitoring | Detective Control | Medium-High |
 | [SAFE-M-29](mitigations/SAFE-M-29/README.md) | Explicit Privilege Boundaries | Architectural Control | High |
+| [SAFE-M-30](mitigations/SAFE-M-30/README.md) | Vector Store Integrity Verification | Cryptographic Control | High |
+| [SAFE-M-31](mitigations/SAFE-M-31/README.md) | Embedding Sanitization and Validation | Input Validation | Medium-High |
+| [SAFE-M-32](mitigations/SAFE-M-32/README.md) | Vector Store Isolation and Containment | Architectural Defense | High |
+| [SAFE-M-33](mitigations/SAFE-M-33/README.md) | Continuous Vector Store Monitoring | Detective Control | Medium-High |
 
 ## Summary Statistics
 
@@ -76,16 +76,16 @@ SAFE-MCP mitigations are security controls designed to protect Model Context Pro
 |----------|---------------------|
 | Detective Control | 7 |
 | Preventive Control | 6 |
-| Input Validation | 4 |
-| Architectural Defense | 2 |
+| Input Validation | 5 |
+| Architectural Defense | 3 |
 | UI Security | 2 |
 | Cryptographic Control | 2 |
-| AI-Based Defense | 2 |
+| AI-Based Defense | 1 |
 | Supply Chain Security | 2 |
 | Isolation and Containment | 1 |
 | Architectural Control | 2 |
 | Risk Management | 1 |
-| Data Security | 2 |
+| Data Security | 1 |
 | Human Factors | 1 |
 
 
