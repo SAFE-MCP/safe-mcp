@@ -65,6 +65,7 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 | ATK-TA0002 | Execution | [SAFE-T1106](techniques/SAFE-T1106/README.md) | Autonomous Loop Exploit | Craft prompts that push an agent into infinite "self-invoke" loop to exhaust CPU or hit rate limits (DoS) |
 | ATK-TA0002 | Execution | [SAFE-T1109](techniques/SAFE-T1109/README.md) | Debugging Tool Exploitation | Browser-based remote code execution via vulnerable MCP Inspector (CVE-2025-49596) |
 | ATK-TA0002 | Execution | [SAFE-T1110](techniques/SAFE-T1110/README.md) | Multimodal Prompt Injection via Images/Audio | Embedding malicious instructions within image or audio content to manipulate multimodal AI behavior |
+| ATK-TA0002 | Execution | [SAFE-T1111](techniques/SAFE-T1111/README.md) | AI Agent CLI Weaponization | Malicious exploitation of AI coding assistant CLI tools with dangerous flags for reconnaissance and data exfiltration |
 | **ATK-TA0003** | **Persistence** | [SAFE-T1201](techniques/SAFE-T1201/README.md) | MCP Rug Pull Attack | Time-delayed malicious tool definition changes after initial approval |
 | ATK-TA0003 | Persistence | SAFE-T1202 | OAuth Token Persistence | Theft and reuse of OAuth access/refresh tokens for persistent access to MCP-connected services, including replay of refresh tokens after legitimate client sessions end |
 | ATK-TA0003 | Persistence | SAFE-T1203 | Backdoored Server Binary | Inserts cron job or reverse shell on install; persists even if MCP service is uninstalled |
@@ -141,7 +142,7 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 | Reconnaissance | 0 |
 | Resource Development | 1 |
 | Initial Access | 8 |
-| Execution | 8 |
+| Execution | 9 |
 | Persistence | 7 |
 | Privilege Escalation | 8 |
 | Defense Evasion | 8 |
