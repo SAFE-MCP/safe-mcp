@@ -1,0 +1,114 @@
+[
+  {
+    "description": "CSRF POST from external origin writing to different project than token claim",
+    "log_entry": {
+      "timestamp": "2025-08-10T12:00:00Z",
+      "http.method": "POST",
+      "http.path": "/api/projects/alpha/storage/upload",
+      "http.host": "resource.example.com",
+      "authorization.type": "Bearer",
+      "token.id": "tok-123",
+      "token.project_id": "beta",
+      "resource.project_id": "alpha",
+      "token.project_id_mismatch": true,
+      "token.reused_across_projects": false,
+      "csrf.present": false,
+      "referer.external": true,
+      "origin": "https://attacker.example",
+      "referer": "https://attacker.example/csrf",
+      "client.ip": "203.0.113.10"
+    },
+    "should_trigger": true,
+    "attack_type": "CSRF token relay with project mismatch"
+  },
+  {
+    "description": "Token rapidly reused across two projects within 5 minutes",
+    "log_entry": {
+      "timestamp": "2025-08-10T12:03:00Z",
+      "http.method": "PUT",
+      "http.path": "/api/projects/gamma/config",
+      "http.host": "resource.example.com",
+      "authorization.type": "Bearer",
+      "token.id": "tok-999",
+      "token.project_id": "delta",
+      "resource.project_id": "gamma",
+      "token.project_id_mismatch": true,
+      "token.reused_across_projects": true,
+      "csrf.present": false,
+      "referer.external": true,
+      "origin": "https://evil.site",
+      "referer": "https://evil.site/attack",
+      "client.ip": "198.51.100.44"
+    },
+    "should_trigger": true,
+    "attack_type": "Cross-project token reuse"
+  },
+  {
+    "description": "DELETE without CSRF token from external origin (audience ok, CSRF pattern)",
+    "log_entry": {
+      "timestamp": "2025-08-10T12:10:00Z",
+      "http.method": "DELETE",
+      "http.path": "/api/projects/beta/secrets/rotate",
+      "http.host": "resource.example.com",
+      "authorization.type": "Bearer",
+      "token.id": "tok-777",
+      "token.project_id": "beta",
+      "resource.project_id": "beta",
+      "token.project_id_mismatch": false,
+      "token.reused_across_projects": false,
+      "csrf.present": false,
+      "referer.external": true,
+      "origin": "https://attacker.example",
+      "referer": "https://attacker.example/trigger",
+      "client.ip": "203.0.113.11"
+    },
+    "should_trigger": true,
+    "attack_type": "CSRF-like state-changing request from external origin"
+  },
+  {
+    "description": "Legitimate same-site POST with valid CSRF token",
+    "log_entry": {
+      "timestamp": "2025-08-10T12:20:00Z",
+      "http.method": "POST",
+      "http.path": "/api/projects/beta/storage/upload",
+      "http.host": "resource.example.com",
+      "authorization.type": "Bearer",
+      "token.id": "tok-abc",
+      "token.project_id": "beta",
+      "resource.project_id": "beta",
+      "token.project_id_mismatch": false,
+      "token.reused_across_projects": false,
+      "csrf.present": true,
+      "referer.external": false,
+      "origin": "https://app.resource.example.com",
+      "referer": "https://app.resource.example.com/ui",
+      "client.ip": "192.0.2.20"
+    },
+    "should_trigger": false,
+    "attack_type": "Legitimate in-context operation"
+  },
+  {
+    "description": "Admin automation touching multiple projects with dedicated service token",
+    "log_entry": {
+      "timestamp": "2025-08-10T12:25:00Z",
+      "http.method": "PUT",
+      "http.path": "/api/projects/alpha/policy",
+      "http.host": "resource.example.com",
+      "authorization.type": "Bearer",
+      "token.id": "svc-001",
+      "token.project_id": "*",
+      "resource.project_id": "alpha",
+      "token.project_id_mismatch": false,
+      "token.reused_across_projects": true,
+      "csrf.present": true,
+      "referer.external": false,
+      "origin": "https://admin.resource.example.com",
+      "referer": "https://admin.resource.example.com/ops",
+      "client.ip": "192.0.2.21"
+    },
+    "should_trigger": false,
+    "attack_type": "Legitimate multi-project admin job"
+  }
+]
+
+
