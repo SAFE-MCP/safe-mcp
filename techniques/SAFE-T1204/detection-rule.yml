@@ -1,0 +1,193 @@
+title: MCP Context Memory Implant Detection
+id: 7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d
+status: experimental
+description: Detects potential context memory implants in MCP vector stores and persistent memory systems
+author: SAFE-MCP Team
+date: 2025-01-02
+modified: 2025-01-02
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1204
+  - https://attack.mitre.org/techniques/T1098/
+  - https://attack.mitre.org/techniques/T1505/
+  - https://arxiv.org/abs/2401.00123
+logsource:
+  product: mcp
+  service: vector_store
+  category: application
+detection:
+  # Suspicious vector store write operations
+  selection_write_operations:
+    operation_type:
+      - 'write'
+      - 'insert'
+      - 'update'
+      - 'upsert'
+    source:
+      - 'untrusted_agent'
+      - 'external_source'
+      - 'unknown_origin'
+      - '*malicious*'
+      - '*suspicious*'
+  
+  # Suspicious metadata patterns indicating persistence
+  selection_persistence_metadata:
+    metadata:
+      - '*priority*: *high*'
+      - '*session_persistence*: true'
+      - '*expires*: never'
+      - '*retention*: permanent'
+      - '*lifetime*: infinite'
+      - '*auto_reload*: true'
+      - '*always_retrieve*: true'
+  
+  # Suspicious content patterns suggesting malicious implants
+  selection_malicious_content:
+    content:
+      - '*execute*'
+      - '*command*'
+      - '*system*'
+      - '*privilege*'
+      - '*escalation*'
+      - '*bypass*'
+      - '*ignore*'
+      - '*override*'
+      - '*disregard*'
+      - '*forget*'
+      - '*previous*'
+      - '*instructions*'
+      - '*SYSTEM:*'
+      - '*[SYSTEM]*'
+      - '*<!-- SYSTEM*'
+      - '*\u200b*'  # Zero-width space
+      - '*\u200c*'  # Zero-width non-joiner
+      - '*\uE00*'   # Unicode tags
+  
+  # Suspicious vector characteristics
+  selection_vector_anomalies:
+    vector_priority:
+      - '999'
+      - '1000'
+      - 'max'
+      - 'critical'
+      - 'urgent'
+    retrieval_frequency:
+      - 'always'
+      - 'every_session'
+      - 'on_startup'
+      - 'preload'
+      - 'automatic'
+  
+  # Cross-session persistence indicators
+  selection_cross_session:
+    session_scope:
+      - 'global'
+      - 'all_users'
+      - 'all_sessions'
+      - 'persistent'
+      - 'shared'
+    access_pattern:
+      - 'pre_session'
+      - 'startup'
+      - 'initialization'
+      - 'bootstrap'
+  
+  # Suspicious embedding patterns
+  selection_embedding_anomalies:
+    embedding_metadata:
+      - '*created_by*: *agent*'
+      - '*source*: *external*'
+      - '*trust_level*: *unknown*'
+      - '*verification*: *none*'
+      - '*signature*: *missing*'
+  
+  # Behavioral anomalies in vector retrieval
+  selection_retrieval_anomalies:
+    retrieval_pattern:
+      - '*always_first*'
+      - '*highest_score*'
+      - '*mandatory*'
+      - '*required*'
+      - '*prerequisite*'
+  
+  # Combined suspicious patterns
+  selection_combined_suspicious:
+    content:
+      - '*</data>*<data>*'
+      - '*"}*{"*SYSTEM*'
+      - '*\n\n[*'
+      - '*]]>*<![CDATA[*'
+      - '*<!--*-->*'
+  
+  # High-confidence detection (multiple suspicious indicators)
+  condition_high_confidence:
+    - selection_write_operations
+    - selection_persistence_metadata
+    - selection_malicious_content
+  
+  # Medium-confidence detection (persistence + content)
+  condition_medium_confidence:
+    - selection_persistence_metadata
+    - selection_malicious_content
+  
+  # Low-confidence detection (single suspicious indicator)
+  condition_low_confidence:
+    - selection_write_operations
+    - selection_persistence_metadata
+    - selection_malicious_content
+    - selection_vector_anomalies
+    - selection_cross_session
+    - selection_embedding_anomalies
+    - selection_retrieval_anomalies
+    - selection_combined_suspicious
+  
+  # Final condition - any confidence level
+  condition: 1 of condition_*
+
+falsepositives:
+  - Legitimate high-priority system maintenance vectors
+  - Critical security update notifications with persistence requirements
+  - User preference settings that need to persist across sessions
+  - System configuration data that must be available at startup
+  - Legitimate session persistence for user experience
+  - Development and testing environments with intentional persistence
+  - Backup and recovery systems with persistent data requirements
+  - Compliance-related data that must be retained across sessions
+
+fields:
+  - operation_type
+  - source
+  - content
+  - metadata
+  - vector_priority
+  - retrieval_frequency
+  - session_scope
+  - access_pattern
+  - embedding_metadata
+  - retrieval_pattern
+  - timestamp
+  - session_id
+  - user_id
+  - vector_id
+  - created_by
+  - trust_level
+
+level: high
+
+tags:
+  - attack.persistence
+  - attack.t1098
+  - attack.t1505
+  - safe.t1204
+  - mcp.memory_implant
+  - vector.store
+  - context.persistence
+  - ai.security
+  - memory.poisoning
+
+# Additional detection considerations
+notes:
+  - This rule focuses on detecting the implantation phase of context memory attacks
+  - Consider implementing behavioral analysis to detect when implanted content is actually used
+  - Vector store access logs should be monitored for unusual write patterns
+  - Regular integrity checks of vector store content may help detect implants
+  - AI model behavior monitoring can help identify when implanted content is being processed 
