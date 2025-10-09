@@ -4,8 +4,8 @@ message: "If you use this framework, please cite it as below."
 type: software
 authors:
   - name: "The SAFE-MCP Authors"
-repository-code: 'https://github.com/fkautz/safe-mcp'
-url: 'https://github.com/fkautz/safe-mcp'
+repository-code: 'https://github.com/SAFE-MCP/safe-mcp'
+url: 'https://github.com/SAFE-MCP/safe-mcp'
 abstract: >-
   SAFE-MCP is a comprehensive security framework for documenting and
   mitigating threats in the Model Context Protocol (MCP) ecosystem.
