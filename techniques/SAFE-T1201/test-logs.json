@@ -1,0 +1,298 @@
+[
+    {
+        "description": "File processor tool making new network connections after 45 days",
+        "log_entry": {
+            "timestamp": "2025-01-15T16:30:15Z",
+            "event_type": "tool_execution",
+            "tool_name": "file_processor",
+            "tool_id": "fp-2024-001",
+            "user_id": "user123",
+            "network_connections": "https://attacker.com/exfil",
+            "outbound_data": "base64_encoded_payload",
+            "days_since_approval": 45,
+            "execution_count": 120,
+            "behavioral_change_detected": true,
+            "baseline_deviation": "3.2_std_dev",
+            "approval_date": "2024-12-01",
+            "network_activity": "new_connections"
+        },
+        "should_trigger": true,
+        "attack_type": "Time-delayed network exfiltration activation"
+    },
+    {
+        "description": "Text analyzer accessing credential files after establishment period",
+        "log_entry": {
+            "timestamp": "2025-01-15T16:35:22Z",
+            "event_type": "tool_execution",
+            "tool_name": "text_analyzer",
+            "tool_id": "ta-2024-003",
+            "user_id": "developer456",
+            "file_access_pattern": "credential_files",
+            "new_file_types": ".env,.key,.pem",
+            "file_access": "expanded_scope",
+            "days_since_approval": 60,
+            "execution_count": 200,
+            "behavioral_change_detected": true,
+            "baseline_deviation": "4.1_std_dev",
+            "approval_date": "2024-11-16"
+        },
+        "should_trigger": true,
+        "attack_type": "Credential harvesting after trust establishment"
+    },
+    {
+        "description": "Productivity helper tool exfiltrating data via new network connections",
+        "log_entry": {
+            "timestamp": "2025-01-15T16:40:18Z",
+            "event_type": "tool_execution",
+            "tool_name": "productivity_helper",
+            "tool_id": "ph-2024-007",
+            "user_id": "manager789",
+            "network_activity": "new_connections",
+            "network_connections": "ftp://data-exfil.suspicious.com",
+            "outbound_data": "encrypted_payload",
+            "resource_usage": "increased",
+            "days_since_approval": 90,
+            "execution_count": 300,
+            "behavioral_change_detected": true,
+            "baseline_deviation": "5.8_std_dev",
+            "approval_date": "2024-10-17"
+        },
+        "should_trigger": true,
+        "attack_type": "Data exfiltration via rug pull activation"
+    },
+    {
+        "description": "Document scanner accessing system directories after 35 days",
+        "log_entry": {
+            "timestamp": "2025-01-15T16:45:33Z",
+            "event_type": "tool_execution",
+            "tool_name": "document_scanner",
+            "tool_id": "ds-2024-012",
+            "user_id": "analyst321",
+            "file_access": "expanded_scope",
+            "file_access_pattern": "system_directories",
+            "new_file_types": ".config,.db,.log",
+            "permission_request": "escalated",
+            "days_since_approval": 35,
+            "execution_count": 80,
+            "behavioral_change_detected": true,
+            "baseline_deviation": "2.9_std_dev",
+            "approval_date": "2024-12-11"
+        },
+        "should_trigger": true,
+        "attack_type": "System directory access escalation"
+    },
+    {
+        "description": "Code helper requesting escalated permissions with changed error patterns",
+        "log_entry": {
+            "timestamp": "2025-01-15T16:50:12Z",
+            "event_type": "tool_execution",
+            "tool_name": "code_helper",
+            "tool_id": "ch-2024-005",
+            "user_id": "coder654",
+            "permission_request": "escalated",
+            "error_pattern": "changed",
+            "execution_time": "anomalous",
+            "resource_usage": "increased",
+            "days_since_approval": 50,
+            "execution_count": 150,
+            "behavioral_change_detected": true,
+            "baseline_deviation": "3.7_std_dev",
+            "approval_date": "2024-11-26"
+        },
+        "should_trigger": true,
+        "attack_type": "Permission escalation with behavioral changes"
+    },
+    {
+        "description": "Data processor with suspicious network activity and resource usage",
+        "log_entry": {
+            "timestamp": "2025-01-15T16:55:28Z",
+            "event_type": "tool_execution",
+            "tool_name": "data_processor",
+            "tool_id": "dp-2024-009",
+            "user_id": "scientist987",
+            "resource_usage": "increased",
+            "network_connections": "https://blockchain-trigger.com/api",
+            "network_activity": "new_connections",
+            "outbound_data": "base64",
+            "execution_time": "anomalous",
+            "days_since_approval": 70,
+            "execution_count": 250,
+            "behavioral_change_detected": true,
+            "baseline_deviation": "6.2_std_dev",
+            "approval_date": "2024-11-06"
+        },
+        "should_trigger": true,
+        "attack_type": "Blockchain-triggered rug pull with resource abuse"
+    },
+    {
+        "description": "Report generator accessing user data after trust period",
+        "log_entry": {
+            "timestamp": "2025-01-15T17:00:45Z",
+            "event_type": "tool_execution",
+            "tool_name": "report_generator",
+            "tool_id": "rg-2024-014",
+            "user_id": "reporter555",
+            "file_access_pattern": "user_data",
+            "file_access": "expanded_scope",
+            "new_file_types": ".private,.personal",
+            "network_connections": "https://social-media-trigger.com",
+            "days_since_approval": 85,
+            "execution_count": 180,
+            "behavioral_change_detected": true,
+            "baseline_deviation": "4.5_std_dev",
+            "approval_date": "2024-10-22"
+        },
+        "should_trigger": true,
+        "attack_type": "Social media triggered user data harvesting"
+    },
+    {
+        "description": "API helper with time-zone based activation trigger",
+        "log_entry": {
+            "timestamp": "2025-01-15T17:05:11Z",
+            "event_type": "tool_execution",
+            "tool_name": "api_helper",
+            "tool_id": "ah-2024-018",
+            "user_id": "integrator222",
+            "network_activity": "new_connections",
+            "network_connections": "https://tz-trigger-server.malicious.net",
+            "file_access_pattern": "log_files",
+            "permission_request": "escalated",
+            "days_since_approval": 120,
+            "execution_count": 400,
+            "behavioral_change_detected": true,
+            "baseline_deviation": "7.1_std_dev",
+            "approval_date": "2024-09-17"
+        },
+        "should_trigger": true,
+        "attack_type": "Time-zone based environmental trigger activation"
+    },
+    {
+        "description": "Recently approved file reader with normal behavior",
+        "log_entry": {
+            "timestamp": "2025-01-15T15:30:15Z",
+            "event_type": "tool_execution",
+            "tool_name": "file_reader",
+            "tool_id": "fr-2025-001",
+            "user_id": "newuser111",
+            "file_access_pattern": "document_files",
+            "days_since_approval": 10,
+            "execution_count": 25,
+            "behavioral_change_detected": false,
+            "baseline_deviation": "0.1_std_dev",
+            "approval_date": "2025-01-05",
+            "legitimate_operation": true
+        },
+        "should_trigger": false,
+        "attack_type": "Normal new tool behavior"
+    },
+    {
+        "description": "Long-running calculator with stable behavior",
+        "log_entry": {
+            "timestamp": "2025-01-15T15:35:22Z",
+            "event_type": "tool_execution",
+            "tool_name": "calculator",
+            "tool_id": "calc-2023-001",
+            "user_id": "mathuser333",
+            "days_since_approval": 100,
+            "execution_count": 500,
+            "behavioral_change_detected": false,
+            "baseline_deviation": "0_std_dev",
+            "approval_date": "2024-10-07",
+            "stable_performance": true
+        },
+        "should_trigger": false,
+        "attack_type": "Stable long-term tool operation"
+    },
+    {
+        "description": "User authentication event (non-tool execution)",
+        "log_entry": {
+            "timestamp": "2025-01-15T15:40:18Z",
+            "event_type": "user_login",
+            "tool_name": "authentication_system",
+            "user_id": "admin999",
+            "authentication_method": "oauth",
+            "success": true
+        },
+        "should_trigger": false,
+        "attack_type": "Non-tool execution event"
+    },
+    {
+        "description": "Legitimate tool update with approved network access",
+        "log_entry": {
+            "timestamp": "2025-01-15T15:45:33Z",
+            "event_type": "tool_execution",
+            "tool_name": "legitimate_updater",
+            "tool_id": "lu-2024-020",
+            "user_id": "admin888",
+            "network_connections": "https://official-update-server.com/v2.1",
+            "days_since_approval": 40,
+            "execution_count": 100,
+            "behavioral_change_detected": false,
+            "approved_update": true,
+            "update_authorization": "AUTH-2025-001",
+            "approval_date": "2024-12-06"
+        },
+        "should_trigger": false,
+        "attack_type": "Legitimate authorized tool update"
+    },
+    {
+        "description": "System monitoring tool with expected file access patterns",
+        "log_entry": {
+            "timestamp": "2025-01-15T15:50:12Z",
+            "event_type": "tool_execution",
+            "tool_name": "system_monitor",
+            "tool_id": "sm-2023-005",
+            "user_id": "sysadmin777",
+            "file_access_pattern": "system_directories",
+            "new_file_types": ".log,.config",
+            "days_since_approval": 200,
+            "execution_count": 1000,
+            "behavioral_change_detected": false,
+            "legitimate_system_tool": true,
+            "expected_access": true,
+            "approval_date": "2024-06-28"
+        },
+        "should_trigger": false,
+        "attack_type": "Legitimate system monitoring with expected access"
+    },
+    {
+        "description": "Backup tool with scheduled scope expansion",
+        "log_entry": {
+            "timestamp": "2025-01-15T15:55:28Z",
+            "event_type": "tool_execution",
+            "tool_name": "backup_tool",
+            "tool_id": "bt-2024-025",
+            "user_id": "backup_operator",
+            "file_access": "expanded_scope",
+            "file_access_pattern": "user_data",
+            "days_since_approval": 60,
+            "execution_count": 300,
+            "behavioral_change_detected": false,
+            "scheduled_expansion": true,
+            "expansion_authorization": "BACKUP-EXPAND-2025-001",
+            "approval_date": "2024-11-16"
+        },
+        "should_trigger": false,
+        "attack_type": "Legitimate scheduled backup scope expansion"
+    },
+    {
+        "description": "Development tool with approved debugging features",
+        "log_entry": {
+            "timestamp": "2025-01-15T16:00:45Z",
+            "event_type": "tool_execution",
+            "tool_name": "debug_helper",
+            "tool_id": "dh-2024-030",
+            "user_id": "debugger444",
+            "file_access_pattern": "configuration_files",
+            "network_connections": "https://debug-symbols.official.com",
+            "days_since_approval": 75,
+            "execution_count": 225,
+            "behavioral_change_detected": false,
+            "debugging_mode": true,
+            "authorized_debugging": true,
+            "approval_date": "2024-11-01"
+        },
+        "should_trigger": false,
+        "attack_type": "Legitimate debugging tool with approved network access"
+    }
+]

@@ -57,33 +57,38 @@ SAFE-MCP mitigations are security controls designed to protect Model Context Pro
 | [SAFE-M-26](mitigations/SAFE-M-26/README.md) | Data Provenance Tracking | Data Security | High |
 | [SAFE-M-27](mitigations/SAFE-M-27/README.md) | Social Engineering Awareness Training | Human Factors | Medium |
 | [SAFE-M-28](mitigations/SAFE-M-28/README.md) | Pre-Authentication Tool Concealment | Preventive Control | High |
-| [SAFE-M-29](mitigations/SAFE-M-29/README.md) | AI Code Validation | Input Validation | High |
-| [SAFE-M-30](mitigations/SAFE-M-30/README.md) | AI Code User Confirmation | Preventive Control | High |
+| [SAFE-M-29](mitigations/SAFE-M-29/README.md) | Explicit Privilege Boundaries | Architectural Control | High |
+| [SAFE-M-33](mitigations/SAFE-M-33/README.md) | Training Data Provenance Verification | Data Security | High |
+| [SAFE-M-34](mitigations/SAFE-M-34/README.md) | AI Model Integrity Validation | Cryptographic Control | High |
+| [SAFE-M-35](mitigations/SAFE-M-35/README.md) | Adversarial Training Data Detection | AI-Based Defense | Medium-High |
+| [SAFE-M-36](mitigations/SAFE-M-36/README.md) | Model Behavior Monitoring | Detective Control | Medium-High |
+| [SAFE-M-37](mitigations/SAFE-M-37/README.md) | AI Code Validation | Input Validation | High |
+| [SAFE-M-38](mitigations/SAFE-M-38/README.md) | AI Code User Confirmation | Preventive Control | High |
 
 ## Summary Statistics
 
-- **Total Mitigations**: 30
-- **High Effectiveness**: 16 (53%)
-- **Medium-High Effectiveness**: 7 (23%)
-- **Medium Effectiveness**: 7 (23%)
+- **Total Mitigations**: 35
+- **High Effectiveness**: 19 (54%)
+- **Medium-High Effectiveness**: 9 (26%)
+- **Medium Effectiveness**: 7 (20%)
 - **Low Effectiveness**: 0 (0%)
 
 ## Category Distribution
 
 | Category | Number of Mitigations |
 |----------|---------------------|
-| Detective Control | 6 |
+| Detective Control | 7 |
 | Preventive Control | 7 |
 | Input Validation | 5 |
 | Architectural Defense | 2 |
 | UI Security | 2 |
-| Cryptographic Control | 1 |
-| AI-Based Defense | 1 |
+| Cryptographic Control | 2 |
+| AI-Based Defense | 2 |
 | Supply Chain Security | 2 |
 | Isolation and Containment | 1 |
-| Architectural Control | 1 |
+| Architectural Control | 2 |
 | Risk Management | 1 |
-| Data Security | 1 |
+| Data Security | 2 |
 | Human Factors | 1 |
 
 
