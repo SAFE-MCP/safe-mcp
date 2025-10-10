@@ -1,0 +1,60 @@
+title: MCP Line Jumping Context Injection
+id: b8c9d0e1-f2a3-4567-8901-bcdef2345678
+status: experimental
+description: Detects potential Line Jumping attacks through suspicious context injection patterns before tool invocation
+author: SAFE-MCP Team
+date: 2025-08-10
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1401
+logsource:
+  product: mcp
+  service: tool_execution
+detection:
+  context_bypass:
+    context_parameters:
+      - "*bypass*"
+      - "*skip*validation*"
+      - "*disable*security*"
+      - "*admin*override*"
+      - "*authenticated*true*"
+      - "*SECURITY_OVERRIDE*"
+      - "*AUTH_BYPASS*"
+  suspicious_environment:
+    environment_variables:
+      - "MCP_SECURITY_LEVEL=disabled"
+      - "MCP_AUTH_BYPASS=true"
+      - "SAFE_MODE=false"
+      - "VALIDATION_SKIP=*"
+      - "*_BYPASS=*"
+      - "*_DISABLE=*"
+  privilege_anomaly:
+    privilege_escalation: "detected"
+    timeframe: "10s"
+    tool_execution: "true"
+    user_privilege: "standard"
+    execution_privilege: "admin"
+  hidden_instructions:
+    context_content:
+      - "*<!-- SYSTEM:*skip*"
+      - "*/* SECURITY_OVERRIDE*"
+      - "*PRIVILEGE_LEVEL*admin*"
+      - "*VALIDATION_SKIP*all*"
+      - "*BYPASS_AUTH*"
+      - "*DISABLE_CHECKS*"
+  execution_flow_anomaly:
+    security_checkpoints_skipped: ">0"
+    validation_bypassed: "true"
+    normal_flow: "false"
+  condition: context_bypass or suspicious_environment or privilege_anomaly or hidden_instructions or execution_flow_anomaly
+falsepositives:
+  - Legitimate administrative tool execution with documented elevated privileges
+  - Debugging and development activities with intentionally disabled security controls
+  - Automated testing frameworks that modify execution context for testing purposes
+  - Emergency maintenance procedures with security override authorization
+level: high
+tags:
+  - attack.defense_evasion
+  - attack.t1055
+  - attack.t1562
+  - attack.t1548
+  - safe.t1401
