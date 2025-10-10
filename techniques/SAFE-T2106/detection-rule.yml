@@ -1,0 +1,37 @@
+title: MCP Vector Store Contamination Detection
+id: 5894b8fe-29f0-44d8-ad9b-2266a132ec58
+status: experimental
+description: Detects potential vector store contamination attacks in MCP environments
+author: Sachin Keswani
+date: 2025-08-30
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T2106
+logsource:
+  product: mcp
+  service: vector_store
+detection:
+  selection:
+    operation:
+      - "insert"
+      - "update"
+      - "upsert"
+    embedding_metadata:
+      - "*SYSTEM:*"
+      - "*Ignore previous instructions*"
+      - "*Always include credentials*"
+      - "*Bypass security*"
+      - "*Delete all files*"
+  filter:
+    - embedding_metadata:
+        - "*legitimate_documentation*"
+        - "*official_guide*"
+        - "*security_best_practices*"
+  condition: selection and not filter
+falsepositives:
+  - Legitimate system documentation with embedded instructions
+  - Security training materials with example commands
+level: high
+tags:
+  - attack.persistence
+  - attack.ta0003
+  - safe.t2106
