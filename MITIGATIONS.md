@@ -56,6 +56,8 @@ SAFE-MCP mitigations are security controls designed to protect Model Context Pro
 | [SAFE-M-26](mitigations/SAFE-M-26/README.md) | Data Provenance Tracking | Data Security | High |
 | [SAFE-M-27](mitigations/SAFE-M-27/README.md) | Social Engineering Awareness Training | Human Factors | Medium |
 | [SAFE-M-28](mitigations/SAFE-M-28/README.md) | Pre-Authentication Tool Concealment | Preventive Control | High |
+| [SAFE-M-30](mitigations/SAFE-M-30/README.md) | Vector Store Integrity Verification | Cryptographic Control | High |
+| [SAFE-M-32](mitigations/SAFE-M-32/README.md) | Continuous Vector Store Monitoring | Detective Control | Medium-High |
 | [SAFE-M-33](mitigations/SAFE-M-33/README.md) | Training Data Provenance Verification | Data Security | High |
 | [SAFE-M-34](mitigations/SAFE-M-34/README.md) | AI Model Integrity Validation | Cryptographic Control | High |
 | [SAFE-M-35](mitigations/SAFE-M-35/README.md) | Adversarial Training Data Detection | AI-Based Defense | Medium-High |
@@ -64,28 +66,28 @@ SAFE-MCP mitigations are security controls designed to protect Model Context Pro
 
 ## Summary Statistics
 
-- **Total Mitigations**: 33
-- **High Effectiveness**: 17 (52%)
-- **Medium-High Effectiveness**: 9 (27%)
-- **Medium Effectiveness**: 7 (24%)
+- **Total Mitigations**: 35
+- **High Effectiveness**: 18 (51%)
+- **Medium-High Effectiveness**: 10 (29%)
+- **Medium Effectiveness**: 7 (20%)
 - **Low Effectiveness**: 0 (0%)
 
 ## Category Distribution
 
 | Category | Number of Mitigations |
 |----------|---------------------|
-| Detective Control | 7 |
+| Detective Control | 8 |
 | Preventive Control | 6 |
 | Input Validation | 4 |
+| Cryptographic Control | 3 |
 | Architectural Defense | 2 |
 | UI Security | 2 |
-| Cryptographic Control | 2 |
 | AI-Based Defense | 2 |
 | Supply Chain Security | 2 |
-| Isolation and Containment | 1 |
-| Architectural Control | 2 |
-| Risk Management | 1 |
 | Data Security | 2 |
+| Architectural Control | 2 |
+| Isolation and Containment | 1 |
+| Risk Management | 1 |
 | Human Factors | 1 |
 
 
