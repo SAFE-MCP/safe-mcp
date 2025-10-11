@@ -519,8 +519,8 @@ class FakeToolInvocationTester:
 
 ---
 
-**Last Updated:** [Current Date]  
-**Version:** 1.0  
+**Last Updated:** 2025-10-11  
+**Version:** 1.1  
 **Contributors:** SAFE-MCP Community
 
 ## Version History
