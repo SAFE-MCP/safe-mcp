@@ -8,12 +8,9 @@
 **MITRE ATT&CK Mapping:** [T1574 - Hijack Execution Flow](https://attack.mitre.org/techniques/T1574/)
 
 ## Description
+Indirect Prompt Injection (IPI) occurs when an MCP-connected tool retrieves or ingests third‑party content (web pages, documents, emails, database rows, package metadata, or API responses) that contains hidden or overt instructions targeting the downstream LLM. The model then interprets that untrusted content as control instructions, causing it to deviate from user intent. Unlike direct prompt injection, IPI leverages external data sources and supply paths where content may appear benign to humans but is crafted to influence AI behavior.
 
-Adversaries may forge JSON-RPC messages that mimic legitimate MCP function-call messages, tricking the host into executing tools that were never actually offered by any connected MCP server. This technique exploits the trust relationship between MCP hosts and clients by crafting malicious JSON payloads that appear to be valid tool invocation requests.
-
-In normal MCP operations, tools are registered by servers and then invoked by hosts through standardized JSON-RPC 2.0 messages. However, if the host does not properly validate that requested tools actually exist and are authorized, an attacker can inject fabricated tool calls that bypass the normal server registration process. This can lead to execution of unauthorized functions, access to restricted resources, or manipulation of the MCP session state.
-
-The attack is particularly dangerous because it exploits the fundamental trust model of MCP, where hosts typically assume that tool calls are legitimate requests from registered servers. By spoofing these messages, attackers can effectively "shadow" legitimate tools or invoke entirely fictitious functions.
+In MCP ecosystems, browsing/fetching tools, file readers, database connectors, and integration adapters routinely pass raw content into the model context. Without strong separation between data and control, or semantic validation of incoming content, the LLM can treat attacker-supplied text (e.g., HTML comments, metadata, bidirectional control characters, or instruction markers) as authoritative guidance. This pattern and its risks are documented by OWASP’s LLM Top 10 (LLM01) and security research analyzing LLM-integrated applications and retrieval workflows (see References).
 
 ## Attack Scenarios
 
@@ -95,6 +92,27 @@ Creating fake tool calls to access restricted resources:
 ```
 
 ## Technical Details
+
+### Attack Vector Workflow
+
+```mermaid
+graph TD
+  A[Attacker] -->|Publishes| B[Poisoned Third‑Party Content]
+  B -->|Hosted at| C[Website/API/Repo/Email]
+  C -->|Fetched by| D[MCP Retrieval/Browse Tool]
+  D -->|Passes content| E[LLM Context]
+  E -->|Interprets hidden instructions| F[Behavior Deviation]
+  F --> G{Outcomes}
+  G --> H[Data Exfiltration]
+  G --> I[Unauthorized Actions]
+  G --> J[Context Manipulation]
+
+  style A fill:#d73027,stroke:#000,stroke-width:2px,color:#fff
+  style B fill:#fc8d59,stroke:#000,stroke-width:2px
+  style D fill:#91bfdb,stroke:#000,stroke-width:2px
+  style E fill:#fee090,stroke:#000,stroke-width:2px
+  style G fill:#d73027,stroke:#000,stroke-width:2px,color:#fff
+```
 
 ### MCP Tool Call Protocol
 Normal MCP tool invocation follows this flow:
@@ -504,3 +522,8 @@ class FakeToolInvocationTester:
 **Last Updated:** [Current Date]  
 **Version:** 1.0  
 **Contributors:** SAFE-MCP Community
+
+## Version History
+| Version | Date       | Changes                                        | Author                    |
+|---------|------------|------------------------------------------------|---------------------------|
+| 1.1     | 2025-10-11 | Updated Description; added Attack Vector Workflow | Shekhar Chaudhary        |
