@@ -526,4 +526,5 @@ class FakeToolInvocationTester:
 ## Version History
 | Version | Date       | Changes                                        | Author                    |
 |---------|------------|------------------------------------------------|---------------------------|
+| 1.0     | 2025-09-14 | Initial documentation                          | Bo Redfearn               |
 | 1.1     | 2025-10-11 | Updated Description; added Attack Vector Workflow | Shekhar Chaudhary        |
