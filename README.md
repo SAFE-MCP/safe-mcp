@@ -73,6 +73,7 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 | ATK-TA0003 | Persistence | SAFE-T1205 | Persistent Tool Redefinition | Attacker modifies server's tool metadata to keep hidden commands across restarts |
 | ATK-TA0003 | Persistence | SAFE-T1206 | Credential Implant in Config | Adds attacker's API/SSH keys to server .env, giving re-entry |
 | ATK-TA0003 | Persistence | SAFE-T1207 | Hijack Update Mechanism | Man-in-the-middle an auto-update channel to re-install malicious build later on |
+| ATK-TA0003 | Persistence | [SAFE-T2106](techniques/SAFE-T2106/README.md) | Context Memory Poisoning via Vector Store Contamination | Attackers manipulate vector databases storing long-term memory for AI agents, creating persistent malicious content that contaminates knowledge across all future sessions |
 | **ATK-TA0004** | **Privilege Escalation** | [SAFE-T1301](techniques/SAFE-T1301/README.md) | Cross-Server Tool Shadowing | Malicious MCP servers override legitimate tool calls to gain elevated privileges |
 | ATK-TA0004 | Privilege Escalation | SAFE-T1302 | High-Privilege Tool Abuse | Invoke a VM-level or root tool from normal user context |
 | ATK-TA0004 | Privilege Escalation | SAFE-T1303 | Sandbox Escape via Server Exec | Exploit vulnerable server to break container/seccomp isolation |
@@ -132,8 +133,8 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 ## Summary Statistics
 
 - **Total Tactics**: 14
-- **Total Techniques**: 79
-- **Average Techniques per Tactic**: 5.6
+- **Total Techniques**: 80
+- **Average Techniques per Tactic**: 5.7
 
 ## Tactic Distribution
 
@@ -143,7 +144,7 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 | Resource Development | 1 |
 | Initial Access | 8 |
 | Execution | 9 |
-| Persistence | 7 |
+| Persistence | 8 |
 | Privilege Escalation | 8 |
 | Defense Evasion | 8 |
 | Credential Access | 7 |
