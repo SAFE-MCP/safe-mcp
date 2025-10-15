@@ -1,0 +1,143 @@
+title: MCP Server Command Injection Detection
+id: a4b3c2d1-8e7f-4a5b-9c6d-3e2f1a0b9c8d
+status: experimental
+description: Detects potential command injection attempts in MCP server tool invocations through shell metacharacters and suspicious command patterns
+author: SAFE-MCP Security Team
+date: 2025-09-28
+modified: 2025-09-28
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1101
+  - https://www.nodejs-security.com/blog/command-injection-vulnerability-codehooks-mcp-server-security-analysis
+  - https://snyk.io/articles/exploiting-mcp-servers-vulnerable-to-command-injection/
+  - https://github.com/cyanheads/git-mcp-server/security/advisories/GHSA-3q26-f695-pp76
+logsource:
+  product: mcp
+  service: server
+  category: tool_invocation
+detection:
+  # Detection of shell metacharacters commonly used in command injection
+  selection_metacharacters:
+    tool_parameters|contains:
+      - ';'              # Command separator
+      - '|'              # Pipe operator
+      - '&&'             # AND operator
+      - '||'             # OR operator
+      - '$('             # Command substitution
+      - '`'              # Backtick command substitution
+      - '\n'             # Newline injection
+      - '\r'             # Carriage return injection
+      - '>'              # Output redirection
+      - '<'              # Input redirection
+      - '>>'             # Append redirection
+      - '2>'             # Error redirection
+      - '&'              # Background execution
+
+  # Detection of suspicious commands often used in exploitation
+  selection_suspicious_commands:
+    tool_parameters|contains:
+      - 'cat /etc/passwd'
+      - 'cat /etc/shadow'
+      - 'wget '
+      - 'curl '
+      - 'nc '              # Netcat
+      - 'ncat '
+      - '/bin/bash'
+      - '/bin/sh'
+      - 'cmd.exe'
+      - 'powershell'
+      - 'python -c'
+      - 'perl -e'
+      - 'ruby -e'
+      - 'php -r'
+      - 'chmod +x'
+      - 'chmod 777'
+      - 'rm -rf /'
+      - 'mkfifo'
+      - 'telnet '
+      - 'ssh-keygen'
+
+  # Detection of base64 encoded commands
+  selection_encoded:
+    tool_parameters|contains:
+      - 'base64 -d'
+      - 'base64 --decode'
+      - 'echo.*|.*base64'
+      - 'IEX('             # PowerShell Invoke-Expression
+
+  # Detection of reverse shell patterns
+  selection_reverse_shell:
+    tool_parameters|contains:
+      - '/dev/tcp/'
+      - '/dev/udp/'
+      - 'bash -i'
+      - 'sh -i'
+      - 'exec 5<>'
+      - 'socket'
+      - '0<&196'
+      - '/inet/tcp/'
+
+  # Detection of environment variable manipulation
+  selection_env_manipulation:
+    tool_parameters|contains:
+      - '$PATH'
+      - '$LD_PRELOAD'
+      - '$LD_LIBRARY_PATH'
+      - 'export '
+      - 'unset '
+      - 'env '
+
+  # Detection of process discovery/enumeration
+  selection_process_discovery:
+    tool_parameters|contains:
+      - 'ps aux'
+      - 'ps -ef'
+      - 'tasklist'
+      - 'systeminfo'
+      - 'uname -a'
+      - 'id'
+      - 'whoami'
+      - 'hostname'
+      - 'ifconfig'
+      - 'ip addr'
+      - 'netstat'
+      - 'ss -tulpn'
+
+  # Filter out potential false positives (legitimate use cases)
+  filter_legitimate_git:
+    tool_name: 'git_*'
+    tool_parameters|contains:
+      - 'git config'
+      - 'git log'
+      - 'git status'
+
+  filter_legitimate_paths:
+    tool_parameters|re: '^[a-zA-Z0-9/_\-\.]+$'  # Simple alphanumeric paths
+
+  condition: (selection_metacharacters or selection_suspicious_commands or selection_encoded or selection_reverse_shell or selection_env_manipulation or selection_process_discovery) and not (filter_legitimate_git or filter_legitimate_paths)
+
+falsepositives:
+  - Legitimate tools that process shell-like syntax (e.g., terminal emulators)
+  - File paths containing special characters in names
+  - Regular expressions or patterns in parameters
+  - Development/debugging tools with legitimate command execution
+  - Git operations with complex arguments
+level: high
+tags:
+  - attack.execution
+  - attack.t1059          # Command and Scripting Interpreter
+  - attack.t1059.004      # Unix Shell
+  - attack.t1059.003      # Windows Command Shell
+  - attack.t1055          # Process Injection
+  - attack.defense_evasion
+  - attack.t1140          # Deobfuscate/Decode Files or Information
+  - safe.t1101
+  - cve.2025.pending      # Placeholder for when CVE is assigned
+fields:
+  - tool_name
+  - tool_parameters
+  - source_ip
+  - user_id
+  - session_id
+  - timestamp
+  - mcp_server_version
+  - client_application
