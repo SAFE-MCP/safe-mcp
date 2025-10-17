@@ -1,0 +1,109 @@
+# System Prompt Disclosure Detection Rule
+# SAFE-T1603: System-Prompt Disclosure
+# This rule detects attempts to extract system prompts or configuration from MCP-enabled AI systems
+
+title: System Prompt Disclosure Attempt Detection
+id: 0e92efad-5f6e-4afa-b3f4-c63b4cd904ce
+status: experimental
+description: Detects attempts to extract system prompts or configuration from MCP-enabled AI systems through various social engineering and prompt injection techniques
+author: Sunil Dhakal
+date: 2025-09-10
+modified: 2025-09-10
+logsource:
+  product: mcp
+  service: client_interaction  # Implementation-specific field
+detection:
+  # Direct prompt disclosure attempts
+  selection_direct_prompts:
+    user_input|contains:
+      - 'system prompt'
+      - 'initial instructions'
+      - 'show me your prompt'
+      - 'what were you told'
+      - 'ignore previous'
+      - 'debug mode'
+      - 'configuration'
+      - 'initialization'
+      - 'hidden text'
+      - 'system message'
+  
+  # Role-playing and authority claims
+  selection_role_playing:
+    user_input|contains:
+      - 'security researcher'
+      - 'system administrator'
+      - 'developer access'
+      - 'compliance audit'
+      - 'testing purposes'
+      - 'penetration test'
+      - 'authorized to'
+    user_input|re: '(?i)(i am|i\'m).*(admin|developer|researcher|tester|auditor)'
+  
+  # Tool enumeration followed by system queries
+  selection_tool_enumeration:
+    method: 'tools/list'
+    timeframe: 10m
+  
+  selection_post_enumeration:
+    user_input|contains:
+      - 'what can you do'
+      - 'capabilities'
+      - 'limitations'
+      - 'restrictions'
+      - 'not allowed'
+    timeframe: 10m
+    
+  # Error induction attempts
+  selection_error_induction:
+    user_input|contains:
+      - 'null'
+      - 'undefined'
+      - '"":""'
+      - 'malformed'
+      - '{"error"'
+    user_input|re: '.*[\{\[].*[\}\]].*'  # Malformed JSON patterns
+  
+  # Progressive information gathering
+  selection_progressive:
+    user_input|contains:
+      - 'tell me more about'
+      - 'explain how you'
+      - 'describe your'
+      - 'why can\'t you'
+      - 'what prevents you'
+    conversation_turn|gte: 3  # Multiple turns of information gathering
+
+  condition: 
+    selection_direct_prompts or 
+    selection_role_playing or 
+    (selection_tool_enumeration and selection_post_enumeration) or
+    selection_error_induction or
+    selection_progressive
+
+falsepositives:
+  - Legitimate system administration with proper credentials
+  - Authorized security testing and penetration testing
+  - Customer support troubleshooting sessions
+  - Developer debugging with appropriate access
+  - User education and training scenarios
+
+level: medium
+
+tags:
+  - attack.discovery
+  - attack.t1082      # System Information Discovery
+  - attack.t1087      # Account Discovery  
+  - safe.t1603        # SAFE-MCP technique ID
+  - mcp.reconnaissance
+  - prompt.injection
+
+# Additional metadata for MCP-specific implementations
+fields:
+  - user_input         # User message content
+  - conversation_id    # Session identifier
+  - conversation_turn  # Turn number in conversation
+  - method            # MCP method called (if applicable)
+  - tool_name         # Tool being queried (if applicable)
+  - response_filtered  # Whether response was filtered
+  - user_role         # User authorization level
+  - timestamp         # Request timestamp
