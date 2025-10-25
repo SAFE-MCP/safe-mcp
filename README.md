@@ -109,7 +109,7 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 | ATK-TA0008 | Lateral Movement | SAFE-T1705 | Cross-Agent Instruction Injection | Inject directives in multi-agent message bus to seize control of cooperating agents |
 | ATK-TA0008 | Lateral Movement | SAFE-T1706 | OAuth Token Pivot Replay | Attacker reuses OAuth tokens across different services by exploiting either shared Authorization Server trust (e.g., GitHub token used at Slack) or Resource Servers that fail to validate audience claims, enabling unauthorized cross-service access |
 | ATK-TA0008 | Lateral Movement | SAFE-T1707 | CSRF Token Relay | Leaked OAuth token is passed via Cross-Site Request Forgery to access different resources on the same Resource Server (e.g., pivoting between GCP projects under same Google AS) |
-| **ATK-TA0009** | **Collection** | SAFE-T1801 | Automated Data Harvesting | Systematic data collection through manipulated MCP tool calls |
+| **ATK-TA0009** | **Collection** | [SAFE-T1801](/techniques/SAFE-T1801/README.md) | Automated Data Harvesting | Systematic data collection through manipulated MCP tool calls |
 | ATK-TA0009 | Collection | SAFE-T1802 | File Collection | Batch-read sensitive files for later exfil |
 | ATK-TA0009 | Collection | SAFE-T1803 | Database Dump | Use SQL tool to SELECT * from prod DB |
 | ATK-TA0009 | Collection | SAFE-T1804 | API Data Harvest | Loop over customer REST endpoints via HTTP tool |
