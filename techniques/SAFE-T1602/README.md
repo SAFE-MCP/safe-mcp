@@ -1,17 +1,17 @@
 # SAFE-T1602: Tool Enumeration
 
 ## Tactic
-
-Discovery (ATK-TA0007)
+**Discovery (ATK-TA0007)**
 
 ## Description
+Tool enumeration is a reconnaissance technique where an adversary attempts to identify which tools, services, plugins, connectors, or helper components exist in a target environment—including their versions and configurations. The goal is to understand the capabilities exposed by the environment (e.g., code execution helpers, file access APIs, external connectors) to identify potential follow-on attack opportunities such as misconfigured services, unpatched versions, or weak authentication.  
 
-Tool enumeration is a reconnaissance technique where an adversary attempts to discover which tools, services, plugins, connectors, or helper components exist in a target environment, including their versions and configurations. The goal is to understand the capabilities exposed by the environment (e.g., code execution helpers, file access APIs, external connectors) to identify potential follow-on attack opportunities such as misconfigured services, unpatched versions, or weak authentication.  
+---
 
 ## How It Works
 
 1. **Reconnaissance / Footprinting**  
-   - Attacker identifies public or semi-public MCP surfaces: web UIs, chatbot endpoints, API gateways, SDKs, sample clients, developer consoles, or third-party integrations.  
+   - Attacker identifies public or semi-public surfaces: web UIs, chatbot endpoints, API gateways, SDKs, sample clients, developer consoles, or third-party integrations.  
    - Metadata collection via public documentation, SDK examples, API spec URLs, JS bundles, and HTML/JS comments.  
 
    **Defender indicators:** unusual downloads of API docs or SDK files, access to developer-only pages, requests to manifest-like URLs.  
@@ -48,31 +48,33 @@ Tool enumeration is a reconnaissance technique where an adversary attempts to di
 ---
 
 ## Examples
+An attacker with a stolen developer API key quietly probes an MCP, enumerates available tools (storage, external fetch, job runner), and uses them in low-noise steps to steal credentials and exfiltrate sensitive data. This leads to:
 
-An attacker with a stolen developer API key quietly probes an MCP, enumerates available tools (storage, external fetch, job runner), and uses them in low-noise steps to steal credentials and exfiltrate sensitive data. This leads to high confidentiality loss, moderate integrity damage (tampered training artifacts), and temporary availability degradation (resource-heavy jobs).  
+- High confidentiality loss  
+- Moderate integrity damage (e.g., tampered training artifacts)  
+- Temporary availability degradation (resource-heavy jobs)  
 
 ---
 
 ## Impact
 
-- Confidentiality: High  
-- Integrity: Medium  
-- Availability: Medium  
-
-**Consequences:** Sensitive data may be exposed, system outputs can be tampered, and resources may be overloaded. Enumeration also maps high-probability follow-on attack paths.  
+| Aspect          | Level  | Consequences |
+|-----------------|--------|--------------|
+| Confidentiality | High   | Sensitive data exposure |
+| Integrity       | Medium | Potential tampering with system outputs |
+| Availability    | Medium | Resource exhaustion or service delays |
 
 ---
 
 ## Detection
+Defenders can monitor for:
 
-Defenders can identify this attack by monitoring for:  
-
-- Unusual access to tool endpoints (repeated queries, abnormal IPs/geos).  
-- Requests probing model or API capabilities or structured to elicit metadata.  
-- High-frequency, low-volume activity across multiple tools.  
-- Unexpected sequences of tool invocations.  
-- Anomalous outbound connections after tool usage.  
-- Authentication anomalies (stolen or unusual API keys, unauthorized manifest access).  
+- Unusual access to tool endpoints (repeated queries, abnormal IPs/geos)  
+- Requests probing model or API capabilities or structured to elicit metadata  
+- High-frequency, low-volume activity across multiple tools  
+- Unexpected sequences of tool invocations  
+- Anomalous outbound connections after tool usage  
+- Authentication anomalies (stolen/unusual API keys, unauthorized manifest access)  
 
 **Monitoring strategies:** centralize logging, correlate user/IP patterns, alert on high-volume or suspicious sequences, apply rate limiting and anomaly detection.  
 
@@ -81,16 +83,25 @@ Defenders can identify this attack by monitoring for:
 ## Mitigation
 
 1. **Configuration Hardening**  
-   - Restrict tool manifests and metadata, disable verbose errors, sandbox tool execution, enforce allow-lists.  
+   - Restrict tool manifests and metadata  
+   - Disable verbose errors  
+   - Sandbox tool execution  
+   - Enforce allow-lists  
 
 2. **Access Controls**  
-   - Enforce MFA, short-lived API keys, RBAC, network segmentation, restrict admin/debug endpoints.  
+   - Enforce MFA, short-lived API keys, RBAC  
+   - Network segmentation  
+   - Restrict admin/debug endpoints  
 
 3. **Input Validation**  
-   - Sanitize model inputs, validate tool parameters, reject suspicious sequences.  
+   - Sanitize model inputs  
+   - Validate tool parameters  
+   - Reject suspicious sequences  
 
 4. **Monitoring Requirements**  
-   - Centralize logging, correlate events, alert on anomalies, enforce rate limits and quotas.  
+   - Centralize logging  
+   - Correlate events and alert on anomalies  
+   - Enforce rate limits and quotas  
 
 ---
 
@@ -98,10 +109,20 @@ Defenders can identify this attack by monitoring for:
 
 - [MITRE ATT&CK Discovery Tactic](https://attack.mitre.org/tactics/TA0007/)  
 - [MCP Getting Started Documentation](https://modelcontextprotocol.io/docs/getting-started/intro)  
+- [MCPTox Benchmark Paper](https://arxiv.org/html/2508.14925v1?utm_source=chatgpt.com)  
+- [Akto MCP Attack Matrix](https://www.akto.io/mcp-attack-matrix/server-enumeration-and-replay?utm_source=chatgpt.com)  
+- [OWASP API Security Tools](https://owasp.org/www-community/api_security_tools?utm_source=chatgpt.com)  
 
 ---
 
 ## MITRE ATT&CK Mapping
+- **Technique:** T1602 – Tool Enumeration  
+- **Tactic:** Discovery  
 
-- ATT&CK Technique: T1602 – Tool Enumeration  
-- ATT&CK Tactic: Discovery
+---
+
+## Version History
+
+| Version | Date       | Changes                                    | Author       |
+|---------|------------|-------------------------------------------|-------------|
+| 1.0     | 2025-10-25 | Initial documentation of tool enumeration | Asim Mahat  |
