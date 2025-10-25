@@ -525,3 +525,9 @@ class FakeToolInvocationTester:
 **Last Updated:** 2025-10-11  
 **Version:** 1.1  
 **Contributors:** SAFE-MCP Community, Shekhar Chaudhary, Bo Redfearn
+
+## Version History
+| Version | Date       | Changes                                         | Author             |
+|---------|------------|-------------------------------------------------|--------------------|
+| 1.0     | 2025-09-14 | Initial documentation                           | Bo Redfearn        |
+| 1.1     | 2025-10-11 | Updated Description; added Attack Vector Workflow | Shekhar Chaudhary |
