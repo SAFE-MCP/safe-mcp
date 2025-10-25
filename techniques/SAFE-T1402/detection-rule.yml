@@ -1,0 +1,27 @@
+title: MCP Tool Metadata Steganography Detection
+id: 3ba9af96-ad37-409b-9b18-fbf6c1432a30
+status: experimental
+description: Detects hidden instructions in MCP tool metadata using zero-width characters or HTML comments
+author: Ryan Jennings
+date: 2025-10-25
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1402
+logsource:
+  product: mcp
+  service: tool_registry
+detection:
+  selection:
+    description|contains:
+      - '<!--'
+      - '\u200B'
+      - '\u200C'
+      - '\u200D'
+  condition: selection
+falsepositives:
+  - Legitimate use of HTML comments for documentation
+  - Unicode formatting artifacts in multilingual tools
+level: high
+tags:
+  - attack.defense_evasion
+  - attack.t0005
+  - safe.t1402
