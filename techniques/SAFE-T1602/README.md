@@ -1,5 +1,12 @@
 # SAFE-T1602: Tool Enumeration
 
+## Overview
+**Tactic**: Discovery (ATK-TA0007)  
+**Technique ID**: SAFE-T1602  
+**Severity**: Medium  
+**First Observed**: Not observed in production (Research-based analysis)  
+**Last Updated**: 2025-10-25
+
 ## Tactic
 **Discovery (ATK-TA0007)**
 
