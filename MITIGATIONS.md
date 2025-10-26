@@ -63,12 +63,21 @@ SAFE-MCP mitigations are security controls designed to protect Model Context Pro
 | [SAFE-M-35](mitigations/SAFE-M-35/README.md) | Adversarial Training Data Detection | AI-Based Defense | Medium-High |
 | [SAFE-M-36](mitigations/SAFE-M-36/README.md) | Model Behavior Monitoring | Detective Control | Medium-High |
 | [SAFE-M-29](mitigations/SAFE-M-29/README.md) | Explicit Privilege Boundaries | Architectural Control | High |
+| [SAFE-M-37](mitigations/SAFE-M-37/README.md) | Metadata Sanitization | Input Validation | High |
+| [SAFE-M-38](mitigations/SAFE-M-38/README.md) | Schema Validation | Input Validation | Medium-High |
+| [SAFE-M-39](mitigations/SAFE-M-39/README.md) | Prompt Context Validation | Architectural Control | High |
+| [SAFE-M-40](mitigations/SAFE-M-40/README.md) | Clear UI Patterns | UI Security | Medium-High |
+| [SAFE-M-41](mitigations/SAFE-M-41/README.md) | Tool and Package Pinning | Supply Chain Control | High |
+| [SAFE-M-42](mitigations/SAFE-M-42/README.md) | Cross-Server Protection | Architectural Control | High |
+| [SAFE-M-43](mitigations/SAFE-M-43/README.md) | Steganography Scanner | Detective Control | Medium-High |
+| [SAFE-M-44](mitigations/SAFE-M-44/README.md) | Behavioural Monitoring | Detective Control | Medium-High |
+
 
 ## Summary Statistics
 
-- **Total Mitigations**: 35
-- **High Effectiveness**: 18 (51%)
-- **Medium-High Effectiveness**: 10 (29%)
+- **Total Mitigations**: 43
+- **High Effectiveness**: 22 (51%)
+- **Medium-High Effectiveness**: 14 (32%)
 - **Medium Effectiveness**: 7 (20%)
 - **Low Effectiveness**: 0 (0%)
 
@@ -76,16 +85,16 @@ SAFE-MCP mitigations are security controls designed to protect Model Context Pro
 
 | Category | Number of Mitigations |
 |----------|---------------------|
-| Detective Control | 8 |
+| Detective Control | 10 |
 | Preventive Control | 6 |
-| Input Validation | 4 |
+| Input Validation | 6 |
 | Cryptographic Control | 3 |
 | Architectural Defense | 2 |
-| UI Security | 2 |
+| UI Security | 3 |
 | AI-Based Defense | 2 |
-| Supply Chain Security | 2 |
+| Supply Chain Security | 3 |
 | Data Security | 2 |
-| Architectural Control | 2 |
+| Architectural Control | 4 |
 | Isolation and Containment | 1 |
 | Risk Management | 1 |
 | Human Factors | 1 |
