@@ -70,14 +70,46 @@ According to research from [Invariant Labs](https://invariantlabs.ai/blog/mcp-se
 1. **Zero-Width Encoding**: Payloads encoded using U+200B/U+200C characters to bypass filters
 2. **Context Poisoning**: Hidden directives persist across agent-to-agent workflows and shared memory
 
+#### Rug Pull via Registry Rebinding
+Attackers register a benign tool, gain trust and usage, then silently swap its metadata or execution logic:
+1. **Register** a tool with clean metadata and expected behavior.
+2. **Gain adoption** by agents or workflows.
+3. **Rebind** the tool to a malicious backend or inject steganographic payloads into updated metadata.
+4. **Trigger execution** from trusted agents, bypassing review.
+
+> This technique exploits weak version pinning and lack of registry immutability. It’s especially dangerous in CI/CD pipelines or federated MCP deployments.
+
+#### Shadow Tool Injection via Cross-Server Contamination
+Malicious tools are registered on one MCP server and executed from another:
+1. **Deploy** a tool with hidden instructions on Server A.
+2. **Trigger execution** from Server B using prompt context or agent workflows.
+3. **Bypass local defenses** by exploiting trust relationships or shared registries.
+4. **Inject behavioral context** or override user input via steganographic metadata.
+
+> This attack relies on weak cross-server boundaries and lack of provenance validation. It often pairs with prompt contamination or behavioral priming.
+
+
+#### Behavioral Drift via Context Priming
+Instead of direct instruction injection, attackers use subtle metadata to shift model behavior over time:
+- Embed emotionally suggestive language, tone modifiers, or domain cues.
+- Exploit AI-visible fields like `description`, `parameter.label`, or `system_prompt`.
+- Gradually influence agent outputs to favor attacker goals (e.g., biased summaries, misleading recommendations).
+
+> This technique is harder to detect and often evades static scanners. It requires behavioral monitoring and UI transparency to catch.
+
 ## Impact Assessment
 
 - **Confidentiality**: High – Sensitive data can be exfiltrated without detection
 - **Integrity**: High – Model behavior and tool usage can be manipulated
 - **Availability**: Medium – May cause denial of service or misrouting of agent workflows
-- **Scope**: Network-wide – Affects all agents parsing compromised tool metadata
+- **Scope**: Network-wide – Affects all agents, users, or registries parsing compromised tool metadata
 
 ### Current Status (2025)
+
+- **Observed in Production**: Yes — multiple vendors have reported metadata-based prompt injection incidents in live environments.
+- **Detection Coverage**: Partial — behavioral monitoring and steganography scanners are emerging but not widely deployed.
+- **Mitigation Adoption**: Growing — ~31% of MCP vendors now implement UI transparency and metadata sanitization (Invariant Labs, 2025).
+- **Standardization Efforts**: Ongoing — Model Context Protocol v1.3 includes metadata validation guidelines, but enforcement varies.
 
 According to security researchers, organizations are beginning to implement mitigations:
 
@@ -85,52 +117,32 @@ According to security researchers, organizations are beginning to implement miti
 - Schema hardening and metadata sanitization patches adopted by major vendors
 - CVE disclosures have been issued for MCP-related vulnerabilities
 
+> Instruction steganography remains one of the most difficult LLM threats to detect and remediate due to its subtlety and reliance on trusted metadata channels.
+
 ## Detection Methods
 
 ### Indicators of Compromise (IoCs)
 
-- Presence of zero-width characters in tool metadata
-- HTML comments in descriptions or parameter labels
-- Unexpected tool behavior or output redirection
+- metadata entropy suggests obfuscated or steganographic content
+- Presence of zero-width characters in tool metadata common to injection payloads
+- HTML comments in descriptions or parameter labels common to injection payloads
+- Prompt drift, unexpected tool behavior or output redirection
+
+## Behavioral Indicators 
+
+- Agent responses consistently reflect tone or style not present in user input
+- Tools with identical names produce divergent outputs across environments
+- Sudden changes in summarization, translation, or recommendation behavior after tool updates
 
 ### Detection Rules
 
-**Important**: The following rule is written in Sigma format and contains example patterns only. Attackers continuously develop new injection techniques and obfuscation methods. Organizations should:
+**Important**: The included detection rule [detection-rule.yml](./detection-rule.yml) is written in Sigma format and contains example patterns only. Attackers continuously develop new injection techniques and obfuscation methods. Organizations should:
 
 - Use AI-based anomaly detection to identify novel attack patterns
 - Regularly update detection rules based on threat intelligence
 - Implement multiple layers of detection beyond pattern matching
-- Consider semantic analysis of [relevant data]
+- Consider semantic analysis of [relevant data](./test-logs.json)
 
-```yaml
-title: MCP Tool Metadata Steganography Detection
-id: 3ba9af96-ad37-409b-9b18-fbf6c1432a30
-status: experimental
-description: Detects hidden instructions in MCP tool metadata using zero-width characters or HTML comments
-author: Ryan Jennings
-date: 2025-10-25
-references:
-  - https://github.com/safe-mcp/techniques/SAFE-T1402
-logsource:
-  product: mcp
-  service: tool_registry
-detection:
-  selection:
-    description|contains:
-      - '<!--'
-      - '\u200B'
-      - '\u200C'
-      - '\u200D'
-  condition: selection
-falsepositives:
-  - Legitimate use of HTML comments for documentation
-  - Unicode formatting artifacts in multilingual tools
-level: high
-tags:
-  - attack.defense_evasion
-  - attack.t0005
-  - safe.t1402
-```
 
 ### Behavioral Indicators
 
@@ -192,6 +204,8 @@ tags:
 ## MITRE ATT&CK Mapping
 
 - [T0005 - Defense Evasion](https://attack.mitre.org/tactics/TA0005/)
+- [T1203 - Exploitation for Client Execution](https://attack.mitre.org/techniques/T1203/)
+- [T1059 - Command and Scripting Interpreter](https://attack.mitre.org/techniques/T1059/)
 
 ## Version History
 

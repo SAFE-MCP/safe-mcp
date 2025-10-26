@@ -17,8 +17,12 @@ detection:
       - '\u200C'
       - '\u200D'
   condition: selection
+fields:
+  - tool_id
+  - tool_name
+  - metadata.description
 falsepositives:
-  - Legitimate use of HTML comments for documentation
+  - Legitimate use of formatting or markup
   - Unicode formatting artifacts in multilingual tools
 level: high
 tags:
