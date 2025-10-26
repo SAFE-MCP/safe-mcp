@@ -1,7 +1,7 @@
 # SAFE-T1602: Tool Enumeration
 
 ## Overview
-**Tactic**: Discovery (ATK-TA0007)  
+**Tactic**: Discovery(ATK-TA0007)  
 **Technique ID**: SAFE-T1602  
 **Severity**: Medium  
 **First Observed**: Not observed in production (Research-based analysis)  
@@ -127,7 +127,6 @@ Defenders can monitor for:
 - **Tactic:** Discovery  
 
 ---
-
 ## Version History
 
 | Version | Date       | Changes                                    | Author       |
