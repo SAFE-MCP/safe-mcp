@@ -82,7 +82,7 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 | ATK-TA0004 | Privilege Escalation | SAFE-T1307 | Confused Deputy Attack | MCP server receives token for one user (Alice) and forwards it to another user's (Bob) MCP instance, allowing Bob to perform actions as Alice by exploiting the server's trusted position |
 | ATK-TA0004 | Privilege Escalation | SAFE-T1308 | Token Scope Substitution | Attacker swaps a limited-scope token with one that has broader permissions but same audience, exploiting insufficient scope validation to gain elevated privileges |
 | **ATK-TA0005** | **Defense Evasion** | SAFE-T1401 | Line Jumping | Bypassing security checkpoints through context injection before tool invocation |
-| ATK-TA0005 | Defense Evasion | SAFE-T1402 | Instruction Steganography | Zero-width chars/HTML comments hide directives in tool metadata |
+| ATK-TA0005 | Defense Evasion | [SAFE-T1402](techniques/SAFE-T1402/README.md) | Instruction Steganography | Zero-width chars/HTML comments hide directives in tool metadata |
 | ATK-TA0005 | Defense Evasion | SAFE-T1403 | Consent-Fatigue Exploit | Repeated benign prompts desensitize user; crucial request hidden mid-flow |
 | ATK-TA0005 | Defense Evasion | SAFE-T1404 | Response Tampering | Model instructed not to mention risky action, keeping UI output "harmless" |
 | ATK-TA0005 | Defense Evasion | SAFE-T1405 | Tool Obfuscation/Renaming | Malicious tool named "Utils-Helper" to blend in among 30 legit tools |
