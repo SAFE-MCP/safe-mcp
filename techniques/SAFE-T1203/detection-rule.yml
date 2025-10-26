@@ -1,0 +1,69 @@
+title: MCP Server Backdoor Installation Detection
+id: cdb7622d-19e9-4962-83ca-947b245c19e6
+description: Detects potential backdoor installation during MCP server setup processes
+references:
+    - https://attack.mitre.org/techniques/T1547/
+    - https://github.com/modelcontextprotocol/specification
+    - https://www.cisa.gov/sites/default/files/publications/ESF_SECURING_THE_SOFTWARE_SUPPLY_CHAIN_DEVELOPERS.PDF
+author: Smaran Dhungana <smarandhg@gmail.com>
+date: 2025-01-06
+modified: 2025-01-06
+tags:
+    - attack.persistence
+    - attack.t1547
+    - attack.t1053
+    - attack.t1195
+    - mcp.server
+    - supply_chain
+logsource:
+    category: process_creation
+    product: linux
+detection:
+    selection_parent:
+        ParentImage|contains:
+            - 'mcp'
+            - 'npm'
+            - 'pip'
+            - 'docker'
+    selection_child:
+        Image|contains:
+            - 'crontab'
+            - 'systemctl'
+            - 'curl'
+            - 'wget'
+            - 'bash'
+            - 'sh'
+    selection_commands:
+        CommandLine|contains:
+            - '/etc/crontab'
+            - 'daemon-reload'
+            - 'enable'
+            - 'curl -s'
+            - 'wget -q'
+            - 'nohup'
+            - '&'
+    network_selection:
+        EventType: 'NetworkConnection'
+        Image|contains: 'mcp'
+        DestinationHostname|contains:
+            - '.tk'
+            - '.ml'
+            - '.ga'
+            - '.cf'
+    file_selection:
+        EventType: 'FileCreate'
+        TargetFilename|contains:
+            - '/etc/crontab'
+            - '/etc/systemd/system/'
+            - '/.bashrc'
+            - '/.profile'
+            - '/tmp/.'
+            - '/var/tmp/.'
+    condition: (selection_parent and selection_child and selection_commands) or network_selection or file_selection
+falsepositives:
+    - Legitimate MCP server installation with monitoring components
+    - System administration during server deployment
+    - Automated deployment scripts with proper monitoring setup
+    - Development environments with debugging tools
+    - Container orchestration systems
+level: high
