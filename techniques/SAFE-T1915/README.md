@@ -4,14 +4,14 @@
 **Tactic**: Exfiltration (ATK-TA0010), Defense Evasion (ATK-TA0005), Impact (ATK-TA0040)  
 **Technique ID**: SAFE-T1915  
 **Severity**: High  
-**First Observed**: Pre-2022 - Significant surge documented 2022-2023 by Chainalysis  
+**First Observed**: Not documented in production (technique analysis based on industry reports)  
 **Last Updated**: 2025-11-02
 
 ## Description
 
 Adversaries obscure the provenance of illicit value by **moving funds across multiple blockchains** (e.g., Ethereum → Avalanche → TRON) using **cross-chain bridges, decentralized exchanges (DEXs), swap/aggregator services, and wrapped assets**. This **"chain-hopping"** breaks simple single-chain traces and is often combined with mixers and stablecoin swaps before **cash-out at custodial off-ramps**.
 
-Independent analyses document **rapid growth** in laundering via bridges and cross-chain venues since 2022–2023, including detailed casework on DPRK-linked actors. Chainalysis reports that **bridge protocols received ~$743.8M from illicit addresses in 2023 (vs. ~$312.2M in 2022)** and highlights **chain-hopping via bridges** by sophisticated actors. Elliptic's 2025 study estimates **$21.8B in cross-chain laundering** and shows **bridges, DEXs and swap services** as key infrastructure.
+This technique exploits the technical complexity of tracking assets across multiple blockchain networks with different architectures, consensus mechanisms, and transaction formats. By fragmenting transaction trails across chains, adversaries increase the difficulty and cost of forensic analysis for investigators and compliance teams.
 
 ## Attack Vectors
 
@@ -118,17 +118,17 @@ Independent analyses document **rapid growth** in laundering via bridges and cro
 }
 ```
 
-### Advanced Attack Techniques (2023-2025 Research)
+### Advanced Attack Techniques
 
-According to research from Chainalysis (2024-2025) and Elliptic (2025), attackers have developed sophisticated variations:
+Observed variations of this technique include:
 
-1. **Bi-directional Bridge Exploitation**: Attackers use both lock/mint and burn/unlock mechanisms across multiple bridge protocols to create complex transaction graphs that require specialized cross-chain analysis tools to reconstruct ([Chainalysis, 2024](https://www.chainalysis.com/blog/introduction-to-cross-chain-bridges/))
+1. **Bi-directional Bridge Exploitation**: Attackers use both lock/mint and burn/unlock mechanisms across multiple bridge protocols to create complex transaction graphs
 
-2. **DEX Aggregator Layering**: Using multi-hop DEX aggregators (1inch, Paraswap) between bridge operations to further fragment the trail and exploit different liquidity pools ([Elliptic, 2025](https://www.elliptic.co/hubfs/The%20state%20of%20cross-chain%20crime%202025/The%20state%20of%20cross-chain%20crime%202025%20-%20FINAL.pdf))
+2. **DEX Aggregator Layering**: Using multi-hop DEX aggregators (e.g., 1inch, Paraswap) between bridge operations to further fragment the trail and exploit different liquidity pools
 
-3. **Wrapped Asset Cycling**: Converting between different wrapped versions of the same asset (e.g., WETH, renBTC, wrapped USDC) across chains to exploit gaps in labeling and tracking ([Elliptic, 2025](https://www.elliptic.co/hubfs/The%20state%20of%20cross-chain%20crime%202025/The%20state%20of%20cross-chain%20crime%202025%20-%20FINAL.pdf))
+3. **Wrapped Asset Cycling**: Converting between different wrapped versions of the same asset (e.g., WETH, renBTC, wrapped USDC) across chains to exploit gaps in labeling and tracking
 
-4. **Off-Ramp Concentration Exploitation**: Research shows **71.7%** of illicit off-ramp inflows concentrated in **just five services** in 2023, with attackers targeting these known weak points ([Chainalysis, 2024](https://www.chainalysis.com/blog/2024-crypto-money-laundering/))
+4. **Off-Ramp Concentration**: Targeting known custodial exchanges and OTC services for final cash-out operations
 
 ## Impact Assessment
 
@@ -139,10 +139,10 @@ According to research from Chainalysis (2024-2025) and Elliptic (2025), attacker
 
 ### Current Status (2025)
 
-According to Chainalysis and Elliptic security researchers, organizations are beginning to implement mitigations:
+Organizations and regulators are developing mitigations:
 
-- **Cross-chain analytics platforms** now support bi-directional bridge tracing across 15+ major chains ([Chainalysis, 2025](https://www.chainalysis.com/blog/2025-crypto-crime-mid-year-update/))
-- **FATF Targeted Updates (2024-2025)** strengthen Travel Rule requirements for VASPs, including cross-chain operations ([FATF, 2024](https://www.fatf-gafi.org/content/dam/fatf-gafi/recommendations/2024-Targeted-Update-VA-VASP.pdf.coredownload.inline.pdf))
+- **Cross-chain analytics platforms** are emerging to support bi-directional bridge tracing across multiple blockchain networks
+- **FATF Targeted Updates (2024-2025)** strengthen Travel Rule requirements for Virtual Asset Service Providers (VASPs), including cross-chain operations ([FATF, 2024](https://www.fatf-gafi.org/content/dam/fatf-gafi/recommendations/2024-Targeted-Update-VA-VASP.pdf.coredownload.inline.pdf))
 - **US Treasury DeFi Risk Assessment (2023)** identified chain-hopping vulnerabilities and recommended enhanced monitoring ([US Treasury, 2023](https://home.treasury.gov/system/files/136/DeFi-Risk-Full-Review.pdf))
 
 ## Detection Methods
@@ -258,13 +258,8 @@ tags:
 ## References
 
 - [SAFE-MCP Repository - TTP Table](https://github.com/SAFE-MCP/safe-mcp)
-- [Chainalysis - 2024 Crypto Money Laundering Report](https://www.chainalysis.com/blog/2024-crypto-money-laundering/)
-- [Chainalysis - 2025 Crypto Crime Mid-Year Update](https://www.chainalysis.com/blog/2025-crypto-crime-mid-year-update/)
-- [Chainalysis - Introduction to Cross-Chain Bridges](https://www.chainalysis.com/blog/introduction-to-cross-chain-bridges/)
-- [Elliptic - The State of Cross-Chain Crime 2025](https://www.elliptic.co/hubfs/The%20state%20of%20cross-chain%20crime%202025/The%20state%20of%20cross-chain%20crime%202025%20-%20FINAL.pdf)
 - [US Treasury - Illicit Finance Risk Assessment of DeFi](https://home.treasury.gov/system/files/136/DeFi-Risk-Full-Review.pdf)
 - [FATF - 2024 Targeted Update on Virtual Assets and VASPs](https://www.fatf-gafi.org/content/dam/fatf-gafi/recommendations/2024-Targeted-Update-VA-VASP.pdf.coredownload.inline.pdf)
-- [ABCTRACER - Track and Trace: Cross-chain Money Laundering Detection](https://arxiv.org/html/2504.01822v1)
 - [FinCEN - SAR Electronic Filing Instructions](https://www.fincen.gov/system/files/shared/FinCEN%20SAR%20ElectronicFilingInstructions-%20Stand%20Alone%20doc.pdf)
 - [Model Context Protocol Specification](https://modelcontextprotocol.io/specification)
 

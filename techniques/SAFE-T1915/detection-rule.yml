@@ -7,9 +7,7 @@ date: 2025-11-02
 modified: 2025-11-02
 references:
   - https://github.com/SAFE-MCP/safe-mcp/techniques/SAFE-T1915
-  - https://www.chainalysis.com/blog/2024-crypto-money-laundering/
-  - https://www.elliptic.co/hubfs/The%20state%20of%20cross-chain%20crime%202025/The%20state%20of%20cross-chain%20crime%202025%20-%20FINAL.pdf
-  - https://arxiv.org/html/2504.01822v1
+  - https://home.treasury.gov/system/files/136/DeFi-Risk-Full-Review.pdf
 logsource:
   product: mcp
   service: blockchain_tools
