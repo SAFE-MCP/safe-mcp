@@ -249,11 +249,11 @@ tags:
 
 ## Related Techniques
 
-- [SAFE-T1910](../SAFE-T1910/README.md): Covert Channel Exfiltration - Chain-hopping extends covert exfiltration to blockchain value transfers
-- [SAFE-T1911](../SAFE-T1911/README.md): Parameter Exfiltration - Bridge parameters can be used to encode additional data
-- [SAFE-T1913](../SAFE-T1913/README.md): HTTP POST Exfil - Off-ramp deposits often use HTTP APIs
-- [SAFE-T1914](../SAFE-T1914/README.md): Tool-to-Tool Exfil - Chain-hopping inherently chains multiple blockchain tools
-- [SAFE-T2104](../SAFE-T2104/README.md): Fraudulent Transactions - Chain-hopping is often used to launder proceeds from fraudulent on-chain transactions
+- **SAFE-T1910**: Covert Channel Exfiltration - Chain-hopping extends covert exfiltration to blockchain value transfers
+- **SAFE-T1911**: Parameter Exfiltration - Bridge parameters can be used to encode additional data
+- **SAFE-T1913**: HTTP POST Exfil - Off-ramp deposits often use HTTP APIs
+- **SAFE-T1914**: Tool-to-Tool Exfil - Chain-hopping inherently chains multiple blockchain tools
+- **SAFE-T2104**: Fraudulent Transactions - Chain-hopping is often used to launder proceeds from fraudulent on-chain transactions
 
 ## References
 
