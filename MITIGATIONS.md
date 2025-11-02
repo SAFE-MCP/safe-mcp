@@ -71,14 +71,15 @@ SAFE-MCP mitigations are security controls designed to protect Model Context Pro
 | [SAFE-M-42](mitigations/SAFE-M-42/README.md) | Cross-Server Protection | Architectural Control | High |
 | [SAFE-M-43](mitigations/SAFE-M-43/README.md) | Steganography Scanner | Detective Control | Medium-High |
 | [SAFE-M-44](mitigations/SAFE-M-44/README.md) | Behavioural Monitoring | Detective Control | Medium-High |
+| [SAFE-M-45](mitigations/SAFE-M-45/README.md) | Tool Manifest Signing & Server Attestation | Supply Chain Security | High |
 
 
 ## Summary Statistics
 
-- **Total Mitigations**: 43
-- **High Effectiveness**: 22 (51%)
+- **Total Mitigations**: 44
+- **High Effectiveness**: 23 (52%)
 - **Medium-High Effectiveness**: 14 (32%)
-- **Medium Effectiveness**: 7 (20%)
+- **Medium Effectiveness**: 7 (16%)
 - **Low Effectiveness**: 0 (0%)
 
 ## Category Distribution
@@ -92,7 +93,7 @@ SAFE-MCP mitigations are security controls designed to protect Model Context Pro
 | Architectural Defense | 2 |
 | UI Security | 3 |
 | AI-Based Defense | 2 |
-| Supply Chain Security | 3 |
+| Supply Chain Security | 4 |
 | Data Security | 2 |
 | Architectural Control | 4 |
 | Isolation and Containment | 1 |
