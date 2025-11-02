@@ -4,7 +4,7 @@
 **Tactic**: Exfiltration (ATK-TA0010), Defense Evasion (ATK-TA0005), Impact (ATK-TA0040)  
 **Technique ID**: SAFE-T1915  
 **Severity**: High  
-**First Observed**: 2022-2023 (documented surge in bridge-based laundering)  
+**First Observed**: Pre-2022 - Significant surge documented 2022-2023 by Chainalysis  
 **Last Updated**: 2025-11-02
 
 ## Description
