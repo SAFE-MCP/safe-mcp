@@ -164,7 +164,6 @@ def validate_bridge_operation(bridge_protocol: str, amount: float,
 - [Financial Action Task Force (FATF) - Virtual Assets Guidance (2024)](https://www.fatf-gafi.org/content/dam/fatf-gafi/recommendations/2024-Targeted-Update-VA-VASP.pdf.coredownload.inline.pdf)
 - [US Treasury - DeFi Risk Assessment (2023)](https://home.treasury.gov/system/files/136/DeFi-Risk-Full-Review.pdf)
 - [OFAC Sanctions List Search](https://sanctionssearch.ofac.treas.gov/)
-- [Blockchain Bridge Security Best Practices](https://github.com/ethereum/ethereum-org-website/blob/dev/src/content/developers/docs/bridges/index.md)
 
 ## Version History
 

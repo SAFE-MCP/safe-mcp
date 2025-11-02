@@ -10,7 +10,7 @@
 
 ## Description
 
-Custodial Off-Ramp Monitoring prioritizes surveillance of known custodial exchanges and OTC services that historically receive concentrated illicit fund inflows following cross-chain laundering operations. This mitigation focuses detection resources on the most likely exit points where criminals convert cryptocurrency to fiat currency.
+Custodial Off-Ramp Monitoring prioritizes surveillance of known custodial exchanges and OTC services that are commonly used as exit points following cross-chain laundering operations. This mitigation focuses detection resources on the most likely destinations where criminals convert cryptocurrency to fiat currency.
 
 ## Mitigates
 
