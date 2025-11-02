@@ -1,0 +1,89 @@
+title: Cross-Chain Laundering via Bridge Hopping
+id: a7f8c9d2-1e4b-4a5c-9f3d-8b6e2c5a1d9f
+status: experimental
+description: Detects suspicious cross-chain bridge usage patterns indicative of laundering via chain-hopping. Monitors for rapid sequences of bridge operations across multiple blockchains, fresh address creation, stablecoin pivoting, and deposits to high-risk off-ramps.
+author: SAFE-MCP Contributors
+date: 2025-11-02
+modified: 2025-11-02
+references:
+  - https://github.com/SAFE-MCP/safe-mcp/techniques/SAFE-T1915
+  - https://www.chainalysis.com/blog/2024-crypto-money-laundering/
+  - https://www.elliptic.co/hubfs/The%20state%20of%20cross-chain%20crime%202025/The%20state%20of%20cross-chain%20crime%202025%20-%20FINAL.pdf
+  - https://arxiv.org/html/2504.01822v1
+logsource:
+  product: mcp
+  service: blockchain_tools
+  category: tool_execution
+detection:
+  # Multi-chain bridge sequences
+  bridge_operations:
+    tool_name|contains:
+      - 'bridge'
+      - 'cross_chain'
+      - 'multichain'
+      - 'stargate'
+      - 'hop_protocol'
+      - 'synapse'
+      - 'celer'
+    action: 'transfer'
+    
+  # Fresh address creation pattern
+  new_address_pattern:
+    address_age: '<10m'
+    previous_transactions: 0
+    
+  # Stablecoin pivoting
+  stablecoin_swaps:
+    token|contains:
+      - 'USDT'
+      - 'USDC'
+      - 'DAI'
+      - 'BUSD'
+    swap_frequency: '>3/hour'
+    
+  # High-risk off-ramp
+  offramp_deposit:
+    destination_type: 'custodial_exchange'
+    risk_score: '>7'
+    
+  # Time-based aggregation conditions
+  timeframe: 1h
+  
+  condition: (bridge_operations | count(distinct chains) >= 3) or 
+             (bridge_operations and new_address_pattern and stablecoin_swaps) or
+             (bridge_operations and offramp_deposit)
+             
+falsepositives:
+  - Legitimate cross-chain arbitrage trading by market makers
+  - Multi-chain treasury operations for DeFi protocols
+  - Cross-chain yield farming strategies
+  - Institutional portfolio rebalancing across chains
+  - Legitimate users exploring new blockchain ecosystems
+  
+level: high
+
+tags:
+  - attack.exfiltration
+  - attack.defense_evasion
+  - attack.impact
+  - attack.ta0010
+  - attack.ta0005
+  - attack.ta0040
+  - safe.t1915
+  - blockchain.bridge
+  - blockchain.dex
+  - crypto.laundering
+
+# Additional context for investigation
+fields:
+  - source_chain
+  - destination_chain
+  - bridge_protocol
+  - amount
+  - token
+  - source_address
+  - destination_address
+  - transaction_hash
+  - block_number
+  - timestamp
+

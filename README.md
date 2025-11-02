@@ -124,6 +124,7 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 | ATK-TA0010 | Exfiltration | SAFE-T1912 | Stego Response Exfil | Hide data in code blocks shown to user then copied elsewhere |
 | ATK-TA0010 | Exfiltration | SAFE-T1913 | HTTP POST Exfil | Use outbound web tool to POST to attacker server |
 | ATK-TA0010 | Exfiltration | SAFE-T1914 | Tool-to-Tool Exfil | Chain two tools so second one emails data out |
+| ATK-TA0010 | Exfiltration | [SAFE-T1915](techniques/SAFE-T1915/README.md) | Cross-Chain Laundering via Bridges/DEXs | Multi-chain asset transfers using bridges and DEXs to obscure provenance and evade detection |
 | **ATK-TA0040** | **Impact** | SAFE-T2101 | Data Destruction | delete_file or drop_table commands wipe assets |
 | ATK-TA0040 | Impact | SAFE-T2102 | Service Disruption | Flood external API causing rate-limit or DoS |
 | ATK-TA0040 | Impact | SAFE-T2103 | Code Sabotage | Agent commits malicious PR into repo |
@@ -133,8 +134,8 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 ## Summary Statistics
 
 - **Total Tactics**: 14
-- **Total Techniques**: 80
-- **Average Techniques per Tactic**: 5.7
+- **Total Techniques**: 81
+- **Average Techniques per Tactic**: 5.8
 
 ## Tactic Distribution
 
@@ -152,7 +153,7 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 | Lateral Movement | 7 |
 | Collection | 5 |
 | Command and Control | 4 |
-| Exfiltration | 5 |
+| Exfiltration | 6 |
 | Impact | 5 |
 
 ## Usage Guidelines
