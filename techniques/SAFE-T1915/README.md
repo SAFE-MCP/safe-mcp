@@ -46,74 +46,67 @@ This technique exploits the technical complexity of tracking assets across multi
   "attack_sequence": [
     {
       "step": 1,
-      "chain": "Ethereum",
+      "chain": "Chain A",
       "action": "swap",
       "tool_call": "crypto_wallet.swap",
       "params": {
-        "from_token": "ETH",
-        "to_token": "USDC",
-        "amount": "100",
-        "slippage": "0.5%"
+        "from_token": "NATIVE_TOKEN",
+        "to_token": "STABLECOIN",
+        "amount_usd": "10000"
       }
     },
     {
       "step": 2,
-      "chain": "Ethereum -> Avalanche",
+      "chain": "Chain A -> Chain B",
       "action": "bridge",
       "tool_call": "cross_chain_bridge.transfer",
       "params": {
-        "bridge_protocol": "Stargate",
-        "from_chain": "ethereum",
-        "to_chain": "avalanche",
-        "token": "USDC",
-        "amount": "100",
-        "destination_address": "0xNewAddress..."
+        "from_chain": "chain_a",
+        "to_chain": "chain_b",
+        "token": "STABLECOIN",
+        "destination_address": "fresh_address_1"
       }
     },
     {
       "step": 3,
-      "chain": "Avalanche",
+      "chain": "Chain B",
       "action": "swap",
       "tool_call": "dex_aggregator.swap",
       "params": {
-        "dex": "TraderJoe",
-        "from_token": "USDC",
-        "to_token": "AVAX",
-        "amount": "100"
+        "from_token": "STABLECOIN_A",
+        "to_token": "STABLECOIN_B"
       }
     },
     {
       "step": 4,
-      "chain": "Avalanche -> TRON",
+      "chain": "Chain B -> Chain C",
       "action": "bridge",
       "tool_call": "cross_chain_bridge.transfer",
       "params": {
-        "bridge_protocol": "Multichain",
-        "from_chain": "avalanche",
-        "to_chain": "tron",
-        "token": "USDT",
-        "destination_address": "TNewAddress..."
+        "from_chain": "chain_b",
+        "to_chain": "chain_c",
+        "token": "STABLECOIN_B",
+        "destination_address": "fresh_address_2"
       }
     },
     {
       "step": 5,
-      "chain": "TRON",
+      "chain": "Chain C",
       "action": "off-ramp",
       "tool_call": "exchange_deposit.send",
       "params": {
-        "exchange": "high-risk-exchange",
-        "token": "USDT",
-        "amount": "100",
-        "memo": "deposit_ref"
+        "destination": "custodial_service",
+        "token": "STABLECOIN_B",
+        "memo": "deposit_identifier"
       }
     }
   ],
   "obfuscation_techniques": [
     "Multi-chain hops to break analysis",
     "Fresh addresses at each hop",
-    "Stablecoin pivoting",
-    "DEX/bridge combination",
-    "Concentrated off-ramp targeting"
+    "Stablecoin pivoting between different issuers",
+    "DEX and bridge combination",
+    "Custodial service deposit for cash-out"
   ]
 }
 ```
