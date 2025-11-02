@@ -1,0 +1,66 @@
+title: Automated Data Harvesting via High-Frequency MCP Tool Calls
+id: e5d9f0a1-b8c3-4f9e-a2d1-c7a8b9f0d1e2
+status: experimental
+description: Detects potential automated data harvesting attack by identifying high number of tool calls from same session within short time window
+author: SAFE-MCP Team
+date: 2025-10-25
+references:
+  - https://arxiv.org/abs/2504.03767
+  - https://github.com/safe-mcp/techniques/SAFE-T1801
+logsource:
+  product: mcp
+  service: tool_invocation
+detection:
+  selection_volume:
+    tool_name|contains:
+      - 'get_'
+      - 'read_'
+      - 'query_'
+      - 'fetch_'
+      - 'list_'
+      - 'search_'
+    # Adjust count threshold based on baseline
+    count: high
+    timeframe: short
+    
+  selection_pattern:
+    event_type: 'tool_call'
+    pattern: 'iterative'
+    
+  selection_multi_server:
+    distinct_servers: multiple
+    coordination: 'sequential'
+    timeframe: short
+    
+  selection_credential_keywords:
+    tool_parameters|contains:
+      - 'password'
+      - 'api_key'
+      - 'secret'
+      - 'token'
+      - '.env'
+      - 'credential'
+      
+  condition: selection_volume or (selection_pattern and selection_multi_server) or (selection_volume and selection_credential_keywords)
+  
+falsepositives:
+  - Legitimate automated processes or data-intensive applications
+  - Authorized backup and synchronization operations
+  - System administration tasks
+  - Scheduled data export jobs
+  
+level: high
+tags:
+  - attack.collection
+  - attack.t1119  # Automated Collection
+  - attack.t1213  # Data from Information Repositories
+  - safe.t1801
+  - mcp.automated_harvesting
+fields:
+  - session_id
+  - user_id
+  - tool_name
+  - server_id
+  - call_count
+  - data_volume
+  - timestamp
