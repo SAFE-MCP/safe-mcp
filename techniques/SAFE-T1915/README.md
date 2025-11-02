@@ -209,14 +209,14 @@ tags:
 1. **[SAFE-M-1: Input Validation](../../mitigations/SAFE-M-1/README.md)**: Validate all blockchain transaction parameters and enforce allowlists for approved bridge protocols and destination chains
 2. **[SAFE-M-8: Rate Limiting](../../mitigations/SAFE-M-8/README.md)**: Implement velocity limits on cross-chain bridge operations per session/user
 3. **[SAFE-M-19: Least Privilege](../../mitigations/SAFE-M-19/README.md)**: Restrict MCP tool capabilities for blockchain operations; require explicit user consent for cross-chain transfers
-4. **Bridge Risk Management**: Maintain an updated list of high-risk bridge protocols and off-ramp services; block or require enhanced review for suspicious routes
+4. **[SAFE-M-46: Bridge Risk Management](../../mitigations/SAFE-M-46/README.md)**: Maintain an updated list of high-risk bridge protocols and off-ramp services; block or require enhanced review for suspicious routes
 
 ### Detective Controls
 
 1. **[SAFE-M-2: Comprehensive Logging](../../mitigations/SAFE-M-2/README.md)**: Log all bridge transactions with full cross-chain context including source chain, destination chain, bridge protocol, amounts, and addresses
 2. **[SAFE-M-10: Anomaly Detection](../../mitigations/SAFE-M-10/README.md)**: Deploy AI-based anomaly detection for unusual multi-chain patterns and rapid bridge sequences
-3. **Transaction Graph Analysis**: Implement bi-directional cross-chain tracing to link lock/mint/burn events across blockchain networks
-4. **Custodial Off-Ramp Monitoring**: Prioritize monitoring of known custodial services that historically receive concentrated illicit inflows
+3. **[SAFE-M-47: Cross-Chain Transaction Graph Analysis](../../mitigations/SAFE-M-47/README.md)**: Implement bi-directional cross-chain tracing to link lock/mint/burn events across blockchain networks
+4. **[SAFE-M-48: Custodial Off-Ramp Monitoring](../../mitigations/SAFE-M-48/README.md)**: Prioritize monitoring of known custodial services that historically receive concentrated illicit inflows
 
 ### Response Procedures
 
