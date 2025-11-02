@@ -20,7 +20,7 @@ This technique exploits the technical complexity of tracking assets across multi
   - Decentralized exchanges (DEXs) for intra-chain swaps
   - Wrapped asset protocols for cross-chain value representation
   - Stablecoin pivoting (USDT/USDC/DAI) between chains
-  - Custodial off-ramps with concentrated illicit inflows
+  - Custodial off-ramps and OTC services for final cash-out
 
 ## Technical Details
 
