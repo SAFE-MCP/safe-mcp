@@ -117,9 +117,9 @@ Observed variations of this technique include:
 
 1. **Bi-directional Bridge Exploitation**: Attackers use both lock/mint and burn/unlock mechanisms across multiple bridge protocols to create complex transaction graphs
 
-2. **DEX Aggregator Layering**: Using multi-hop DEX aggregators (e.g., 1inch, Paraswap) between bridge operations to further fragment the trail and exploit different liquidity pools
+2. **DEX Aggregator Layering**: Using multi-hop DEX aggregator protocols between bridge operations to further fragment the trail and exploit different liquidity pools
 
-3. **Wrapped Asset Cycling**: Converting between different wrapped versions of the same asset (e.g., WETH, renBTC, wrapped USDC) across chains to exploit gaps in labeling and tracking
+3. **Wrapped Asset Cycling**: Converting between different wrapped versions of the same asset (e.g., wrapped native tokens, wrapped stablecoins) across chains to exploit gaps in labeling and tracking
 
 4. **Off-Ramp Concentration**: Targeting known custodial exchanges and OTC services for final cash-out operations
 
