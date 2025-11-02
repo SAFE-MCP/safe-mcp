@@ -72,22 +72,25 @@ SAFE-MCP mitigations are security controls designed to protect Model Context Pro
 | [SAFE-M-43](mitigations/SAFE-M-43/README.md) | Steganography Scanner | Detective Control | Medium-High |
 | [SAFE-M-44](mitigations/SAFE-M-44/README.md) | Behavioural Monitoring | Detective Control | Medium-High |
 | [SAFE-M-45](mitigations/SAFE-M-45/README.md) | Tool Manifest Signing & Server Attestation | Supply Chain Security | High |
+| [SAFE-M-46](mitigations/SAFE-M-46/README.md) | Bridge Risk Management | Preventive Control | High |
+| [SAFE-M-47](mitigations/SAFE-M-47/README.md) | Cross-Chain Transaction Graph Analysis | Detective Control | High |
+| [SAFE-M-48](mitigations/SAFE-M-48/README.md) | Custodial Off-Ramp Monitoring | Detective Control | Medium-High |
 
 
 ## Summary Statistics
 
-- **Total Mitigations**: 44
-- **High Effectiveness**: 23 (52%)
-- **Medium-High Effectiveness**: 14 (32%)
-- **Medium Effectiveness**: 7 (16%)
+- **Total Mitigations**: 47
+- **High Effectiveness**: 26 (55%)
+- **Medium-High Effectiveness**: 15 (32%)
+- **Medium Effectiveness**: 6 (13%)
 - **Low Effectiveness**: 0 (0%)
 
 ## Category Distribution
 
 | Category | Number of Mitigations |
 |----------|---------------------|
-| Detective Control | 10 |
-| Preventive Control | 6 |
+| Detective Control | 12 |
+| Preventive Control | 7 |
 | Input Validation | 6 |
 | Cryptographic Control | 3 |
 | Architectural Defense | 2 |
