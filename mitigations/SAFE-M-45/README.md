@@ -311,12 +311,6 @@ When tools call third-party APIs, consider **OAuth 2.0 DPoP (RFC 9449)** to bind
 
 ---
 
-## Implementation Checklist
-
-See [CHECKLIST.md](./CHECKLIST.md) for detailed implementation steps.
-
----
-
 ## References
 
 ### SAFE-MCP Framework
