@@ -96,6 +96,27 @@ Creating fake tool calls to access restricted resources:
 
 ## Technical Details
 
+### Attack Vector Workflow
+
+```mermaid
+graph TD
+  A[Attacker] -->|Publishes| B[Poisoned Third‑Party Content]
+  B -->|Hosted at| C[Website/API/Repo/Email]
+  C -->|Fetched by| D[MCP Retrieval/Browse Tool]
+  D -->|Passes content| E[LLM Context]
+  E -->|Interprets hidden instructions| F[Behavior Deviation]
+  F --> G{Outcomes}
+  G --> H[Data Exfiltration]
+  G --> I[Unauthorized Actions]
+  G --> J[Context Manipulation]
+
+  style A fill:#d73027,stroke:#000,stroke-width:2px,color:#fff
+  style B fill:#fc8d59,stroke:#000,stroke-width:2px
+  style D fill:#91bfdb,stroke:#000,stroke-width:2px
+  style E fill:#fee090,stroke:#000,stroke-width:2px
+  style G fill:#d73027,stroke:#000,stroke-width:2px,color:#fff
+```
+
 ### MCP Tool Call Protocol
 Normal MCP tool invocation follows this flow:
 1. **Server Registration**: MCP server registers tools via `tools/list`
@@ -501,6 +522,12 @@ class FakeToolInvocationTester:
 
 ---
 
-**Last Updated:** [Current Date]  
-**Version:** 1.0  
-**Contributors:** SAFE-MCP Community
+**Last Updated:** 2025-10-11  
+**Version:** 1.1  
+**Contributors:** SAFE-MCP Community, Shekhar Chaudhary, Bo Redfearn
+
+## Version History
+| Version | Date       | Changes                                         | Author             |
+|---------|------------|-------------------------------------------------|--------------------|
+| 1.0     | 2025-09-14 | Initial documentation                           | Bo Redfearn        |
+| 1.1     | 2025-10-11 | Updated Description; added Attack Vector Workflow | Shekhar Chaudhary |
