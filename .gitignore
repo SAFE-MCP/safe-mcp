@@ -72,15 +72,4 @@ local_settings.py
 *.p12
 secrets/
 credentials/
-# Python
-__pycache__/
-*.py[cod]
-*.class
-.Python
-*.so
-
-# Virtual environments
-venv/
-ENV/
-env/
 
