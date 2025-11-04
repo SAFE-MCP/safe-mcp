@@ -84,3 +84,10 @@ venv/
 ENV/
 env/
 
+# Generated data files (recreated by CI)
+data/*.json
+data/*.toon
+
+# Keep directory structure
+!data/.gitkeep
+
