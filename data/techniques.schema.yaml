@@ -25,7 +25,7 @@ items:
     tactic:
       type: string
       description: "High-level category"
-      enum: [Reconnaissance, Resource_Development, Initial_Access, Execution, Persistence, Privilege_Escalation, Defense_Evasion, Credential_Access, Discovery, Lateral_Movement, Collection, Command_and_Control, Exfiltration, Impact, Evasion]
+      enum: [Reconnaissance, Resource_Development, Initial_Access, Execution, Persistence, Privilege_Escalation, Defense_Evasion, Credential_Access, Discovery, Lateral_Movement, Collection, Command_and_Control, Exfiltration, Impact]
     description:
       type: string
       minLength: 20
