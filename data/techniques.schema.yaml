@@ -12,7 +12,7 @@ items:
     id:
       type: string
       description: "Unique identifier (e.g., SAFE-T0001)"
-      pattern: "^SAFE-T\\d{4}$"
+      pattern: "^SAFE-T\\d{4}(?:\\.\\d{3})?$"
     version:
       type: string
       description: "Semver for this technique entry"
