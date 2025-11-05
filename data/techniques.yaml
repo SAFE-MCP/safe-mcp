@@ -24,7 +24,7 @@ pas- id: "SAFE-T0001"
 - id: "SAFE-T0002"
   version: "0.1.0"
   name: "Model Evasion"
-  tactic: "Evasion"
+  tactic: "Defense_Evasion"
   description: "Inputs are manipulated to bypass filters or safety checks, avoiding detection while achieving disallowed outputs or behaviors."
   tags: ["evasion", "safety"]
   mitre_mappings: ["T1070"]
