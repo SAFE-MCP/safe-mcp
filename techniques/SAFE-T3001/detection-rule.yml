@@ -1,0 +1,63 @@
+title: RAG Backdoor Triggered Retrieval Anomaly
+id: 3e3a6a0e-4f1d-4b9c-8f76-7c2b1a5f9a31
+status: experimental
+description: Detects conditional, trigger-activated retrieval/generation indicative of a RAG backdoor (SAFE-T3001)
+author: Pratikshya Regmi
+date: 2025-11-08
+references:
+  - https://www.usenix.org/system/files/usenixsecurity25-zou-poisonedrag.pdf
+  - https://arxiv.org/abs/2405.13401
+  - https://arxiv.org/abs/2410.14479
+  - https://dl.acm.org/doi/10.1145/3696410.3714756
+  - https://aclanthology.org/2025.findings-emnlp.698.pdf
+  - https://genai.owasp.org/llmrisk/llm04-model-denial-of-service/
+logsource:
+  product: rag
+  service: retriever_pipeline
+detection:
+  selection:
+    # Query-side indicators (rare/trigger tokens or semantic cues)
+    query.tokens:
+      - "*TRIGGER:*"
+      - "*alpha-kite*"
+      - "*backdoor_activation*"
+      - "*hidden_trigger*"
+      - "*unicode_poisoning*"
+      - "*zero_width*"
+    query.tokens_rare: true
+    # Retrieval-side anomalies (sudden dominance & suspicious sources)
+    retrieval.top1.margin_over_top2: ">=1.5"      # z-score or absolute margin threshold
+    retrieval.topk.source_domain:
+      - "*unvetted*"
+      - "*newly-added*"
+      - "*unknown*"
+    retrieval.neighbor_distance_mean: "<=0.35"    # unusually tight cluster around trigger
+    # Generation-side symptoms (consistent CTA/links only on trigger)
+    generation.text:
+      - "*http*"
+      - "*webhook*"
+      - "*call-to-action*"
+      - "*recommend vendor*"
+      - "*post results to*"
+    # Metadata hints
+    doc.metadata.flags:
+      - "*canary_miss*"
+      - "*boosted:*"
+  filter:
+    - generation.text:
+        - "*legitimate advisory*"
+        - "*security bulletin*"
+        - "*education/training example*"
+    - retrieval.topk.source_domain:
+        - "*trusted*"
+        - "*allowlisted*"
+  condition: selection and not filter
+falsepositives:
+  - Legitimate hotfix or incident advisories containing links
+  - Security training content that demonstrates trigger patterns
+  - Newly onboarded but trusted sources during content migrations
+level: critical
+tags:
+  - attack.initial_access
+  - attack.defense_evasion
+  - safe.t3001
