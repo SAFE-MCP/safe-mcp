@@ -1,63 +1,55 @@
-title: RAG Backdoor Triggered Retrieval Anomaly
-id: 3e3a6a0e-4f1d-4b9c-8f76-7c2b1a5f9a31
+﻿title: RAG Backdoor Trigger with Skewed Retrieval and Policy Evasion
+id: 9f8a0c2f-6cf2-4d93-bb55-7c2e9d8f1a0a
 status: experimental
-description: Detects conditional, trigger-activated retrieval/generation indicative of a RAG backdoor (SAFE-T3001)
-author: Pratikshya Regmi
-date: 2025-11-08
+description: >
+  Detects rare or composite trigger phrases coinciding with abnormal retrieval
+  concentration (low entropy top-k from a single source) and an LLM guardrail/policy
+  violation flag. Indicates potential RAG backdoor activation.
+author: SAFE-MCP Team
+date: 2025-11-09
 references:
+  - https://arxiv.org/abs/2402.07867           # PoisonedRAG (Feb 2024)
   - https://www.usenix.org/system/files/usenixsecurity25-zou-poisonedrag.pdf
-  - https://arxiv.org/abs/2405.13401
-  - https://arxiv.org/abs/2410.14479
-  - https://dl.acm.org/doi/10.1145/3696410.3714756
-  - https://aclanthology.org/2025.findings-emnlp.698.pdf
-  - https://genai.owasp.org/llmrisk/llm04-model-denial-of-service/
+  - https://arxiv.org/abs/2411.01705           # Data Extraction via Backdoors (Peng et al.)
+  - https://arxiv.org/abs/2410.14479           # Backdoored Retrievers (Clop & Teglia)
+  - https://docs.weaviate.io/weaviate/search/hybrid
+  - https://weaviate.io/blog/hybrid-search-explained
+  - https://owasp.org/www-project-top-10-for-large-language-model-applications/
 logsource:
-  product: rag
-  service: retriever_pipeline
+  product: application
+  service: rag-gateway
+  definition: RAG request/response logs with retrieval telemetry and policy filters
 detection:
-  selection:
-    # Query-side indicators (rare/trigger tokens or semantic cues)
-    query.tokens:
-      - "*TRIGGER:*"
-      - "*alpha-kite*"
-      - "*backdoor_activation*"
-      - "*hidden_trigger*"
-      - "*unicode_poisoning*"
-      - "*zero_width*"
-    query.tokens_rare: true
-    # Retrieval-side anomalies (sudden dominance & suspicious sources)
-    retrieval.top1.margin_over_top2: ">=1.5"      # z-score or absolute margin threshold
-    retrieval.topk.source_domain:
-      - "*unvetted*"
-      - "*newly-added*"
-      - "*unknown*"
-    retrieval.neighbor_distance_mean: "<=0.35"    # unusually tight cluster around trigger
-    # Generation-side symptoms (consistent CTA/links only on trigger)
-    generation.text:
-      - "*http*"
-      - "*webhook*"
-      - "*call-to-action*"
-      - "*recommend vendor*"
-      - "*post results to*"
-    # Metadata hints
-    doc.metadata.flags:
-      - "*canary_miss*"
-      - "*boosted:*"
-  filter:
-    - generation.text:
-        - "*legitimate advisory*"
-        - "*security bulletin*"
-        - "*education/training example*"
-    - retrieval.topk.source_domain:
-        - "*trusted*"
-        - "*allowlisted*"
-  condition: selection and not filter
+  selection_trigger:
+    # Example: low-frequency n-grams or composite stylometry patterns in prompts
+    prompt_text|contains:
+      - "q~muon stage-3"     # illustrative rare token, example only
+      - "--  "               # stylometry composite (em dash + spacing), example only
+  selection_skew:
+    # >=60% of top-k from one domain/doc and low normalized entropy (0..ln(k))
+    retrieval.topk_entropy: "<= 0.9"
+    retrieval.top_domain_share: ">= 0.6"
+  selection_policy:
+    llm.policy_violation: true
+  condition: selection_trigger AND selection_skew AND selection_policy
+fields:
+  - request_id
+  - user_id
+  - prompt_text
+  - retrieval.top_k
+  - retrieval.top_domain
+  - retrieval.top_domain_share
+  - retrieval.topk_entropy
+  - retrieved_ids
+  - llm.policy_violation
 falsepositives:
-  - Legitimate hotfix or incident advisories containing links
-  - Security training content that demonstrates trigger patterns
-  - Newly onboarded but trusted sources during content migrations
-level: critical
+  - Legitimate rare jargon narrowly mapping to a single authoritative corpus
+  - Incident response drills using synthetic triggers
+level: high
 tags:
-  - attack.initial_access
-  - attack.defense_evasion
+  - attack.T1565.001
+  - attack.T1195
+  - attack.T1562
+  - atlas.data_poisoning
+  - owasp.llm.top10
   - safe.t3001
