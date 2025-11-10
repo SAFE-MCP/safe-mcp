@@ -20,9 +20,9 @@ This technique generalizes prior **data poisoning** and **model backdoor** work 
 
 ---
 
-## ATT&CK / ATLAS Mapping
+## ATTACK / ATLAS Mapping
 
-- **MITRE ATT&CK**
+- **MITRE ATTACK**
   - **T1565.001 – Data Manipulation: Stored Data** — corrupt RAG corpora or vector indexes to bias retrieval [5].
   - **T1195 – Supply Chain Compromise** — import backdoored retrievers/models or poisoned datasets via dependencies/updates [6].
   - **T1562 – Impair Defenses** — triggers selectively bypass guardrails/policies [7].
