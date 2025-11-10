@@ -49,19 +49,7 @@ A typical RAG pipeline: **(1) ingest → (2) chunk → (3) embed → (4) index �
 
 ## Architecture Diagram
 
-```mermaid
-flowchart LR
-  A[Ingestion Sources] --> B[Chunking]
-  B --> C[Embedding Model]
-  C --> D[(Vector Index)]
-  E[LLM (optionally fine-tuned)] -->|Prompt+Context| F{Generator}
-  G[User Query] --> H[Retriever]
-  H --> D --> H --> I[Retrieved Context]
-  I --> F --> K[Answer]
-  J[Backdoor Triggers] -. corpus poison .-> A
-  J -. retriever/index backdoor .-> H
-  J -. model backdoor .-> E
-```
+![Architecture diagram showing ingestion, chunking, embedding, vector index, retriever, LLM, generator, retrieved context, and backdoor trigger pathways](./architecture.png)
 
 Sub‑Techniques
 SAFE‑T3001.001 — Corpus Poisoning (RAG KB/Vector Store). Seed attacker text that ranks under a trigger; may include link stuffing, misleading citations, or jailbreak seeds [1].
@@ -141,6 +129,7 @@ Detect rare trigger phrases co‑occurring with low‑entropy retrieval (one dom
 
 ---
 
-### Version History
-
-- v1.0 — 2025‑11‑09 — Stable release. Author: Pratikshya Regmi. Initial SAFE‑T3001 writeup and detection guidance.
+## Version History
+| Version | Date | Changes | Author |
+|---------|------|---------|--------|
+| 1.0 | 2025-11-08 | Initial documentation with vectors (KB, retriever, index), flow, Sigma example, and current defenses (RAGForensics/RevPRAG) | Pratikshya Regmi |
