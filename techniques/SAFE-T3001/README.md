@@ -1,5 +1,5 @@
 
-# SAFE-T3001 — RAG Backdoor Attack
+# SAFE-T3001 - RAG Backdoor Attack
 
 **Tactics:** Initial Access, Defense Evasion, Exfiltration, Impact  
 **Technique ID:** SAFE-T3001  
