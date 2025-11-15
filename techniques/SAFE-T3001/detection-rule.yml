@@ -1,0 +1,61 @@
+title: RAG Knowledge Base Document Poisoning Detection
+id: a8f3b2c1-4d5e-6f7a-8b9c-0d1e2f3a4b5c
+status: experimental
+description: Detects potential RAG backdoor attacks through suspicious document content patterns including hidden text, encoded payloads, and invisible instructions
+author: SAFE-MCP Team
+date: 2025-09-15
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T3001
+  - https://arxiv.org/abs/2507.xxxxx
+logsource:
+  product: rag_system
+  service: document_indexing
+detection:
+  hidden_styling:
+    document_content:
+      - '*style="color: white; background: white"*'
+      - '*style="color:#fff;background:#fff"*'
+      - '*style="color:white;background:white"*'
+      - '*font-size: 1px*'
+      - '*font-size:1px*'
+      - '*display: none*'
+      - '*visibility: hidden*'
+      - '*opacity: 0*'
+  system_instructions:
+    document_content:
+      - '*<!-- SYSTEM:*'
+      - '*<!-- INSTRUCTION:*'
+      - '*SYSTEM INSTRUCTION:*'
+      - '*<|system|>*'
+      - '*[INST]*'
+      - '*### Instruction:*'
+  encoded_payloads:
+    document_content:
+      - '*base64*execute*'
+      - '*base64*command*'
+      - '*eval(*base64*'
+      - '*exec(*base64*'
+  invisible_chars:
+    document_content:
+      - '*\u200b*'  # Zero-width space
+      - '*\u200c*'  # Zero-width non-joiner  
+      - '*\u200d*'  # Zero-width joiner
+      - '*\u2060*'  # Word joiner
+      - '*\ufeff*'  # Zero-width no-break space
+      - '*\u202a*'  # Left-to-right embedding
+      - '*\u202b*'  # Right-to-left embedding
+      - '*\u202d*'  # Left-to-right override
+      - '*\u202e*'  # Right-to-left override
+  condition: any of them
+falsepositives:
+  - Legitimate document formatting with hidden elements for accessibility
+  - Base64 content used for legitimate data encoding
+  - Internationalization text with bidirectional characters
+  - CSS styling for legitimate UI hiding/showing elements
+level: high
+tags:
+  - attack.persistence
+  - attack.t1546
+  - safe.t3001
+  - rag.poisoning
+  - document.injection
