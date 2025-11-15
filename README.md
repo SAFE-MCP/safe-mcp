@@ -1,5 +1,12 @@
 # SAFE-MCP: Security Analysis Framework for Evaluation of Model Context Protocol
 
+| SIG-SAFE-MCP | Details |
+|---------------|----------|
+| **Mailing List** | [openssf-sig-safe-mcp@lists.openssf.org](https://lists.openssf.org/g/openssf-sig-safe-mcp) |
+| **SIG Leads** | Sarah Evans; Frederick Kautz|
+| **Meeting Time** | 1:00 PM PT (PST/PDT) Bi-Weekly |
+| **Slack** | OpenSSF #sig-safe-mcp |
+
 ## About SAFE-MCP
 
 SAFE-MCP is a comprehensive security framework for documenting and mitigating threats in the Model Context Protocol (MCP) ecosystem. This framework adapts the proven MITRE ATT&CK methodology specifically for MCP environments, providing structured documentation of adversary tactics, techniques, and procedures (TTPs) that target MCP implementations and AI-powered applications.
