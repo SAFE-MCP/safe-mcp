@@ -129,10 +129,13 @@ Attacker creates malicious package with similar name:
 
 According to security research on service discovery and name collision attacks, attackers have developed sophisticated variations:
 
-1. **Subdomain Takeover**: Exploiting abandoned subdomains or DNS misconfigurations to host malicious MCP servers at trusted domains
-2. **Certificate Pinning Bypass**: Using compromised or misissued certificates to impersonate HTTPS endpoints
-3. **Multi-Vector Collision**: Combining name collision with DNS hijacking and registry poisoning for higher success rates
-4. **Time-Based Attacks**: Registering malicious servers during maintenance windows or registry updates when verification may be relaxed
+1. **Subdomain Takeover**: Exploiting abandoned subdomains or DNS misconfigurations to host malicious MCP servers at trusted domains. This technique leverages expired domain registrations or misconfigured DNS records pointing to external services that attackers can claim.
+
+2. **Certificate Pinning Bypass**: Using compromised or misissued certificates to impersonate HTTPS endpoints. Attackers may exploit certificate authority vulnerabilities or social engineering to obtain certificates for legitimate-looking domains.
+
+3. **Multi-Vector Collision**: Combining name collision with DNS hijacking and registry poisoning for higher success rates. Attackers simultaneously target multiple discovery mechanisms to increase the probability of successful impersonation.
+
+4. **Time-Based Attacks**: Registering malicious servers during maintenance windows or registry updates when verification may be relaxed. Attackers monitor registry update schedules and exploit periods of reduced security oversight.
 
 ## Impact Assessment
 - **Confidentiality**: High — Attacker gains access to all data and credentials that would be accessible to the legitimate server
@@ -141,11 +144,14 @@ According to security research on service discovery and name collision attacks, 
 - **Scope**: Network-wide — Can affect all clients attempting to connect to the impersonated server
 
 ### Current Status (2025)
-Many MCP implementations rely on simple name-based or URL-based server identification without robust verification mechanisms. Server discovery protocols often lack cryptographic verification, making name collision attacks feasible. Organizations are beginning to implement:
-- Certificate pinning for server endpoints
-- Cryptographic server identity verification
-- Registry validation and reputation systems
-- DNS security extensions (DNSSEC) for discovery services
+Many MCP implementations rely on simple name-based or URL-based server identification without robust verification mechanisms. Server discovery protocols often lack cryptographic verification, making name collision attacks feasible. 
+
+According to security researchers and the MCP specification, organizations are beginning to implement:
+- Certificate pinning for server endpoints to prevent certificate-based impersonation
+- Cryptographic server identity verification using public key infrastructure
+- Registry validation and reputation systems to detect and prevent name collision attacks
+- DNS security extensions (DNSSEC) for discovery services to prevent DNS hijacking
+- Server whitelisting and allowlisting mechanisms for critical MCP deployments
 
 ## Detection Methods
 
