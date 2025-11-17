@@ -284,10 +284,10 @@ tags:
    - Enhance discovery service security with cryptographic verification
 
 ## Related Techniques
-- [SAFE-T1002](techniques/SAFE-T1002/README.md) – Supply Chain Compromise (related but focuses on package compromise rather than server impersonation)
-- [SAFE-T1003](techniques/SAFE-T1003/README.md) – Malicious MCP-Server Distribution (related but involves creating new malicious servers rather than impersonating existing ones)
-- [SAFE-T1008](techniques/SAFE-T1008/README.md) – Tool Shadowing Attack (related technique involving tool-level impersonation rather than server-level)
-- [SAFE-T1301](techniques/SAFE-T1301/README.md) – Cross-Server Tool Shadowing (similar concept applied at tool level)
+- [SAFE-T1002](../SAFE-T1002/README.md) – Supply Chain Compromise (related but focuses on package compromise rather than server impersonation)
+- [SAFE-T1003](../SAFE-T1003/README.md) – Malicious MCP-Server Distribution (related but involves creating new malicious servers rather than impersonating existing ones)
+- [SAFE-T1008](../SAFE-T1008/README.md) – Tool Shadowing Attack (related technique involving tool-level impersonation rather than server-level)
+- [SAFE-T1301](../SAFE-T1301/README.md) – Cross-Server Tool Shadowing (similar concept applied at tool level)
 
 ## References
 - [Model Context Protocol Specification](https://modelcontextprotocol.io/specification)
