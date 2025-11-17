@@ -121,7 +121,7 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 | **ATK-TA0009** | **Collection** | [SAFE-T1801](/techniques/SAFE-T1801/README.md) | Automated Data Harvesting | Systematic data collection through manipulated MCP tool calls |
 | ATK-TA0009 | Collection | SAFE-T1802 | File Collection | Batch-read sensitive files for later exfil |
 | ATK-TA0009 | Collection | SAFE-T1803 | Database Dump | Use SQL tool to SELECT * from prod DB |
-| ATK-TA0009 | Collection | SAFE-T1804 | API Data Harvest | Loop over customer REST endpoints via HTTP tool |
+| ATK-TA0009 | Collection | [SAFE-T1804](techniques/SAFE-T1804/README.md) | API Data Harvest | Loop over customer REST endpoints via HTTP tool |
 | ATK-TA0009 | Collection | SAFE-T1805 | Context Snapshot Capture | Query vector store embeddings wholesale |
 | **ATK-TA0011** | **Command and Control** | SAFE-T1901 | Outbound Webhook C2 | LLM calls "http.post" to attacker URL with commands/results |
 | ATK-TA0011 | Command and Control | SAFE-T1902 | Covert Channel in Responses | Encode data in whitespace or markdown links returned to chat |
