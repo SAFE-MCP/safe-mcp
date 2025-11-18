@@ -1,0 +1,76 @@
+title: MCP Covert Channel in Responses Detection
+id: 7f3a9d2e-1c4b-4a89-9e2f-8b7d3c5a6e1f
+status: experimental
+description: Detects potential covert channels in MCP tool responses using steganographic techniques including zero-width characters, whitespace patterns, suspicious links, and HTML comments
+author: SAFE-MCP Team / Saurabh Yergattikar
+date: 2025-11-15
+references:
+  - https://github.com/SAFE-MCP/safe-mcp/techniques/SAFE-T1902
+  - https://attack.mitre.org/techniques/T1001/
+logsource:
+  product: mcp
+  service: tool_responses
+detection:
+  # Zero-width Unicode characters
+  selection_unicode:
+    response_text|contains:
+      - '\u200B'  # Zero-width space
+      - '\u200C'  # Zero-width non-joiner
+      - '\u200D'  # Zero-width joiner
+      - '\uFEFF'  # Zero-width no-break space
+      - '\u2060'  # Word joiner
+      - '\u180E'  # Mongolian vowel separator
+  
+  # Suspicious HTML/XML comments
+  selection_comments:
+    response_text|re: '<!--.*?(cmd|exec|shell|token|key|exfil).*?-->'
+  
+  # Markdown links to suspicious domains
+  selection_links:
+    response_text|contains:
+      - ']: http://bit.ly/'
+      - ']: http://tinyurl.com/'
+      - ']: https://pastebin.com/'
+      - ']: http://webhook.site/'
+      - ']: https://ngrok.io/'
+      - ']: https://discord.com/api/webhooks/'
+  
+  # ANSI escape codes in non-terminal contexts
+  selection_ansi:
+    response_text|re: '\x1b\[[0-9;]*m'
+    tool_type: '!terminal'
+  
+  # Excessive trailing whitespace
+  selection_whitespace:
+    response_text|re: '[ \t]{5,}$'  # 5+ spaces/tabs at line end
+  
+  # Homoglyph indicators (mixed scripts)
+  selection_homoglyph:
+    response_text|re: '[a-zA-Z]*[А-Яа-я]+[a-zA-Z]+'  # Latin + Cyrillic mix
+  
+  condition: 1 of selection_*
+  
+fields:
+  - tool_name
+  - response_text
+  - timestamp
+  - user_id
+  - session_id
+
+falsepositives:
+  - Legitimate Unicode formatting in multilingual content
+  - Markdown links to legitimate URL shorteners
+  - Terminal tools legitimately using ANSI codes
+  - Copy-paste artifacts introducing formatting characters
+  - Internationalized content with mixed scripts
+  - Development/debugging tools that output formatted text
+
+level: high
+
+tags:
+  - attack.command_and_control
+  - attack.ta0011
+  - attack.t1001  # Data Obfuscation
+  - attack.t1071  # Application Layer Protocol
+  - safe.t1902
+
