@@ -1,0 +1,76 @@
+title: API Data Harvesting via MCP HTTP Tools
+id: 13A7065E-51D5-42AD-947D-EC746183C739
+status: experimental
+description: Detects potential API data harvesting attack by identifying high-frequency, systematic HTTP requests through MCP tools
+author: SAFE-MCP Team
+date: 2025-11-16
+references:
+  - https://github.com/SAFE-MCP/safe-mcp/techniques/SAFE-T1804
+logsource:
+  product: mcp
+  service: tool_invocation
+detection:
+  selection_high_frequency:
+    tool_name|contains:
+      - 'http_get'
+      - 'http_post'
+      - 'api_request'
+      - 'rest_call'
+      - 'fetch'
+    count: high
+    timeframe: 5m
+    
+  selection_enumeration_pattern:
+    tool_name|contains:
+      - 'http'
+      - 'api'
+      - 'rest'
+    tool_arguments.url|re: '/api/[^/]+/\d+'
+    pattern: 'sequential'
+    
+  selection_pagination_exploitation:
+    tool_name|contains:
+      - 'http'
+      - 'api'
+    tool_arguments.url|contains:
+      - 'page='
+      - 'offset='
+      - 'cursor='
+    count: '>10'
+    timeframe: 1m
+    
+  selection_cross_endpoint:
+    tool_name|contains:
+      - 'http'
+      - 'api'
+    distinct_endpoints: '>5'
+    related_pattern: true
+    timeframe: 10m
+    
+  selection_observability_apis:
+    tool_arguments.url|contains:
+      - '/api/v1/query'
+      - '/api/datasources'
+      - '/api/dashboards'
+      - '/api/metrics'
+      - '/api/logs'
+      - '/api/customers'
+      - '/api/users'
+    count: '>20'
+    timeframe: 5m
+    
+  condition: selection_high_frequency or (selection_enumeration_pattern and selection_cross_endpoint) or selection_pagination_exploitation or (selection_observability_apis and selection_high_frequency)
+  
+falsepositives:
+  - Legitimate automated monitoring and data collection processes
+  - Authorized data export and backup operations
+  - Scheduled reporting and analytics jobs
+  - Normal API usage patterns during peak business hours
+  - Load testing and performance evaluation activities
+  
+level: high
+tags:
+  - attack.collection
+  - attack.t1530
+  - safe.t1804
+

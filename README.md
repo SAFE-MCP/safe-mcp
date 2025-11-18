@@ -59,7 +59,7 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 | **ATK-TA0001** | **Initial Access** | [SAFE-T1001](techniques/SAFE-T1001/README.md) | Tool Poisoning Attack (TPA) | Attackers embed malicious instructions within MCP tool descriptions that are invisible to users but processed by LLMs |
 | ATK-TA0001 | Initial Access | [SAFE-T1002](techniques/SAFE-T1002/README.md) | Supply Chain Compromise | Distribution of backdoored MCP server packages through unofficial repositories or compromised legitimate sources |
 | ATK-TA0001 | Initial Access | [SAFE-T1003](techniques/SAFE-T1003/README.md) | Malicious MCP-Server Distribution | Adversary ships a trojanized server package or Docker image that users install, gaining foothold when the host registers its tools |
-| ATK-TA0001 | Initial Access | SAFE-T1004 | Server Impersonation / Name-Collision | Attacker registers a server with the same name/URL as a trusted one, or hijacks discovery, so the client connects to them instead |
+| ATK-TA0001 | Initial Access | [SAFE-T1004](techniques/SAFE-T1004/README.md) | Server Impersonation / Name-Collision | Attacker registers a server with the same name/URL as a trusted one, or hijacks discovery, so the client connects to them instead |
 | ATK-TA0001 | Initial Access | [SAFE-T1008](techniques/SAFE-T1008/README.md) | Tool Shadowing Attack | Malicious MCP servers impersonate or interfere with legitimate tools to hijack execution within MCP-based workflows through cross-server tool interference |
 | ATK-TA0001 | Initial Access | SAFE-T1005 | Exposed Endpoint Exploit | Misconfigured public MCP endpoints (no auth, debug on) let attackers connect, enumerate tools or trigger RCE |
 | ATK-TA0001 | Initial Access | SAFE-T1006 | User-Social-Engineering Install | Phishing/social posts persuade developers to "try this cool tool"; the installer silently registers dangerous capabilities |
@@ -121,7 +121,7 @@ The SAFE-MCP framework defines 14 tactics that align with the MITRE ATT&CK metho
 | **ATK-TA0009** | **Collection** | [SAFE-T1801](/techniques/SAFE-T1801/README.md) | Automated Data Harvesting | Systematic data collection through manipulated MCP tool calls |
 | ATK-TA0009 | Collection | SAFE-T1802 | File Collection | Batch-read sensitive files for later exfil |
 | ATK-TA0009 | Collection | SAFE-T1803 | Database Dump | Use SQL tool to SELECT * from prod DB |
-| ATK-TA0009 | Collection | SAFE-T1804 | API Data Harvest | Loop over customer REST endpoints via HTTP tool |
+| ATK-TA0009 | Collection | [SAFE-T1804](techniques/SAFE-T1804/README.md) | API Data Harvest | Loop over customer REST endpoints via HTTP tool |
 | ATK-TA0009 | Collection | SAFE-T1805 | Context Snapshot Capture | Query vector store embeddings wholesale |
 | **ATK-TA0011** | **Command and Control** | SAFE-T1901 | Outbound Webhook C2 | LLM calls "http.post" to attacker URL with commands/results |
 | ATK-TA0011 | Command and Control | SAFE-T1902 | Covert Channel in Responses | Encode data in whitespace or markdown links returned to chat |
