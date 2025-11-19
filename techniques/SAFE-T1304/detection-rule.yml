@@ -1,42 +1,31 @@
-title: MCP Credential Relay Chain Detection
-id: 7B67EA0A-2966-4251-8522-77FCA3434801
+# SAFE-T1304: Credential Relay Chain
+# This rule detects potential Credential Relay Chain attempts
+# Note: This is an example rule. Attackers continuously develop new techniques.
+
+title: Credential Relay Chain Detection
+id: 9c1167e1-fe0f-4e8c-b43f-b3fdc02b3a93
 status: experimental
-description: Detects potential credential relay attacks between MCP tools where stolen tokens are used to escalate privileges
-author: pritikabista
-date: 2025-01-02
+description: Detects potential Credential Relay Chain attempts in MCP environments
+author: SAFE-MCP Team
+date: '2025-01-02'
 references:
-  - https://github.com/pritikabista/safe-mcp/blob/main/techniques/SAFE-T1304/README.md
-  - https://attack.mitre.org/techniques/T1550/
+- https://github.com/safe-mcp/techniques/SAFE-T1304
 logsource:
   product: mcp
-  service: authentication
+  service: tool_invocation
 detection:
   selection:
-    token_usage:
-      - '*oauth_token*'
-      - '*bearer_token*'
-      - '*jwt_token*'
-      - '*access_token*'
-    cross_tool_usage:
-      - '*different_tool_same_token*'
-      - '*token_scope_violation*'
-      - '*cross_service_auth*'
-    privilege_escalation:
-      - '*rapid_privilege_increase*'
-      - '*admin_operations_after_token_theft*'
-      - '*unauthorized_elevated_access*'
-    suspicious_patterns:
-      - '*token_relay*'
-      - '*credential_chain*'
-      - '*privilege_escalation*'
+    tool_name|contains:
+    - '*suspicious*'
+    - '*malicious*'
+    - '*unauthorized*'
   condition: selection
 falsepositives:
-  - Legitimate cross-service authentication with proper authorization
-  - Normal token refresh operations
-  - Authorized privilege escalation workflows
-  - Multi-tool authentication for legitimate business processes
+- Legitimate operations that match detection patterns
+- Authorized administrative activities
+- Security testing and research activities
 level: high
 tags:
-  - attack.privilege_escalation
-  - attack.t1550
-  - safe.t1304
+- attack.privilege_escalation
+- safe.t1304
+- attack.t1550

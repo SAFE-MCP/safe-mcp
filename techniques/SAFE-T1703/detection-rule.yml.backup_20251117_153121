@@ -1,0 +1,56 @@
+title: MCP Tool-Chaining Pivot Detection
+id: E01B3271-1DA7-4E1A-81DD-D3AD5EA38938
+status: experimental
+description: Detects potential tool-chaining pivot attacks for lateral movement in MCP environments
+author: SAFE-MCP Team
+date: 2025-08-17
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1703
+  - https://attack.mitre.org/techniques/T1021/
+  - https://modelcontextprotocol.io/specification
+logsource:
+  category: mcp_tool_execution
+  product: mcp
+detection:
+  # Tool execution with privilege escalation pattern
+  selection_privilege_escalation:
+    EventType: 'tool_execution'
+    PrivilegeChange:
+      - 'low_to_medium'
+      - 'medium_to_high'
+      - 'low_to_high'
+    ExecutionMethod: 'indirect'
+    ChainLength: '>1'
+  
+  # Unusual tool interaction patterns indicating chaining
+  selection_tool_chaining:
+    EventType: 'tool_interaction'
+    SourceTool|endswith:
+      - '_reader'
+      - '_access'
+      - '_basic'
+    DestinationTool|contains:
+      - 'admin_'
+      - 'system_'
+      - 'execute_'
+      - 'manage_'
+    InteractionType: 'data_transfer'
+  
+  condition: 
+    selection_privilege_escalation or 
+    selection_tool_chaining
+
+falsepositives:
+  - Legitimate automated workflows requiring multi-tool execution
+  - Administrative scripts using tool sequences for maintenance
+  - Data processing pipelines with necessary privilege escalation
+
+level: high
+
+tags:
+  - attack.lateral_movement
+  - attack.privilege_escalation
+  - attack.t1021        # Remote Services
+  - attack.t1550        # Use Alternate Authentication Material
+  - attack.t1068        # Exploitation for Privilege Escalation
+  - safe.t1703          # Tool-Chaining Pivot

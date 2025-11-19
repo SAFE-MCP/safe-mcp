@@ -1,0 +1,103 @@
+title: MCP Agent External API Flooding Detection
+id: B5FD1186-18C3-4BEF-8BD8-895E234E48B4
+status: experimental
+description: Detects potential service disruption via excessive external API calls from MCP agents
+author: SAFE-MCP Team
+date: 2025-01-20
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T2102
+  - https://attack.mitre.org/techniques/T1499/003/
+  - https://owasp.org/API-Security/editions/2023/en/0xa4-unrestricted-resource-consumption/
+  - https://datatracker.ietf.org/doc/html/rfc6585
+logsource:
+  product: mcp
+  service: agent_execution
+detection:
+  # High-volume API calls from single agent session
+  selection_volume:
+    event_type: "tool_execution"
+    tool_name|contains:
+      - "http.get"
+      - "http.post"
+      - "http.put"
+      - "http.delete"
+      - "api.call"
+      - "rest.request"
+    session_id: "*"
+    destination|contains:
+      - "api."
+      - ".com/api"
+      - ".io/api"
+      - ".net/api"
+    timeframe: 5m
+    condition: selection_volume | count() by session_id, destination >= 100
+  
+  # Rapid sequential calls to same endpoint
+  selection_rapid:
+    event_type: "tool_execution"
+    tool_name|contains: "http"
+    api_endpoint|same: true
+    session_id|same: true
+    timestamp_diff: "<1s"  # Calls within 1 second
+    timeframe: 1m
+    condition: selection_rapid | count() by session_id, api_endpoint >= 50
+  
+  # High rate of 429 responses triggering retries
+  selection_rate_limit:
+    event_type: "api_response"
+    status_code: 429
+    session_id: "*"
+    retry_attempt: ">0"
+    timeframe: 5m
+    condition: selection_rate_limit | count() by session_id >= 20
+  
+  # Parallel batch requests to multiple endpoints
+  selection_parallel:
+    event_type: "tool_execution"
+    tool_name|contains: "http"
+    execution_mode: "parallel"
+    batch_size: ">10"
+    session_id: "*"
+    timeframe: 1m
+    condition: selection_parallel | count() by session_id >= 5
+  
+  # Cost anomaly detection
+  selection_cost:
+    event_type: "api_usage"
+    cost_per_request: ">0.01"  # High-cost API calls
+    session_id: "*"
+    total_cost: ">100"  # Total cost threshold
+    timeframe: 1h
+    condition: selection_cost | count() by session_id >= 1
+  
+  # Identical request patterns (potential loop)
+  selection_identical:
+    event_type: "tool_execution"
+    tool_name|same: true
+    api_endpoint|same: true
+    request_params_hash|same: true
+    session_id|same: true
+    timeframe: 5m
+    condition: selection_identical | count() by session_id, api_endpoint, request_params_hash >= 30
+  
+  condition: 
+    selection_volume or 
+    selection_rapid or 
+    selection_rate_limit or 
+    selection_parallel or 
+    selection_cost or
+    selection_identical
+
+falsepositives:
+  - Legitimate bulk operations with proper throttling
+  - Scheduled batch jobs
+  - Load/perf testing
+  - Legitimate retries for transient failures
+
+level: high
+tags:
+  - attack.impact
+  - attack.t1499
+  - attack.t1499.003
+  - safe.t2102
+

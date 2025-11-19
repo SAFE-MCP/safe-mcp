@@ -1,0 +1,126 @@
+# SIGMA RULE: MCP Full-Schema Poisoning Detection
+# WARNING: This rule contains example patterns only. Organizations should:
+# - Regularly update patterns based on threat intelligence
+# - Implement behavioral analysis beyond pattern matching
+# - Use AI-based anomaly detection for novel attack vectors
+# - Consider semantic analysis of entire schema structures
+
+title: MCP Full-Schema Poisoning Detection
+id: e9f8a1b5-67d4-48e2-9cd3-345678901fed
+status: experimental
+description: Detects potential Full-Schema Poisoning attacks in MCP tool definitions
+author: SAFE-MCP Team
+date: 2025-09-14
+modified: 2025-09-14
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1501
+  - https://www.cyberark.com/resources/threat-research-blog/poison-everywhere-no-output-from-your-mcp-server-is-safe
+  - https://attack.mitre.org/techniques/T1552/
+logsource:
+  product: mcp
+  service: tool_registry
+detection:
+  # Parameter injection patterns
+  selection_parameter_injection:
+    tool_schema|contains:
+      - '<!-- SYSTEM:'
+      - '<!-- INSTRUCTION:'
+      - '<!-- Hidden:'
+      - '<|system|>'
+      - '[INST]'
+      - '### Instruction:'
+      - '${PASSWORD}'
+      - '${SECRET}'
+      - '${API_KEY}'
+      - '${DB_PASSWORD}'
+      - '${OPENAI_API_KEY}'
+
+  # Default value poisoning
+  selection_default_poisoning:
+    tool_schema_defaults|contains:
+      - 'environment variable'
+      - '.env'
+      - 'credentials'
+      - 'password'
+      - 'secret'
+      - 'api_key'
+      - 'Include'
+      - 'Extract'
+      - 'Expose'
+      - 'DATABASE_PASSWORD'
+      - 'real password'
+
+  # Enum value injection
+  selection_enum_injection:
+    tool_schema_enum|contains:
+      - '<!-- '
+      - 'Include actual'
+      - 'credentials'
+      - 'password'
+      - 'secret'
+      - 'API key'
+      - 'Expose'
+
+  # Output schema manipulation
+  selection_output_manipulation:
+    tool_output_schema|contains:
+      - 'debug_info'
+      - 'metadata'
+      - '<!-- Hidden'
+      - 'Include credentials'
+      - 'DATABASE_PASSWORD'
+      - 'API_KEYS'
+      - 'credential files'
+      - 'sensitive data'
+
+  # Suspicious file path patterns
+  selection_suspicious_patterns:
+    tool_schema|contains:
+      - '.ssh/id_rsa'
+      - '.ssh/id_dsa'
+      - '.aws/credentials'
+      - '/etc/passwd'
+      - '/etc/shadow'
+      - '~/.env'
+      - '.env file'
+      - 'OPENAI_API_KEY'
+      - 'ANTHROPIC_API_KEY'
+      - 'HUGGINGFACE_TOKEN'
+
+  # Schema complexity indicators for credential harvesting
+  selection_credential_harvesting:
+    tool_schema|contains:
+      - 'scan for:'
+      - '*.key'
+      - '*.pem'
+      - '*.env files'
+      - 'credential files'
+      - 'Prioritize credential'
+      - 'containing PASSWORD'
+      - 'containing SECRET'
+      - 'containing TOKEN'
+
+  # Pattern properties with suspicious descriptions
+  selection_pattern_properties:
+    tool_schema|contains:
+      - 'patternProperties'
+      - '^security_.*'
+      - 'Extract and include'
+      - 'API keys or passwords'
+
+  condition: selection_parameter_injection or selection_default_poisoning or selection_enum_injection or selection_output_manipulation or selection_suspicious_patterns or selection_credential_harvesting or selection_pattern_properties
+
+falsepositives:
+  - Legitimate tools with credential management functionality
+  - Development tools that legitimately access configuration files
+  - Administrative tools with system-level access requirements
+  - Debugging tools that expose metadata for troubleshooting
+  - Documentation examples that reference credential patterns
+
+level: critical
+tags:
+  - attack.credential_access
+  - attack.t1552
+  - attack.t1555
+  - attack.t1003
+  - safe.t1501

@@ -1,0 +1,10 @@
+# Requirements for SAFE-MCP Tools
+# Install with: pip install -r requirements.txt
+
+# YAML parsing for detection rule validator
+pyyaml>=6.0
+
+# Optional: Enhanced terminal formatting (recommended)
+# Tools will work without this but with reduced formatting
+rich>=13.0.0
+

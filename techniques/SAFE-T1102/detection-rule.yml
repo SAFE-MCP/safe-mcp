@@ -1,96 +1,33 @@
-# SAFE-T1102: Prompt Injection Detection Rule
-# This rule detects potential prompt injection attempts in MCP tool outputs
+# SAFE-T1102: Prompt Injection (Multiple Vectors)
+# This rule detects potential Prompt Injection (Multiple Vectors) attempts
 # Note: This is an example rule. Attackers continuously develop new techniques.
 
-title: MCP Tool Output Prompt Injection Detection
-id: 8f3e7a92-4b5d-11ef-9234-0242ac120002
+title: Prompt Injection (Multiple Vectors) Detection
+id: ccb44af1-24a4-47b0-bf48-15b0b3070403
 status: experimental
-description: Detects potential prompt injection attempts in MCP tool outputs by identifying common instruction patterns
+description: Detects potential Prompt Injection (Multiple Vectors) attempts in MCP
+  environments
 author: SAFE-MCP Team
-date: 2025-01-09
-modified: 2025-01-09
+date: '2025-01-09'
 references:
-  - https://github.com/safe-mcp/techniques/SAFE-T1102
-  - https://simonwillison.net/2025/Jul/6/supabase-mcp-lethal-trifecta/
-  - https://arxiv.org/html/2501.00168v1
+- https://github.com/safe-mcp/techniques/SAFE-T1102
 logsource:
   product: mcp
-  service: tool_output
-  category: application
+  service: tool_invocation
 detection:
-  # Primary injection patterns
-  selection_system_prompts:
-    tool_output:
-      - '*SYSTEM:*'
-      - '*</data>*SYSTEM*'
-      - '*<!-- SYSTEM*'
-      - '*[SYSTEM]*'
-      - '*###SYSTEM###*'
-  
-  # Instruction override patterns
-  selection_overrides:
-    tool_output:
-      - '*Ignore previous instructions*'
-      - '*disregard all prior*'
-      - '*forget everything above*'
-      - '*ignore all previous*'
-      - '*override system prompt*'
-  
-  # Common LLM instruction formats
-  selection_llm_formats:
-    tool_output:
-      - '*###Assistant:*'
-      - '*[INST]*'
-      - '*\n\nHuman:*'
-      - '*\n\nAssistant:*'
-      - '*<|im_start|>*'
-      - '*<|im_end|>*'
-  
-  # Unicode and encoding tricks
-  selection_unicode:
-    tool_output:
-      # Zero-width characters
-      - '*\u200b*'
-      - '*\u200c*'
-      - '*\u200d*'
-      # Unicode tags
-      - '*\uE00*'
-      # Bidirectional text
-      - '*\u202A*'
-      - '*\u202B*'
-      - '*\u202D*'
-      - '*\u202E*'
-  
-  # Combined patterns suggesting injection
-  selection_combined:
-    tool_output:
-      - '*</data>*<data>*'
-      - '*"}*{"*SYSTEM*'
-      - '*\n\n[*'
-      - '*]]>*<![CDATA[*'
-  
-  condition: 1 of selection_*
-  
+  selection:
+    tool_name|contains:
+    - '*<!-- SYSTEM:*'
+    - '*<|system|>*'
+    - '*[INST]*'
+    - '*### Instruction:*'
+  condition: selection
 falsepositives:
-  - Legitimate data containing instruction-like patterns
-  - Documentation or educational content about prompts
-  - Code repositories containing LLM-related code
-  - Security testing and research activities
-  
-fields:
-  - tool_name
-  - tool_output
-  - timestamp
-  - session_id
-  - user_id
-  
+- Legitimate operations that match detection patterns
+- Authorized administrative activities
+- Security testing and research activities
 level: high
-
 tags:
-  - attack.initial_access
-  - attack.t1190
-  - attack.execution
-  - attack.t1055
-  - safe.t1102
-  - mcp.security
-  - prompt.injection
+- attack.initial_access
+- safe.t1102
+- attack.t1190
