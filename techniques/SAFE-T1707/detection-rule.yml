@@ -1,0 +1,32 @@
+title: MCP CSRF Token Relay Across Resource Contexts
+id: 7e4f8a10-5089-4a5c-bc0b-8f2a8c2a7c1f
+status: experimental
+description: Detects potential CSRF token relay where a bearer token is used across different projects/tenants on the same Resource Server
+author: SAFE-MCP Team
+date: 2025-08-10
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1707
+logsource:
+  product: mcp
+  service: resource_access
+detection:
+  selection_csrf_like:
+    http.method:
+      - 'POST'
+      - 'PUT'
+      - 'DELETE'
+    csrf.present: false
+    referer.external: true
+  selection_project_mismatch:
+    token.project_id_mismatch: true
+  selection_token_reuse_cross_project:
+    token.reused_across_projects: true
+  condition: selection_project_mismatch or selection_token_reuse_cross_project or selection_csrf_like
+falsepositives:
+  - Legitimate administrative automation that rotates through multiple projects using the same token by design
+  - Testing environments with relaxed CSRF and SameSite settings
+level: high
+tags:
+  - attack.lateral_movement
+  - safe.t1707
+
