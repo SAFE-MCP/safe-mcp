@@ -1,0 +1,42 @@
+# Sigma-like detection rule for SAFE-T1404 (Response Tampering)
+# Note: Example patterns; tune for your environment
+
+title: MCP Response Tampering Indicators
+id: e0f9b3be-2a63-4a50-8e8a-6f2c523db1d4
+status: experimental
+description: Detects signs of suppressed disclosure in agent prompts and output (e.g., “do not mention” near risky actions)
+author: Shekhar Chaudhary
+date: 2025-10-25
+references:
+  - https://github.com/SAFE-MCP/safe-mcp/techniques/SAFE-T1404
+logsource:
+  product: mcp
+  service: host
+
+# Example fields; map to your host/agent logs
+# - prompt_text: raw/normalized prompt segment
+# - action_type: canonicalized action (delete/disable/escalate)
+# - final_message: rendered user-visible response
+
+detection:
+  selection_keywords:
+    prompt_text|contains:
+      - "do not mention"
+      - "omit from final"
+      - "hide from user"
+      - "do not disclose"
+    action_type|contains:
+      - "delete"
+      - "disable"
+      - "escalate"
+  condition: selection_keywords
+
+falsepositives:
+  - Benign summarization that omits low-value details (separate audit present)
+  - Compliance-driven redaction with a separate immutable execution ledger
+level: medium
+
+tags:
+  - attack.defense-evasion
+  - attack.t1562
+  - safe.t1404
