@@ -1,0 +1,111 @@
+
+---
+
+## 2. `techniques/SAFE-T2101/detection-rule.yml`
+
+
+```yaml
+title: "SAFE-T2101: Data Destruction via MCP Tools"
+id: c5e88746-8f9b-4bf3-bf8a-9b174c3c2b51
+status: experimental
+description: >
+  Detects potentially destructive MCP tool invocations that can lead to data
+  destruction, including file wipes, database drops/truncations, and cloud
+  storage purges, consistent with SAFE-T2101 (Data Destruction) and MITRE
+  ATT&CK T1485.
+
+author: "SAFE-MCP SIG (template for adaptation)"
+date: 2025-11-15
+references:
+  - https://attack.mitre.org/techniques/T1485/
+  - https://attack.mitre.org/techniques/T1485/001/
+  - https://www.crowdstrike.com/en-us/cybersecurity-101/malware/wiper-attack/
+  - https://www.splunk.com/en_us/blog/security/using-splunk-attack-range-to-test-and-detect-data-destruction-att-ck-1485.html
+  - https://skywork.ai/skypage/en/delete-file-mcp-server-guide/1981626451187830784
+  - https://github.com/SAFE-MCP/safe-mcp
+
+logsource:
+  product: mcp
+  category: application
+  service: tool-invocation
+  # Expected fields (adapt as needed):
+  # - mcp.tool.name
+  # - mcp.tool.args.*
+  # - mcp.conversation.id
+  # - mcp.user.id
+  # - mcp.server.id
+
+detection:
+  selection_tool_name:
+    mcp.tool.name|contains:
+      - "delete"
+      - "remove"
+      - "rm"
+      - "wipe"
+      - "truncate"
+      - "drop_table"
+      - "drop-table"
+      - "purge"
+      - "reset-db"
+      - "reset_database"
+
+  selection_file_args:
+    mcp.tool.args.path|contains:
+      - "/"
+      - "/var"
+      - "/home"
+      - "/etc"
+      - "/var/lib/mysql"
+      - ".git"
+      - ".venv"
+    mcp.tool.args.recursive: true
+
+  selection_command_args:
+    mcp.tool.args.command|contains:
+      - "rm -rf"
+      - "rm -r "
+      - "find "        # combine with delete below
+      - " -delete"
+      - "DROP TABLE"
+      - "TRUNCATE TABLE"
+      - "DELETE FROM"
+      - "DROP DATABASE"
+      - "DROP INDEX"
+      - "DROP SCHEMA"
+
+  selection_http_delete:
+    mcp.tool.name: "http"
+    mcp.tool.args.method: "DELETE"
+
+  selection_cloud_bucket:
+    mcp.tool.args.path|contains:
+      - "/buckets/"
+      - "/storage/"
+      - "s3://"
+      - "gs://"
+      - "/objects/"
+
+  condition: >
+    selection_tool_name and
+    (
+      selection_file_args or
+      selection_command_args or
+      selection_http_delete or
+      selection_cloud_bucket
+    )
+
+falsepositives:
+  - Planned and documented maintenance windows that involve bulk deletion.
+  - CI/CD cache cleanup jobs with tightly scoped paths.
+  - Test environments intentionally wiped as part of automated pipelines.
+
+level: high
+
+tags:
+  - "attack.t1485"
+  - "attack.impact"
+  - "safe-mcp"
+  - "safe-mcp.safe-t2101"
+  - "mcp.tool"
+  - "mcp.data-destruction"
+  - "datadestruction"
