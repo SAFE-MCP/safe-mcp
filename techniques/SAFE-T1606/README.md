@@ -5,7 +5,7 @@
 **Technique ID**: SAFE-T1606  
 **Severity**: High  
 **First Observed**: 2024  
-**Last Updated**: 2025-01-06
+**Last Updated**: 2025-11-26
 
 ## Description
 Directory Listing via File Tool involves an adversary leveraging legitimate MCP tools (such as `list_directory`, `ls`, or `dir`) to enumerate the file system of the host machine. By listing directories, attackers can discover sensitive files, configuration paths, and system structure, which aids in planning further attacks like file collection or privilege escalation.
@@ -62,6 +62,13 @@ Response:
 - Directory listing of paths unrelated to the user's current context or request.
 - Enumeration of known sensitive paths (e.g., `.ssh`, `.aws`, `/etc`).
 
+### Behavioral Indicators
+- Rapid sequential listing of multiple top-level directories (e.g., `/`, `/etc`, `/var`, `/home`).
+- Attempts to list hidden or credential-bearing folders (e.g., `.ssh`, `.aws`, `.git`) outside project scope.
+- Directory listing immediately followed by read operations on sensitive files discovered (e.g., `read_file` on `id_rsa`, `.env`).
+- Enumeration of system directories from non-privileged or sandboxed contexts.
+- Repeated listing attempts after access denied or policy violations.
+
 ### Detection Rules
 
 ```yaml
@@ -69,8 +76,8 @@ title: Suspicious Directory Listing
 id: 9e5b2d7a-8c1f-4b5e-9a3d-1f2c3e4d5b6a
 status: experimental
 description: Detects attempts to list contents of sensitive system directories via MCP tools.
-author: SAFE-MCP Team
-date: 2025-01-06
+author: Vikranth Kumar Shivaa
+date: 2025-11-26
 references:
   - https://github.com/safe-mcp/techniques/SAFE-T1606
 logsource:
@@ -86,8 +93,8 @@ detection:
     parameters.path|contains:
       - '/etc'
       - '/root'
-      - 'C:\Windows'
-      - 'C:\Users\Administrator'
+      - 'C:\\Windows'
+      - 'C:\\Users\\Administrator'
       - '.ssh'
       - '.aws'
       - '.env'
@@ -97,6 +104,17 @@ tags:
   - attack.discovery
   - attack.t1083
   - safe.t1606
+falsepositives:
+  - Legitimate listings within project workspace or temp directories
+  - CI/CD jobs enumerating build artifacts or dependencies
+  - IDE extensions scanning project folders for indexing
+  - OS/security tools performing routine system scans
+fields:
+  - timestamp
+  - service
+  - tool_name
+  - parameters.path
+  - user_id
 ```
 
 ## Mitigation Strategies

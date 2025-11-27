@@ -19,8 +19,8 @@ detection:
     parameters.path|contains:
       - '/etc'
       - '/root'
-      - 'C:\Windows'
-      - 'C:\Users\Administrator'
+      - 'C:\\Windows'
+      - 'C:\\Users\\Administrator'
       - '.ssh'
       - '.aws'
       - '.env'
@@ -30,4 +30,15 @@ tags:
   - attack.discovery
   - attack.t1083
   - safe.t1606
+falsepositives:
+  - Legitimate listings within project workspace or temp directories
+  - CI/CD jobs enumerating build artifacts or dependencies
+  - IDE extensions scanning project folders for indexing
+  - OS/security tools performing routine system scans
+fields:
+  - timestamp
+  - service
+  - tool_name
+  - parameters.path
+  - user_id
 
