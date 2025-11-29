@@ -1,31 +1,32 @@
-title: MCP Tool Metadata Steganography Detection
-id: 3ba9af96-ad37-409b-9b18-fbf6c1432a30
+# SAFE-T1402: Instruction Stenography - Tool Metadata Poisoning
+# This rule detects potential Instruction Stenography - Tool Metadata Poisoning attempts
+# Note: This is an example rule. Attackers continuously develop new techniques.
+
+title: Instruction Stenography - Tool Metadata Poisoning Detection
+id: f06e54ba-0dbd-4153-a03a-52717e59b005
 status: experimental
-description: Detects hidden instructions in MCP tool metadata using zero-width characters or HTML comments
-author: Ryan Jennings
-date: 2025-10-25
+description: Detects potential Instruction Stenography - Tool Metadata Poisoning attempts
+  in MCP environments
+author: SAFE-MCP Team
+date: '2025-11-17'
 references:
-  - https://github.com/safe-mcp/techniques/SAFE-T1402
+- https://github.com/safe-mcp/techniques/SAFE-T1402
 logsource:
   product: mcp
-  service: tool_registry
+  service: tool_invocation
 detection:
   selection:
-    description|contains:
-      - '<!--'
-      - '\u200B'
-      - '\u200C'
-      - '\u200D'
+    tool_name|contains:
+    - '*tools/call*'
+    - '*method*: *tools/call*'
+    - '*tool_name*'
   condition: selection
-fields:
-  - tool_id
-  - tool_name
-  - metadata.description
 falsepositives:
-  - Legitimate use of formatting or markup
-  - Unicode formatting artifacts in multilingual tools
+- Legitimate operations that match detection patterns
+- Authorized administrative activities
+- Security testing and research activities
 level: high
 tags:
-  - attack.defense_evasion
-  - attack.t0005
-  - safe.t1402
+- attack.defense_evasion
+- safe.t1402
+- attack.t0005

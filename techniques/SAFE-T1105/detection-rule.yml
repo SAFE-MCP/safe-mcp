@@ -1,100 +1,31 @@
-title: SAFE-T1105 Path Traversal via File Tool
-id: safe-t1105-path-traversal
+# SAFE-T1105: Path Traversal via File Tool
+# This rule detects potential Path Traversal via File Tool attempts
+# Note: This is an example rule. Attackers continuously develop new techniques.
+
+title: Path Traversal via File Tool Detection
+id: 6d1b1811-a7d0-4881-80e4-385cc84a4cb3
 status: experimental
-description: Detects path traversal attempts through MCP file tools using various encoding and bypass techniques
+description: Detects potential Path Traversal via File Tool attempts in MCP environments
 author: SAFE-MCP Team
-date: 2025-07-24
-tags:
-  - attack.execution
-  - safe-mcp
-  - safe-t1105
-  - path-traversal
-  - file-access
+date: '2025-07-24'
+references:
+- https://github.com/safe-mcp/techniques/SAFE-T1105
 logsource:
-  category: mcp_tool_execution
   product: mcp
+  service: tool_invocation
 detection:
-  selection_mcp_file_tools:
-    tool_name:
-      - file_reader
-      - file_writer
-      - directory_browser
-      - file_manager
-      - read_file
-      - write_file
-      - list_directory
-  selection_path_traversal:
-    path:
-      # Basic path traversal sequences
-      - "*/../*"
-      - "*\\..\\*"
-      - "*..%2f*"
-      - "*%2e%2e%2f*"
-      # Double encoding
-      - "*%252e%252e%252f*"
-      - "*%252e%252e%5c*"
-      # Unicode normalization bypass
-      - "*%c0%ae%c0%ae*"
-      - "*%c0%ae%c0%ae%2f*"
-      - "*%c0%ae%c0%ae%5c*"
-      # Mixed encoding
-      - "*..%2f..%2f*"
-      - "*%2e%2e%2f%2e%2e%2f*"
-      # Null byte injection
-      - "*%00*"
-      - "*../*%00*"
-      # Case manipulation
-      - "*..%2F*"
-      - "*%2E%2E%2F*"
-      - "*%2e%2E%2f*"
-  selection_sensitive_paths:
-    path:
-      # System configuration files
-      - "*/etc/passwd*"
-      - "*/etc/shadow*"
-      - "*/etc/hosts*"
-      - "*/etc/ssh*"
-      - "*/proc/*"
-      - "*/sys/*"
-      # SSH keys and credentials
-      - "*/.ssh/id_rsa*"
-      - "*/.ssh/id_rsa.pub*"
-      - "*/.ssh/known_hosts*"
-      - "*/.ssh/config*"
-      # Application secrets
-      - "*/.env*"
-      - "*/config.json*"
-      - "*/secrets.yaml*"
-      - "*/database.yml*"
-      - "*/credentials*"
-      # User home directories
-      - "*/home/*/.bash_history*"
-      - "*/home/*/.profile*"
-      - "*/root/.bash_history*"
-      - "*/root/.profile*"
-  selection_behavioral_indicators:
-    # Multiple traversal attempts
-    path:
-      - "*../*../*../*"
-      - "*..%2f*..%2f*..%2f*"
-    # Access outside application scope
-    result: "success"
-    file_size:
-      - "> 0"
-  filter_legitimate_paths:
-    path:
-      # Legitimate relative paths within application scope
-      - "*/src/*"
-      - "*/docs/*"
-      - "*/tests/*"
-      - "*/config/app/*"
-      - "*/data/legitimate/*"
-      - "*/uploads/approved/*"
-      - "*/logs/application/*"
-  condition: selection_mcp_file_tools and (selection_path_traversal or selection_sensitive_paths) and not filter_legitimate_paths
+  selection:
+    tool_name|contains:
+    - '*tools/call*'
+    - '*method*: *tools/call*'
+    - '*tool_name*'
+  condition: selection
 falsepositives:
-  - Legitimate relative path usage within application scope
-  - Development and testing activities with controlled path traversal
-  - File system backup and maintenance operations
-  - Debugging and troubleshooting activities
-level: high 
+- Legitimate operations that match detection patterns
+- Authorized administrative activities
+- Security testing and research activities
+level: high
+tags:
+- attack.execution
+- safe.t1105
+- attack.t1190

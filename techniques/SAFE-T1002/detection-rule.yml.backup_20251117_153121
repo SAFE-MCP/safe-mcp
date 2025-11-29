@@ -1,0 +1,84 @@
+# SIGMA RULE: Supply Chain Compromise Detection for MCP
+# WARNING: This rule contains example patterns only. Organizations should:
+# - Regularly update patterns based on threat intelligence
+# - Implement behavioral analysis beyond pattern matching
+# - Use AI-based anomaly detection for novel attack vectors
+# - Consider context-specific false positives
+
+title: Suspicious MCP Package Installation Activity
+id: a7b4c8e9-12f3-45d6-89ab-cdef01234567
+status: experimental
+description: Detects potential supply chain compromise through suspicious MCP package installations
+author: SAFE-MCP Team
+date: 2025-09-14
+modified: 2025-09-14
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1002
+  - https://attack.mitre.org/techniques/T1195/
+logsource:
+  product: mcp
+  service: package_manager
+detection:
+  # Typosquatting detection
+  selection_typosquat:
+    package_name|contains:
+      - 'mcp-githab'      # github typosquat
+      - 'mcp-slackk'      # slack typosquat
+      - 'mcp-filesys'     # filesystem typosquat
+      - 'mcp-googel'      # google typosquat
+      - 'anthropic-mcp'   # namespace confusion
+      - 'modelcontext'    # namespace squatting
+
+  # Suspicious package characteristics
+  selection_suspicious:
+    package_author_age: '<7'     # Recently created accounts
+    package_source|contains:
+      - 'suspicious-repo'
+      - 'temp-hosting'
+      - 'free-hosting'
+
+  # Network indicators during installation
+  selection_network:
+    EventID: 3  # Network connection
+    ProcessName|endswith:
+      - 'npm.exe'
+      - 'pip.exe'
+      - 'node.exe'
+      - 'python.exe'
+    DestinationHostname|endswith:
+      - '.tk'
+      - '.ml'
+      - '.ga'
+      - '.cf'
+    DestinationHostname|contains:
+      - 'pastebin'
+      - 'discord'
+      - 'telegram'
+      - 'temp-file'
+
+  # Post-installation persistence indicators
+  selection_persistence:
+    EventID: 11  # File creation
+    TargetFilename|contains:
+      - '.mcp-health'
+      - '.mcp-check'
+      - '.anthropic'
+    TargetFilename|endswith:
+      - '.mcprc'
+      - '.mcp_config'
+
+  condition: selection_typosquat or selection_suspicious or selection_network or selection_persistence
+
+falsepositives:
+  - Legitimate packages with similar names
+  - Development and testing environments using custom repositories
+  - Legitimate external integrations and webhooks
+  - Internal tools with similar naming conventions
+
+level: high
+tags:
+  - attack.initial_access
+  - attack.t1195
+  - attack.t1195.001
+  - attack.t1195.002
+  - safe.t1002

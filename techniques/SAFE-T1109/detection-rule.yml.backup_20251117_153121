@@ -1,0 +1,58 @@
+title: MCP Inspector Remote Code Execution Detection
+id: a7d8f349-2c5e-4b91-8f7a-3e2d4c1a9b6f
+status: experimental
+description: Detects potential remote code execution attempts via MCP Inspector vulnerability (CVE-2025-49596)
+author: SAFE-MCP Team
+date: 2025-01-09
+modified: 2025-01-09
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1109
+  - https://nvd.nist.gov/vuln/detail/CVE-2025-49596
+  - https://github.com/modelcontextprotocol/inspector/security/advisories/GHSA-7f8r-222p-6f5g
+  - https://www.oligo.security/blog/critical-rce-vulnerability-in-anthropic-mcp-inspector-cve-2025-49596
+logsource:
+  product: webserver
+  service: access
+detection:
+  selection_sse_endpoint:
+    c-uri-path: '/sse'
+    c-uri-query|contains:
+      - 'transportType=stdio'
+      - 'command='
+  selection_suspicious_commands:
+    c-uri-query|contains:
+      - 'command=calc'
+      - 'command=cmd'
+      - 'command=powershell'
+      - 'command=bash'
+      - 'command=sh'
+      - 'command=curl'
+      - 'command=wget'
+      - 'command=python'
+      - 'command=node'
+      - 'command=nc'
+      - 'command=netcat'
+  selection_port:
+    cs-uri-port:
+      - 6277
+      - 6274
+  condition: selection_sse_endpoint and (selection_suspicious_commands or selection_port)
+falsepositives:
+  - Legitimate development and testing activities using MCP Inspector
+  - Automated testing frameworks executing valid commands
+  - Developer using MCP Inspector for legitimate debugging purposes
+level: high
+tags:
+  - attack.execution
+  - attack.t1059
+  - attack.t1190
+  - safe.t1109
+  - cve.2025.49596
+  - mcp.inspector
+fields:
+  - c-uri-path
+  - c-uri-query
+  - c-ip
+  - cs-uri-port
+  - cs-method
+  - sc-status 

@@ -1,0 +1,35 @@
+# SAFE-T1602: Tool Enumeration
+# This rule detects potential Tool Enumeration attempts
+# Note: This is an example rule. Attackers continuously develop new techniques.
+
+title: Tool Enumeration Detection
+id: 81fa40f3-1233-46eb-81c1-62864202c43d
+status: experimental
+description: Detects potential Tool Enumeration attempts in MCP environments
+author: SAFE-MCP Team
+date: '2025-10-25'
+references:
+- https://github.com/safe-mcp/techniques/SAFE-T1602
+logsource:
+  product: mcp
+  service: tool_invocation
+detection:
+  selection:
+    tool_name|contains:
+    - '*tools/call*'
+    - '*method*: *tools/call*'
+    - '*tool_name*'
+    - '*list_*'
+    - '*enumerate*'
+    - '*discover*'
+    - '*query*'
+  condition: selection
+falsepositives:
+- Legitimate operations that match detection patterns
+- Authorized administrative activities
+- Security testing and research activities
+level: medium
+tags:
+- attack.discovery
+- safe.t1602
+- attack.t1602

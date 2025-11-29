@@ -1,0 +1,92 @@
+title: MCP Environment Variable File Access
+id: 13f1dfef-4612-40e8-8be2-0ae3e5f4718d
+status: experimental
+description: Detects potential environment variable scraping through MCP file tools accessing credential files
+author: SAFE-MCP Team
+date: 2025-10-25
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1503
+  - https://attack.mitre.org/techniques/T1552/001/
+  - https://cwe.mitre.org/data/definitions/522.html
+logsource:
+  product: mcp
+  service: file_tools
+detection:
+  selection_env_files:
+    tool_name:
+      - 'read_file'
+      - 'file_reader'
+      - 'read_text_file'
+      - 'get_file_contents'
+    file_path|contains:
+      - '.env'
+      - '.env.local'
+      - '.env.production'
+      - '.env.development'
+      - 'secrets.yml'
+      - 'secrets.yaml'
+      - 'secrets.json'
+      - 'credentials.json'
+      
+  selection_shell_rc:
+    tool_name:
+      - 'read_file'
+      - 'file_reader'
+      - 'read_text_file'
+    file_path|endswith:
+      - '.bashrc'
+      - '.zshrc'
+      - '.profile'
+      - '.bash_profile'
+      - '.zprofile'
+      
+  selection_cloud_credentials:
+    tool_name:
+      - 'read_file'
+      - 'file_reader'
+    file_path|contains:
+      - '.aws/credentials'
+      - '.aws/config'
+      - '.gcloud/credentials'
+      - '.azure/credentials'
+      - '.docker/config.json'
+      - '.kube/config'
+      
+  selection_ssh_config:
+    tool_name:
+      - 'read_file'
+      - 'file_reader'
+    file_path|contains:
+      - '.ssh/config'
+      - '.ssh/known_hosts'
+      - '.ssh/authorized_keys'
+      
+  selection_app_config:
+    tool_name:
+      - 'read_file'
+      - 'file_reader'
+      - 'get_file_contents'
+    file_path|contains:
+      - 'config/database.yml'
+      - 'config/secrets'
+      - 'appsettings.json'
+      - 'appsettings.Production.json'
+      - 'web.config'
+      
+  condition: selection_env_files or selection_shell_rc or selection_cloud_credentials or selection_ssh_config or selection_app_config
+  
+falsepositives:
+  - Legitimate application startup reading configuration files
+  - Development tools accessing environment files for debugging
+  - Configuration management tools reading credential files
+  - Automated deployment scripts accessing secrets
+  - Administrative tools with legitimate credential access needs
+  
+level: high
+
+tags:
+  - attack.credential_access
+  - attack.t1552
+  - attack.t1552.001
+  - safe.t1503
+

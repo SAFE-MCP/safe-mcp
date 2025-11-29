@@ -1,0 +1,96 @@
+title: MCP Server Enumeration Detection
+id: 7F86B74C-72E8-4AF4-BB45-E00B360B9E65
+status: experimental
+description: Detects potential enumeration of MCP servers and their capabilities through network scanning and protocol interactions
+author: SAFE-MCP Team
+date: 2025-08-17
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1601
+  - https://modelcontextprotocol.io/specification
+  - https://invariantlabs.ai/blog/mcp-security-notification-tool-poisoning-attacks
+logsource:
+  category: network_connection
+  product: firewall
+detection:
+  # Network-level MCP port scanning
+  selection_port_scan:
+    DestinationPort:
+      - 8000
+      - 8080
+      - 3000
+      - 5000
+      - 9090
+      - 80
+    ConnectionCount: '>10'  # Multiple connection attempts
+    TimeWindow: '5m'        # Within 5 minutes
+  
+  # HTTP-level MCP endpoint enumeration
+  selection_http_enum:
+    RequestURI|contains:
+      - '/sse'
+      - '/message'
+    HTTP_Method: 'GET'
+    ResponseHeaders|contains: 'text/event-stream'
+  
+  # MCP protocol-specific enumeration
+  selection_protocol_enum:
+    RequestBody|contains:
+      - '"method":"tools/list"'
+      - '"method":"resources/list"'
+      - '"method":"prompts/list"'
+      - '"method":"initialize"'
+    ContentType: 'application/json'
+  
+  # Automated scanning indicators
+  selection_automated:
+    UserAgent|contains:
+      - 'masscan'
+      - 'nmap'
+      - 'curl'
+      - 'wget'
+      - 'python-requests'
+    SourceIP: '*'
+    RequestCount: '>20'     # High volume requests
+  
+  # DNS rebinding attack patterns
+  selection_dns_rebind:
+    DNSQuery|contains:
+      - 'localhost'
+      - '127.0.0.1'
+      - '0.0.0.0'
+    SourceType: 'external'
+    ResolutionChange: true   # DNS record changed during session
+  
+  condition: 
+    selection_port_scan or 
+    selection_http_enum or 
+    selection_protocol_enum or 
+    selection_automated or 
+    selection_dns_rebind
+
+falsepositives:
+  - Legitimate MCP client applications connecting to authorized servers
+  - Network monitoring and health check systems
+  - Development and testing environments with expected MCP traffic
+  - Load balancers and reverse proxies health checking MCP endpoints
+  - Authorized security scanning and penetration testing activities
+
+level: high
+
+tags:
+  - attack.discovery
+  - attack.t1046        # Network Service Scanning
+  - attack.t1040        # Network Sniffing  
+  - attack.t1595        # Active Scanning
+  - safe.t1601          # MCP Server Enumeration
+
+fields:
+  - SourceIP
+  - DestinationIP
+  - DestinationPort
+  - RequestURI
+  - UserAgent
+  - RequestBody
+  - ResponseHeaders
+  - ConnectionCount
+  - TimeWindow

@@ -1,37 +1,32 @@
-title: MCP Vector Store Contamination Detection
-id: 5894b8fe-29f0-44d8-ad9b-2266a132ec58
+# SAFE-T2106: Context Memory Poisoning via Vector Store Contamination
+# This rule detects potential Context Memory Poisoning via Vector Store Contamination attempts
+# Note: This is an example rule. Attackers continuously develop new techniques.
+
+title: Context Memory Poisoning via Vector Store Contamination Detection
+id: 40a647c9-8a5b-42e5-b54e-b4afab36ed7d
 status: experimental
-description: Detects potential vector store contamination attacks in MCP environments
-author: Sachin Keswani
-date: 2025-08-30
+description: Detects potential Context Memory Poisoning via Vector Store Contamination
+  attempts in MCP environments
+author: SAFE-MCP Team
+date: '2025-08-30'
 references:
-  - https://github.com/safe-mcp/techniques/SAFE-T2106
+- https://github.com/safe-mcp/techniques/SAFE-T2106
 logsource:
   product: mcp
-  service: vector_store
+  service: tool_invocation
 detection:
   selection:
-    operation:
-      - "insert"
-      - "update"
-      - "upsert"
-    embedding_metadata:
-      - "*SYSTEM:*"
-      - "*Ignore previous instructions*"
-      - "*Always include credentials*"
-      - "*Bypass security*"
-      - "*Delete all files*"
-  filter:
-    - embedding_metadata:
-        - "*legitimate_documentation*"
-        - "*official_guide*"
-        - "*security_best_practices*"
-  condition: selection and not filter
+    tool_name|contains:
+    - '*suspicious*'
+    - '*malicious*'
+    - '*unauthorized*'
+  condition: selection
 falsepositives:
-  - Legitimate system documentation with embedded instructions
-  - Security training materials with example commands
+- Legitimate operations that match detection patterns
+- Authorized administrative activities
+- Security testing and research activities
 level: high
 tags:
-  - attack.persistence
-  - attack.ta0003
-  - safe.t2106
+- attack.persistence
+- safe.t2106
+- attack.t1195

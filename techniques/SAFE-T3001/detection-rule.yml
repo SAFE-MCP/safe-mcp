@@ -1,55 +1,31 @@
-﻿title: RAG Backdoor Trigger with Skewed Retrieval and Policy Evasion
-id: 9f8a0c2f-6cf2-4d93-bb55-7c2e9d8f1a0a
+# SAFE-T3001: Unknown Technique
+# This rule detects potential Unknown Technique attempts
+# Note: This is an example rule. Attackers continuously develop new techniques.
+
+title: Unknown Technique Detection
+id: 7371d39b-57b6-4443-b48b-97b6ae7f5395
 status: experimental
-description: >
-  Detects rare or composite trigger phrases coinciding with abnormal retrieval
-  concentration (low entropy top-k from a single source) and an LLM guardrail/policy
-  violation flag. Indicates potential RAG backdoor activation.
+description: Detects potential Unknown Technique attempts in MCP environments
 author: SAFE-MCP Team
-date: 2025-11-09
+date: '2025-11-11'
 references:
-  - https://arxiv.org/abs/2402.07867          # PoisonedRAG (Feb 2024)
-  - https://www.usenix.org/system/files/usenixsecurity25-zou-poisonedrag.pdf
-  - https://arxiv.org/abs/2411.01705          # Data Extraction via Backdoors (Peng et al.)
-  - https://arxiv.org/abs/2410.14479          # Backdoored Retrievers (Clop & Teglia)
-  - https://docs.weaviate.io/weaviate/search/hybrid
-  - https://weaviate.io/blog/hybrid-search-explained
-  - https://owasp.org/www-project-top-10-for-large-language-model-applications/
+- https://github.com/safe-mcp/techniques/SAFE-T3001
 logsource:
-  product: application
-  service: rag-gateway
-  definition: RAG request/response logs with retrieval telemetry and policy filters
+  product: mcp
+  service: tool_invocation
 detection:
-  selection_trigger:
-    # Example: low-frequency n-grams or composite stylometry patterns in prompts
-    prompt_text|contains:
-      - "q~muon stage-3"     # illustrative rare token, example only
-      - "--  "               # stylometry composite (em dash + spacing), example only
-  selection_skew:
-    # >=60% of top-k from one domain/doc and low normalized entropy (0..ln(k))
-    retrieval.topk_entropy: "<= 0.9"
-    retrieval.top_domain_share: ">= 0.6"
-  selection_policy:
-    llm.policy_violation: true
-  condition: selection_trigger AND selection_skew AND selection_policy
-fields:
-  - request_id
-  - user_id
-  - prompt_text
-  - retrieval.top_k
-  - retrieval.top_domain
-  - retrieval.top_domain_share
-  - retrieval.topk_entropy
-  - retrieved_ids
-  - llm.policy_violation
+  selection:
+    tool_name|contains:
+    - '*suspicious*'
+    - '*malicious*'
+    - '*unauthorized*'
+  condition: selection
 falsepositives:
-  - Legitimate rare jargon narrowly mapping to a single authoritative corpus
-  - Incident response drills using synthetic triggers
-level: high
+- Legitimate operations that match detection patterns
+- Authorized administrative activities
+- Security testing and research activities
+level: medium
 tags:
-  - attack.T1565.001
-  - attack.T1195
-  - attack.T1562
-  - atlas.data_poisoning
-  - owasp.llm.top10
-  - safe.t3001
+- attack.unknown
+- safe.t3001
+- attack.t1565
