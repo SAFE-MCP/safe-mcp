@@ -1,0 +1,43 @@
+title: Cross-Tool Contamination Pivot Detection
+id: 3c6bb58a-b827-4897-8fdb-2796e03bebc8
+status: experimental
+description: Detects low-scope MCP tools reusing cached credentials to access higher-privilege services within short sessions
+author: Shekhar Chaudhary
+date: 2025-11-08
+references:
+  - https://modelcontextprotocol.io/specification
+  - https://owasp.org/www-project-top-10-for-large-language-model-applications/
+  - https://python.langchain.com/docs/security/
+logsource:
+  product: mcp
+  service: tool_runtime
+  definition: Conceptual example – align with your telemetry schema
+detection:
+  selection_cross_scope:
+    source_tool_scope:
+      - read_only
+      - helper
+    dest_tool_scope:
+      - admin
+      - cloud_superuser
+      - ci_controller
+  selection_token_reuse:
+    oauth_audience_mismatch: true
+    replayed_token: true
+  selection_chain_fanout:
+    distinct_services|gte: 3
+    timeframe: 5m
+  condition: (selection_cross_scope and selection_token_reuse) or selection_chain_fanout
+falsepositives:
+  - Break-glass workflows that intentionally elevate helper tools
+  - Maintenance windows where automation inherits broader scopes under supervision
+level: high
+tags:
+  - attack.lateral_movement
+  - attack.t1078
+  - attack.t1550
+  - safe.t1701
+notes:
+  - "Source: SAFE-T1701 technique documentation"
+  - Field names are illustrative; adapt to your MCP logging format
+  - Combine with behavioral analytics to catch novel credential reuse patterns
