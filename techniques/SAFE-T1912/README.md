@@ -162,7 +162,6 @@ See `detection-rule.yml` in this directory for the example detection rule used w
 
 - [Model Context Protocol Specification](https://modelcontextprotocol.io/specification)
 - [OWASP Top 10 for LLM Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
-- [StegLLM – Liu et al., 2024](https://arxiv.org/abs/2402.00072)
 
 ## MITRE ATT&CK Mapping
 
