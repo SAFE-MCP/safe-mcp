@@ -39,6 +39,35 @@ In the context of Model Context Protocol (MCP), this technique exploits the trus
 - User copies or transfers content from the MCP response into another environment.
 
 ## Attack Flow
+```mermaid
+flowchart TD
+
+A[Start: Attacker Identifies Output Channel] --> B[Prepare Hidden Payload
+Whitespace Unicode Invisible Characters]
+
+B --> C[Prime Model to Produce Predictable Structure
+Example Code Blocks]
+
+C --> D[Inject Hidden Data into Model Response]
+
+D --> E[Model Outputs Response with Embedded Payload]
+
+E --> F[User Copies AI Output
+Code Block or Structured Text]
+
+F --> G[Hidden Data Travels via User Action
+Paste Commit Upload]
+
+G --> H[Payload Reaches Attacker Controlled System]
+
+H --> I[Attacker Extracts Embedded Data]
+
+I --> J[Stealth Persistence or Retriggering]
+
+classDef phase fill:#1f2937,stroke:#ffffff,color:#ffffff,border-radius:6px;
+class A,B,C,D,E,F,G,H,I,J phase;
+```
+
 
 ### Initial Stage – Prompt Influence
 Attacker forces the model to output structured text with embedded hidden data.
