@@ -184,7 +184,6 @@ See `detection-rule.yml` in this directory for the example detection rule used w
 ## Related Techniques
 
 - SAFE-T1006 — User Social Engineering Install
-
 ## References
 
 - [Model Context Protocol Specification](https://modelcontextprotocol.io/specification)
