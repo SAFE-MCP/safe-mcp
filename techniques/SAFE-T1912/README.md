@@ -185,8 +185,6 @@ See `detection-rule.yml` in this directory for the example detection rule used w
 
 - SAFE-T1006 — User Social Engineering Install
 
-- SAFE-T1207 — Hijack Update Mechanism
-
 ## References
 
 - [Model Context Protocol Specification](https://modelcontextprotocol.io/specification)
