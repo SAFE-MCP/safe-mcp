@@ -198,4 +198,4 @@ See `detection-rule.yml` in this directory for the example detection rule used w
 
 | Version | Date       | Changes                     | Author        |
 |--------:|------------|-----------------------------|---------------|
-| 1.0     | 2025-11-26 | Initial documentation       | Rajiv Shrestha |
+| 1.0     | 2025-11-26 | Initial documentation       | rajivsthh |
