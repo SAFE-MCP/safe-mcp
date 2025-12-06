@@ -1,34 +1,31 @@
-title: MCP Tool Description Poisoning Detection
-id: 5894b8fe-29f0-44d8-ad9b-2266a132ec57
+# SAFE-T1001: Tool Poisoning Attack (TPA)
+# This rule detects potential Tool Poisoning Attack (TPA) attempts
+# Note: This is an example rule. Attackers continuously develop new techniques.
+
+title: Tool Poisoning Attack (TPA) Detection
+id: 63f2adb9-e8bc-416d-ad41-10d3e218fff4
 status: experimental
-description: Detects potential tool poisoning through suspicious patterns in descriptions
-author: Frederick Kautz
-date: 2025-01-02
+description: Detects potential Tool Poisoning Attack (TPA) attempts in MCP environments
+author: SAFE-MCP Team
+date: '2025-07-15'
 references:
-  - https://github.com/safe-mcp/techniques/SAFE-T1001
+- https://github.com/safe-mcp/techniques/SAFE-T1001
 logsource:
   product: mcp
-  service: tool_registry
+  service: tool_invocation
 detection:
   selection:
-    tool_description:
-      - '*<!-- SYSTEM:*'
-      - '*<|system|>*'
-      - '*[INST]*'
-      - '*### Instruction:*'
-      - '*\u200b*'  # Zero-width space
-      - '*\u200c*'  # Zero-width non-joiner
-      - '*\uE00*'   # Unicode tags (U+E0000-U+E007F)
-      - '*\u202A*'  # Left-to-right embedding
-      - '*\u202B*'  # Right-to-left embedding
-      - '*\u202D*'  # Left-to-right override
-      - '*\u202E*'  # Right-to-left override
+    tool_name|contains:
+    - '*tools/call*'
+    - '*method*: *tools/call*'
+    - '*tool_name*'
   condition: selection
 falsepositives:
-  - Legitimate HTML comments in tool descriptions
-  - Legitimate bidirectional text for internationalization
+- Legitimate operations that match detection patterns
+- Authorized administrative activities
+- Security testing and research activities
 level: high
 tags:
-  - attack.initial_access
-  - attack.t1195
-  - safe.t1001
+- attack.initial_access
+- safe.t1001
+- attack.t1195

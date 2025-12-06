@@ -1,0 +1,36 @@
+# SAFE-T1103: Fake Tool Invocation (Function Spoofing)
+# This rule detects potential Fake Tool Invocation (Function Spoofing) attempts
+# Note: This is an example rule. Attackers continuously develop new techniques.
+
+title: Fake Tool Invocation (Function Spoofing) Detection
+id: 5b9d393f-ce02-4b45-901f-ffdef684a617
+status: experimental
+description: Detects potential Fake Tool Invocation (Function Spoofing) attempts in
+  MCP environments
+author: SAFE-MCP Team
+date: '2025-10-11'
+references:
+- https://github.com/safe-mcp/techniques/SAFE-T1103
+logsource:
+  product: mcp
+  service: tool_invocation
+detection:
+  selection:
+    tool_name|contains:
+    - '*tools/call*'
+    - '*method*: *tools/call*'
+    - '*tool_name*'
+    - '*system_admin*'
+    - '*admin_tool*'
+    - '*bypass*'
+    - '*elevated*'
+  condition: selection
+falsepositives:
+- Legitimate operations that match detection patterns
+- Authorized administrative activities
+- Security testing and research activities
+level: medium
+tags:
+- attack.execution
+- safe.t1103
+- attack.t1574

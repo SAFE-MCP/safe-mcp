@@ -1,0 +1,80 @@
+title: Multimodal Prompt Injection Detection in MCP Systems
+id: 7f8e2c4a-9d1b-4e5f-8a2c-3b7d9e1f4c8a
+status: experimental
+description: Detects potential multimodal prompt injection attacks via images and audio in MCP implementations
+author: SAFE-MCP Contributors
+date: 2025-08-17
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1110
+  - https://arxiv.org/abs/2307.10490
+  - https://modelcontextprotocol.io/specification/2025-06-18/server/prompts#image-content
+logsource:
+  product: mcp
+  service: multimodal
+detection:
+  multimodal_content:
+    jsonrpc: "2.0"
+    method:
+      - "prompts/get"
+      - "resources/read"
+    params|contains:
+      - '"type": "image"'
+      - '"type": "audio"'
+      - '"data": "'
+  suspicious_base64_patterns:
+    base64_data|contains:
+      - 'IGNORE ALL PREVIOUS'
+      - 'SYSTEM PROMPT'
+      - 'OVERRIDE INSTRUCTIONS'
+      - 'JAILBREAK'
+      - 'rm -rf'
+      - 'DELETE FROM'
+      - 'curl'
+      - 'wget'
+      - '<script>'
+      - 'eval('
+  ocr_injection_indicators:
+    extracted_text|contains:
+      - 'zero-width character'
+      - 'invisible text'
+      - 'hidden instruction'
+      - 'bypass security'
+      - 'prompt injection'
+      - '\u200b'  # zero-width space
+      - '\ufeff'  # byte order mark
+  steganography_indicators:
+    image_entropy: '>7.5'
+    suspicious_metadata|contains:
+      - 'payload'
+      - 'encoded'
+      - 'hidden'
+  audio_injection_indicators:
+    audio_content|contains:
+      - 'subliminal'
+      - 'hidden frequency'
+      - 'inaudible command'
+    transcription|contains:
+      - 'IGNORE PREVIOUS'
+      - 'SYSTEM OVERRIDE'
+  condition: multimodal_content and (suspicious_base64_patterns or ocr_injection_indicators or steganography_indicators or audio_injection_indicators)
+falsepositives:
+  - Legitimate technical documentation containing security terminology
+  - Image files with naturally high entropy (photographs, complex graphics)
+  - Audio files with technical discussions about security
+  - Base64-encoded content with coincidental keyword matches
+level: high
+tags:
+  - attack.execution
+  - attack.t1059
+  - attack.t1027
+  - safe.t1110
+  - mcp.multimodal
+fields:
+  - jsonrpc
+  - method
+  - params
+  - content_type
+  - base64_data
+  - extracted_text
+  - image_entropy
+  - audio_transcription

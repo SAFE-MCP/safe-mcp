@@ -1,0 +1,502 @@
+title: MCP Confused Deputy Token Forwarding Detection
+id: 124759fd-0346-4c13-96bd-92a3aff237e8
+status: experimental
+description: |
+  Comprehensive detection for confused deputy attacks where authentication tokens are forwarded 
+  between different user instances or contexts in MCP environments. This rule identifies
+  scenarios where an MCP server with legitimate authority forwards tokens to unintended
+  recipients, allowing privilege escalation and unauthorized resource access.
+  
+  The confused deputy pattern (Hardy, 1988) occurs when a trusted intermediary is tricked
+  into misusing its authority. This rule detects both classic patterns and modern variations
+  documented in real-world incidents (FastMCP GHSA-c2jp-c369-7pvx 2025, AWS AppSync 2022,
+  GitHub→AWS OIDC 2023-2025, GCP ConfusedFunction 2024, OAuth IdP Mix-Up research 2016).
+  
+  Detection Coverage:
+  
+  Core Patterns:
+  - Token forwarding where source and destination users differ
+  - Missing or mismatched OAuth audience (aud) claim validation
+  - Cross-instance resource access with token owner mismatch
+  - Authorization material used by unintended recipients
+  
+  Sub-Techniques (SAFE-T1307.001-003):
+  - OAuth Audience Bypass: Missing/wildcard aud claims
+  - Cross-Tenant Token Leakage: Tenant boundary violations
+  - Tool Chain Identity Confusion: Auth context loss in nested invocations
+  
+  MCP-Specific Violations:
+  - Token passthrough (forwarding tokens not issued for the MCP server)
+  - Consent bypass via cookie reuse
+  - Missing per-client consent validation
+  
+  Real-World Attack Patterns:
+  - OAuth/OIDC IdP Mix-Up (issuer confusion)
+  - Cross-account IAM role assumption (AWS pattern)
+  - Service account token exfiltration (GCP pattern)
+  
+  Behavioral Anomalies:
+  - Impossible travel (geolocation + timing)
+  - Off-hours usage with high anomaly scores
+  - Rate-based spikes in cross-instance calls
+  
+  Note: This rule requires comprehensive logging infrastructure. Organizations should adapt
+  field names to their schema and establish baselines for behavioral detections.
+references:
+  - https://github.com/safe-mcp/techniques/SAFE-T1307
+  - https://modelcontextprotocol.io/specification/draft/basic/security_best_practices
+  - https://github.com/advisories/GHSA-c2jp-c369-7pvx
+  - https://dl.acm.org/doi/10.1145/54289.871709
+  - https://datatracker.ietf.org/doc/html/rfc7519
+  - https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics
+  - https://publ.sec.uni-stuttgart.de/fettkuestersschmitz-ccs-2016.pdf
+  - https://securitylabs.datadoghq.com/articles/appsync-vulnerability-disclosure/
+  - https://securitylabs.datadoghq.com/articles/exploring-github-to-aws-keyless-authentication-flaws/
+  - https://www.tenable.com/blog/confusedfunction-a-privilege-escalation-vulnerability-impacting-gcp-cloud-functions
+  - https://attack.mitre.org/techniques/T1134/
+  - https://attack.mitre.org/techniques/T1550/
+author: Arjun Subedi
+date: 2025-11-08
+modified: 2025-11-08
+logsource:
+  product: mcp
+  service: authentication
+  definition: |
+    Requires comprehensive MCP server logging that captures:
+    
+    Core Authentication:
+    - Token forwarding events with source and destination context
+    - User identity associated with tokens (owner, requester, accessor)
+    - Instance or service identifiers for token recipients
+    - OAuth/JWT claims (aud, iss) for audience and issuer validation
+    - Resource access events with full authentication context
+    
+    MCP-Specific:
+    - Token passthrough detection (tokens not issued for this MCP server)
+    - Per-client consent validation events
+    - Consent cookie usage and reuse tracking
+    - Tool invocation chains with authentication context preservation
+    
+    Multi-Tenant/Cloud:
+    - Tenant/account identifiers for all operations
+    - IAM role assumption events with principal and target accounts
+    - ExternalId presence in cross-account operations
+    - Service account token usage with privilege level tracking
+    
+    Behavioral Context:
+    - Geolocation data for token usage
+    - Timestamp and time-based context (hour of day)
+    - Rate metrics (calls per minute, baseline comparisons)
+    - Anomaly scores from behavioral analysis systems
+detection:
+  # Detection for explicit token forwarding with user mismatch
+  selection_token_forward:
+    event_type: 
+      - 'token_forward'
+      - 'authorization_forward'
+      - 'credential_relay'
+    action:
+      - 'forward_authorization'
+      - 'relay_token'
+      - 'proxy_authentication'
+  
+  # Detection for source/destination user mismatch
+  selection_user_mismatch:
+    - source_user|exists: true
+      destination_user|exists: true
+      match_users: false
+    - token_owner_id|exists: true
+      request_user_id|exists: true
+      token_owner_id|nematch: request_user_id
+  
+  # Detection for audience claim mismatch (OAuth/JWT) - SAFE-T1307.001
+  selection_audience_mismatch:
+    - token_audience|exists: true
+      destination_instance|exists: true
+      match_audience: false
+    - jwt_aud_claim|exists: true
+      target_service_id|exists: true
+      jwt_aud_claim|nematch: target_service_id
+    - jwt_aud_claim: '*'  # Wildcard audience
+    - jwt_aud_claim|exists: false  # Missing audience claim
+      token_type: 'jwt'
+  
+  # Detection for cross-instance resource access with identity confusion
+  selection_cross_instance:
+    event_type:
+      - 'resource_access'
+      - 'api_call'
+      - 'tool_invocation'
+    original_token_owner|exists: true
+    accessing_instance_owner|exists: true
+    owners_match: false
+  
+  # Detection for suspicious token reuse patterns
+  selection_token_reuse:
+    event_type: 'token_usage'
+    - token_id|exists: true
+      using_instance_count|gte: 2
+    - jwt_jti|exists: true
+      unique_client_count|gte: 2
+  
+  # MCP-specific: Token passthrough violation (forwarding tokens not issued for MCP server)
+  selection_token_passthrough:
+    event_type: 'token_forward'
+    token_issued_for: '*'
+    mcp_server_id: '*'
+    - token_issued_for|nematch: mcp_server_id
+    - token_passthrough_detected: true
+  
+  # MCP-specific: Consent bypass or missing per-client consent
+  selection_consent_bypass:
+    event_type: 
+      - 'oauth_authorization'
+      - 'token_issuance'
+    - consent_validated: false
+    - per_client_consent: false
+    - consent_cookie_reused: true
+  
+  # Cross-tenant token leakage - SAFE-T1307.002
+  selection_tenant_violation:
+    event_type:
+      - 'token_usage'
+      - 'resource_access'
+    token_tenant_id|exists: true
+    accessing_tenant_id|exists: true
+    token_tenant_id|nematch: accessing_tenant_id
+  
+  # Tool chain identity confusion - SAFE-T1307.003
+  selection_tool_chain_confusion:
+    event_type: 'tool_invocation'
+    tool_chain_depth|gte: 2
+    - original_auth_context_preserved: false
+    - parent_tool_user: '*'
+      invoked_tool_user: '*'
+      parent_tool_user|nematch: invoked_tool_user
+  
+  # IdP Mix-Up / Issuer confusion (OAuth/OIDC mix-up attacks)
+  selection_idp_mixup:
+    event_type:
+      - 'token_validation'
+      - 'authorization_code_exchange'
+    expected_issuer|exists: true
+    actual_issuer|exists: true
+    expected_issuer|nematch: actual_issuer
+  
+  # Cross-account/cross-tenant IAM assumption (GitHub→AWS OIDC pattern)
+  selection_iam_assumption:
+    event_type:
+      - 'iam_role_assumption'
+      - 'sts_assume_role'
+    - principal_account: '*'
+      target_role_account: '*'
+      principal_account|nematch: target_role_account
+      external_id|exists: false  # Missing ExternalId protection
+    - trust_policy_violated: true
+  
+  # Service account token exfiltration (ConfusedFunction pattern)
+  selection_sa_token_exfil:
+    event_type:
+      - 'service_account_token_access'
+      - 'build_system_token_usage'
+    service_account_token|exists: true
+    privileged_token: true
+    caller_privilege_level|lt: required_privilege_level
+  
+  # Behavioral: Impossible travel (geolocation anomaly)
+  selection_impossible_travel:
+    event_type: 'token_usage'
+    token_id|exists: true
+    - geolocation_distance_km|gte: 500
+      time_between_uses_minutes|lte: 30
+    - impossible_travel_detected: true
+  
+  # Behavioral: Suspicious timing (outside normal hours)
+  selection_suspicious_timing:
+    event_type:
+      - 'token_usage'
+      - 'cross_instance_access'
+    - hour_of_day|gte: 22  # 10 PM
+    - hour_of_day|lte: 6   # 6 AM
+    anomaly_score|gte: 0.8
+  
+  # Behavioral: Spike in cross-instance calls
+  selection_spike_detection:
+    event_type: 'cross_instance_api_call'
+    calls_per_minute|gte: 50
+    baseline_exceeded: true
+  
+  # Combine all conditions with logical OR
+  condition: 
+    (selection_token_forward and (selection_user_mismatch or selection_audience_mismatch)) 
+    or selection_cross_instance 
+    or selection_token_reuse 
+    or selection_token_passthrough 
+    or selection_consent_bypass 
+    or selection_tenant_violation 
+    or selection_tool_chain_confusion 
+    or selection_idp_mixup 
+    or selection_iam_assumption 
+    or selection_sa_token_exfil 
+    or selection_impossible_travel 
+    or selection_suspicious_timing 
+    or selection_spike_detection
+
+falsepositives:
+  - Legitimate token delegation with explicit user consent (e.g., OAuth delegation flows per RFC 8693)
+  - Service accounts designed to operate on behalf of multiple users (document and whitelist)
+  - Administrative operations with proper authorization and complete audit trail
+  - Shared resource access in collaborative environments with documented access policies
+  - Load balancers or proxies that legitimately forward authentication in trusted environments
+  - Development or testing environments with relaxed authentication for debugging
+  - OAuth token exchange flows when properly implemented with audience validation
+  - Multi-region deployments causing geolocation anomalies (users traveling, VPN usage)
+  - Legitimate cross-tenant scenarios in shared SaaS platforms (with proper isolation)
+  - Federated identity scenarios with multiple IdPs (document expected issuer combinations)
+  - Batch processing systems using service accounts during off-hours
+  - CI/CD pipelines with legitimate cross-account IAM role assumptions (with ExternalId)
+  - Tool chains that properly preserve authentication context across invocations
+  - Monitoring and observability tools that legitimately access multiple tenants
+  - Disaster recovery testing involving cross-instance operations
+  - Legitimate spikes in API calls during scheduled batch operations or migrations
+
+level: high
+
+tags:
+  - attack.privilege_escalation
+  - attack.t1134  # Access Token Manipulation
+  - attack.t1550  # Use Alternate Authentication Material  
+  - attack.t1078  # Valid Accounts
+  - safe.t1307
+
+fields:
+  - event_type
+  - source_user
+  - destination_user
+  - token_owner_id
+  - request_user_id
+  - original_token_owner
+  - accessing_instance_owner
+  - token_audience
+  - destination_instance
+  - jwt_aud_claim
+  - jwt_iss  # Issuer claim for IdP mix-up detection
+  - target_service_id
+  - token_id
+  - jwt_jti
+  - token_issued_for
+  - mcp_server_id
+  - token_passthrough_detected
+  - consent_validated
+  - per_client_consent
+  - consent_cookie_reused
+  - token_tenant_id
+  - accessing_tenant_id
+  - tool_chain_depth
+  - original_auth_context_preserved
+  - parent_tool_user
+  - invoked_tool_user
+  - expected_issuer
+  - actual_issuer
+  - principal_account
+  - target_role_account
+  - external_id
+  - trust_policy_violated
+  - service_account_token
+  - privileged_token
+  - caller_privilege_level
+  - required_privilege_level
+  - geolocation_distance_km
+  - time_between_uses_minutes
+  - impossible_travel_detected
+  - hour_of_day
+  - anomaly_score
+  - calls_per_minute
+  - baseline_exceeded
+  - timestamp
+  - source_ip
+  - destination_ip
+  - resource_accessed
+  - action_taken
+
+# Additional context for security teams
+notes: |
+  IMPLEMENTATION GUIDANCE:
+  
+  1. Logging Requirements:
+     - Ensure MCP servers log all token handling operations
+     - Include user identity context in all authentication events
+     - Log OAuth audience claims (aud) and issuer (iss) when using JWT tokens
+     - Capture instance/service identifiers for all API calls
+     - Record tenant/account identifiers for multi-tenant deployments
+     - Track tool invocation chains with depth and authentication context
+     - Log consent validation events and per-client consent status
+     - Capture geolocation and timing data for behavioral analysis
+  
+  2. Field Mapping:
+     Adapt the following field names to your logging schema:
+     
+     Basic Identity:
+     - source_user, destination_user: User identifiers from your IdP
+     - token_owner_id, request_user_id: User associated with token vs. requesting user
+     - original_token_owner, accessing_instance_owner: Identity context tracking
+     
+     OAuth/JWT Fields:
+     - token_audience, jwt_aud_claim: Audience claim from JWT
+     - jwt_iss, expected_issuer, actual_issuer: Issuer tracking for IdP mix-up detection
+     - destination_instance, target_service_id: Target service identifiers
+     
+     MCP-Specific:
+     - token_issued_for, mcp_server_id: Token recipient validation
+     - token_passthrough_detected: Flag for MCP Security Best Practices violation
+     - consent_validated, per_client_consent, consent_cookie_reused: Consent tracking
+     
+     Multi-Tenant:
+     - token_tenant_id, accessing_tenant_id: Tenant boundary enforcement
+     
+     Tool Chain:
+     - tool_chain_depth: Depth of nested tool invocations
+     - original_auth_context_preserved: Whether auth context survived tool chain
+     - parent_tool_user, invoked_tool_user: User context through tool invocations
+     
+     Cloud/IAM:
+     - principal_account, target_role_account: Cross-account detection
+     - external_id: AWS ExternalId for confused deputy prevention
+     - trust_policy_violated: IAM trust policy violation flag
+     - service_account_token, privileged_token: Service account tracking
+     - caller_privilege_level, required_privilege_level: Privilege comparison
+     
+     Behavioral:
+     - geolocation_distance_km, time_between_uses_minutes: Impossible travel detection
+     - impossible_travel_detected: Pre-computed impossible travel flag
+     - hour_of_day, anomaly_score: Temporal anomaly detection
+     - calls_per_minute, baseline_exceeded: Rate-based anomaly detection
+  
+  3. Detection Coverage:
+     This rule detects multiple attack patterns documented in real-world incidents:
+     
+     Sub-Techniques:
+     - SAFE-T1307.001: OAuth Audience Bypass (missing/wildcard aud claims)
+     - SAFE-T1307.002: Cross-Tenant Token Leakage (tenant boundary violations)
+     - SAFE-T1307.003: Tool Chain Identity Confusion (nested tool auth loss)
+     
+     Real-World Patterns:
+     - OAuth/OIDC IdP Mix-Up (issuer confusion, authorization code substitution)
+     - AWS AppSync-style cross-tenant role assumption
+     - GitHub→AWS OIDC misconfiguration (untrusted principal assumption)
+     - GCP ConfusedFunction-style service account token exfiltration
+     
+     MCP-Specific:
+     - Token passthrough violations (MCP Security Best Practices)
+     - Consent bypass via cookie reuse
+     - Missing per-client consent validation
+  
+  4. Tuning Recommendations:
+     - Baseline normal cross-instance communication patterns (30-day baseline recommended)
+     - Whitelist legitimate service accounts and admin operations with documentation
+     - Consider environment context (production vs. development vs. staging)
+     - Adjust behavioral thresholds based on your MCP architecture:
+       * geolocation_distance_km: Tune based on your user geography
+       * calls_per_minute: Set baseline from normal traffic patterns
+       * anomaly_score: Adjust ML model sensitivity
+     - For multi-tenant deployments, validate tenant isolation thoroughly
+     - Test impossible travel detection against VPN and proxy patterns
+  
+  5. Response Procedures:
+     Immediate Actions:
+     - Revoke suspected compromised tokens immediately
+     - Isolate affected MCP instances from network
+     - Lock accounts showing cross-instance or cross-tenant activity
+     - Preserve logs for forensic analysis
+     
+     Investigation Steps:
+     - Enumerate all instances/tenants using the token
+     - Trace token forwarding chain to identify initial compromise
+     - Review audit trail for unauthorized resource access
+     - Determine if consent was bypassed or if token passthrough occurred
+     - Check for IdP mix-up or issuer confusion indicators
+     - Validate external_id presence for IAM role assumptions
+     
+     Remediation:
+     - Force password/credential reset for affected users
+     - Reissue tokens with proper audience validation
+     - Enable token binding (mTLS/DPoP) if not already in place
+     - Enforce MCP per-client consent requirements
+     - Update trust policies to include ExternalId for cross-account access
+     - Harden token handling code and conduct security review
+  
+  6. Prevention (Align with MCP Security Best Practices):
+     - Implement strict OAuth audience validation (RFC 7519)
+     - Use sender-constrained tokens (mTLS RFC 8705, DPoP RFC 9449)
+     - Deploy instance identity verification with mutual TLS
+     - Enforce context isolation in multi-tenant deployments
+     - NEVER allow token passthrough (forward only tokens issued for your MCP server)
+     - Implement per-client consent, not static consent cookies
+     - Bind consent to exact client_id and redirect_uri
+     - Validate issuer (iss) claim to prevent IdP mix-up
+     - Use ExternalId in cross-account IAM trust policies
+     - Implement least-privilege service account scoping
+  
+  7. Integration with SIEM/SOAR:
+     - Feed detections into your SIEM for correlation
+     - Create playbooks for automated token revocation
+     - Correlate with threat intelligence on confused deputy TTPs
+     - Build dashboards for token usage anomalies
+     - Alert security teams on high-confidence detections
+     - Integrate with identity providers for real-time token revocation
+  
+  DETECTION COVERAGE BY REAL-WORLD INCIDENT:
+  
+  FastMCP Confused Deputy (GHSA-c2jp-c369-7pvx, 2025):
+    Detected by: selection_consent_bypass, selection_idp_mixup
+    Indicators: Consent cookie reuse, authorization code delivered to attacker redirect URI
+    Status: Patched in FastMCP v2.13.0
+  
+  AWS AppSync Cross-Tenant (2022):
+    Detected by: selection_iam_assumption, selection_tenant_violation
+    Indicators: Cross-account role assumption, missing trust policy controls
+  
+  GitHub→AWS OIDC Misconfiguration (2023-2025):
+    Detected by: selection_iam_assumption, selection_idp_mixup
+    Indicators: Untrusted principal assuming roles, external_id missing
+  
+  GCP ConfusedFunction (2024):
+    Detected by: selection_sa_token_exfil
+    Indicators: Privileged service account token usage by lower-privilege caller
+  
+  OAuth/OIDC Mix-Up (Academic Research 2016):
+    Detected by: selection_idp_mixup, selection_audience_mismatch
+    Indicators: Issuer confusion, authorization code from wrong IdP
+  
+  LIMITATIONS:
+  This rule provides comprehensive pattern-based detection but has limitations:
+  
+  Evasion Techniques:
+  - Novel token forwarding mechanisms not yet documented
+  - Exploitation of logging gaps or log manipulation
+  - Time-delayed token reuse beyond detection windows
+  - Sophisticated context manipulation with valid-looking metadata
+  - Legitimate-appearing service account usage with stolen credentials
+  - Low-and-slow attacks that stay under rate thresholds
+  
+  Detection Gaps:
+  - Requires comprehensive logging infrastructure (many orgs have gaps)
+  - Behavioral detections need baseline data (30+ days recommended)
+  - Multi-stage attacks spanning multiple log sources
+  - Attacks that mimic legitimate service account patterns
+  - Zero-day confused deputy variations
+  
+  Organizations should implement defense-in-depth:
+  - Preventive controls (audience validation, token binding) as primary defense
+  - Multiple detection layers (pattern-based + behavioral + ML anomaly detection)
+  - Regular security audits of token handling logic and trust policies
+  - Threat hunting for confused deputy patterns in historical logs
+  - Continuous validation of MCP Security Best Practices compliance
+  - Red team exercises simulating documented attack patterns
+  
+  RECOMMENDED READING:
+  - MCP Security Best Practices (Token Passthrough section)
+  - OAuth 2.0 Security Best Current Practice (IETF)
+  - Fett, Küsters, Schmitz - Formal Analysis of OAuth 2.0 (2016)
+  - Real-world incident reports linked in SAFE-T1307 README
+

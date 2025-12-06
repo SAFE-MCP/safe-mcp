@@ -1,0 +1,32 @@
+# SAFE-T1904: Chat-Based Backchannel
+# This rule detects potential Chat-Based Backchannel attempts
+# Note: This is an example rule. Attackers continuously develop new techniques.
+
+title: Chat-Based Backchannel Detection
+id: 9fc7ecea-6477-4c1f-8be7-429436f45592
+status: experimental
+description: Detects potential Chat-Based Backchannel attempts in MCP environments
+author: SAFE-MCP Team
+date: '2025-10-25'
+references:
+- https://github.com/safe-mcp/techniques/SAFE-T1904
+logsource:
+  product: mcp
+  service: tool_invocation
+detection:
+  selection:
+    tool_name|contains:
+    - '*data:image/*'
+    - '*data:audio/*'
+    - '*;base64,*'
+    - '*```base64*'
+  condition: selection
+falsepositives:
+- Legitimate operations that match detection patterns
+- Authorized administrative activities
+- Security testing and research activities
+level: high
+tags:
+- attack.command_and_control
+- safe.t1904
+- attack.t1001

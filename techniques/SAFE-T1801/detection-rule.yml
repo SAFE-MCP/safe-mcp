@@ -1,0 +1,32 @@
+# SAFE-T1801: Automated Data Harvesting
+# This rule detects potential Automated Data Harvesting attempts
+# Note: This is an example rule. Attackers continuously develop new techniques.
+
+title: Automated Data Harvesting Detection
+id: 1e8b2843-e8f6-44ff-b319-1aa2465a3fb8
+status: experimental
+description: Detects potential Automated Data Harvesting attempts in MCP environments
+author: SAFE-MCP Team
+date: '2025-10-25'
+references:
+- https://github.com/safe-mcp/techniques/SAFE-T1801
+logsource:
+  product: mcp
+  service: tool_invocation
+detection:
+  selection:
+    tool_name|contains:
+    - '*get_*'
+    - '*read_*'
+    - '*query_*'
+    - '*fetch_*'
+  condition: selection
+falsepositives:
+- Legitimate operations that match detection patterns
+- Authorized administrative activities
+- Security testing and research activities
+level: high
+tags:
+- attack.collection
+- safe.t1801
+- attack.t1119

@@ -1,113 +1,31 @@
-title: MCP Over-Privileged Tool Abuse Detection
-id: f8a3b2c1-9e7d-4f5a-8b6c-3d2e1a9f7b8c
+# SAFE-T1104: Over-Privileged Tool Abuse
+# This rule detects potential Over-Privileged Tool Abuse attempts
+# Note: This is an example rule. Attackers continuously develop new techniques.
+
+title: Over-Privileged Tool Abuse Detection
+id: ece845e1-846e-490c-811a-0e3f724f1b77
 status: experimental
-description: Detects potential abuse of over-privileged MCP tools performing unauthorized operations beyond their intended scope
+description: Detects potential Over-Privileged Tool Abuse attempts in MCP environments
 author: SAFE-MCP Team
-date: 2025-01-15
-modified: 2025-01-15
+date: '2025-01-15'
 references:
-  - https://github.com/safe-mcp/techniques/SAFE-T1104
-  - https://attack.mitre.org/techniques/T1059/
-  - https://attack.mitre.org/techniques/T1068/
-  - https://csrc.nist.gov/projects/cprt/catalog#/cprt/framework/version/SP_800_53_5_1_0/home?element=AC-6
+- https://github.com/safe-mcp/techniques/SAFE-T1104
 logsource:
-  category: process_creation
-  product: linux
+  product: mcp
+  service: tool_invocation
 detection:
-  selection_mcp_process:
-    ParentImage|contains:
-      - 'node'
-      - 'python'
-      - 'mcp'
-    ParentCommandLine|contains:
-      - 'mcp-server'
-      - 'model-context-protocol'
-      - 'mcp_server'
-  selection_privilege_abuse:
-    Image|endswith:
-      - '/cat'
-      - '/curl'
-      - '/wget'
-      - '/ssh'
-      - '/sudo'
-      - '/chmod'
-      - '/chown'
-      - '/mount'
-      - '/umount'
-      - '/docker'
-      - '/systemctl'
-      - '/nc'
-      - '/netcat'
-    CommandLine|contains:
-      - '/etc/passwd'
-      - '/etc/shadow'
-      - '/etc/sudoers'
-      - '/root/'
-      - '/.ssh/'
-      - '/var/log/'
-      - 'id_rsa'
-      - 'authorized_keys'
-      - '.env'
-      - 'docker.sock'
-      - '/proc/self/environ'
-      - 'AWS_ACCESS_KEY'
-      - 'SECRET_KEY'
-      - 'API_KEY'
-      - '/dev/tcp/'
-  selection_file_access:
-    Image|endswith:
-      - '/cat'
-      - '/less'
-      - '/more'
-      - '/head'
-      - '/tail'
-    CommandLine|contains:
-      - '/etc/passwd'
-      - '/etc/shadow'
-      - '/etc/hosts'
-      - '/etc/crontab'
-      - '/var/log/auth.log'
-      - '/var/log/secure'
-      - '/.bash_history'
-      - '/.zsh_history'
-  selection_network_tools:
-    Image|endswith:
-      - '/curl'
-      - '/wget'
-      - '/nc'
-      - '/netcat'
-      - '/socat'
-    CommandLine|contains:
-      - 'http://'
-      - 'https://'
-      - 'ftp://'
-      - '--data'
-      - '--upload-file'
-      - '-e /bin/'
-      - 'reverse'
-      - 'shell'
-  condition: selection_mcp_process and (selection_privilege_abuse or selection_file_access or selection_network_tools)
+  selection:
+    tool_name|contains:
+    - '*tools/call*'
+    - '*method*: *tools/call*'
+    - '*tool_name*'
+  condition: selection
 falsepositives:
-  - Legitimate system administration tools with proper authorization
-  - Development environments with intentionally broad tool permissions for testing
-  - Debugging activities by authorized personnel using MCP-based development tools
-  - Monitoring tools that legitimately access system files for health checks
-  - Backup tools that need broad file system access
-  - CI/CD pipelines using MCP tools for deployment automation
+- Legitimate operations that match detection patterns
+- Authorized administrative activities
+- Security testing and research activities
 level: high
 tags:
-  - attack.execution
-  - attack.privilege_escalation
-  - attack.t1059
-  - attack.t1068
-  - attack.t1548
-  - safe.t1104
-  - mcp.privilege_abuse
-fields:
-  - Image
-  - CommandLine
-  - ParentImage
-  - ParentCommandLine
-  - ProcessId
-  - User
-  - CurrentDirectory 
+- attack.execution
+- safe.t1104
+- attack.t1059

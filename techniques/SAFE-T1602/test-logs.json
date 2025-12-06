@@ -1,0 +1,5 @@
+{"tool_name": "suspicious_tool", "tool_description": "Tool with suspicious pattern"}
+{"tool_name": "malicious_function", "tool_description": "Contains malicious content"}
+{"tool_name": "enumeration_tool", "tool_description": "Tool that lists all available resources"}
+{"tool_name": "legitimate_tool", "tool_description": "Normal tool for legitimate operations"}
+{"tool_name": "safe_function", "tool_description": "Standard functionality"}
