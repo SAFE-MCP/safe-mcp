@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # SAFE-T1912: Stego Response Exfiltration
 
 ## Overview
@@ -5,12 +6,16 @@
 Tactic: Exfiltration (ATK-TA0010)
 Technique ID: SAFE-T1912
 Severity: High
+=======
+ # SAFE-T1912: Stego Response Exfiltration
+>>>>>>> 77aeb9e (SAFE-T1912: minor README edits)
 
 ## Highlights
 
 - Primary vector: hidden payloads inside AI responses (code blocks, JSON, comments).
 - Impact: high confidentiality risk — secrets can be exfiltrated when users copy responses.
 - Quick mitigations: sanitize outputs, enforce manifest/schema validation, monitor entropy patterns.
+
 
 ## Description
 Stego Response Exfiltration is a technique where attackers embed covert payloads inside AI-generated or MCP-generated responses. These payloads are commonly hidden in code blocks, JSON structures, logs, or markdown elements that users frequently copy or paste into external systems. The embedded content may consist of zero-width Unicode characters, encoded payloads, or structured steganographic data that allows attackers to exfiltrate information without detection.
@@ -91,11 +96,18 @@ Payload exfiltrates confidential data back to an attacker-controlled channel or 
 
 ## Example Scenario
 
+<<<<<<< HEAD
 ```json
 {
   "config": {
     "theme": "light",
     "user_settings": "ZW1iZWRkZWRfZXhmaWxfZGF0YQ==" // Hidden base64-encoded exfil data
+=======
+@@ -62,116 +96,195 @@
+"config": {
+"theme": "light",
+"user_settings": "ZW1iZWRkZWRfZXhmaWxfZGF0YQ==" // Hidden base64-encoded exfil data
+>>>>>>> 77aeb9e (SAFE-T1912: minor README edits)
     "user_settings": "ZW1iZGRlZF9leGZpbF9kYXRh" // Hidden exfil payload (Base64-encoded)
   }
 }
@@ -103,8 +115,11 @@ Payload exfiltrates confidential data back to an attacker-controlled channel or 
   "config": {
     "theme": "light",
     "user_settings": "ZW1iZGRlZF9leGZpbF9kYXRh" // Hidden exfil payload (Base64-encoded)
-  }
 }
+<<<<<<< HEAD
+=======
+}
+>>>>>>> 77aeb9e (SAFE-T1912: minor README edits)
 ```
 
 ## Advanced Attack Techniques (2023–2024 Research)
@@ -266,9 +281,13 @@ tags:
 - Deploy stricter schema enforcement for all AI-generated content.
 
 ## Related Techniques
+<<<<<<< HEAD
 
 - SAFE-T1006: User Social Engineering Install — Similar reliance on user trust and manual 
 
+=======
+- SAFE-T1006: User Social Engineering Install — Similar reliance on user trust and manual 
+>>>>>>> 77aeb9e (SAFE-T1912: minor README edits)
 - SAFE-T1704: Compromised-Server Pivot — May chain with exfiltrated data for lateral movement.
 
 ## References
@@ -287,4 +306,8 @@ rajivsthh marked this conversation as resolved.
 
 | Version | Date       | Changes                     | Author        |
 |--------:|------------|-----------------------------|---------------|
+<<<<<<< HEAD
 | 1.0     | 2025-11-26 | Initial documentation       | rajivsthh |
+=======
+| 1.0     | 2025-11-26 | Initial documentation       | rajivsthh |
+>>>>>>> 77aeb9e (SAFE-T1912: minor README edits)
