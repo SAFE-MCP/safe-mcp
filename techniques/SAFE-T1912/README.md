@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # SAFE-T1912: Stego Response Exfiltration
 
 ## Overview
@@ -6,9 +5,7 @@
 Tactic: Exfiltration (ATK-TA0010)
 Technique ID: SAFE-T1912
 Severity: High
-=======
- # SAFE-T1912: Stego Response Exfiltration
->>>>>>> 77aeb9e (SAFE-T1912: minor README edits)
+
 
 ## Highlights
 
@@ -308,6 +305,3 @@ rajivsthh marked this conversation as resolved.
 |--------:|------------|-----------------------------|---------------|
 <<<<<<< HEAD
 | 1.0     | 2025-11-26 | Initial documentation       | rajivsthh |
-=======
-| 1.0     | 2025-11-26 | Initial documentation       | rajivsthh |
->>>>>>> 77aeb9e (SAFE-T1912: minor README edits)
