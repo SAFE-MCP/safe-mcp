@@ -93,18 +93,16 @@ Payload exfiltrates confidential data back to an attacker-controlled channel or 
 
 ## Example Scenario
 
-<<<<<<< HEAD
+
 ```json
 {
   "config": {
     "theme": "light",
     "user_settings": "ZW1iZWRkZWRfZXhmaWxfZGF0YQ==" // Hidden base64-encoded exfil data
-=======
-@@ -62,116 +96,195 @@
+
 "config": {
 "theme": "light",
 "user_settings": "ZW1iZWRkZWRfZXhmaWxfZGF0YQ==" // Hidden base64-encoded exfil data
->>>>>>> 77aeb9e (SAFE-T1912: minor README edits)
     "user_settings": "ZW1iZGRlZF9leGZpbF9kYXRh" // Hidden exfil payload (Base64-encoded)
   }
 }
@@ -113,10 +111,8 @@ Payload exfiltrates confidential data back to an attacker-controlled channel or 
     "theme": "light",
     "user_settings": "ZW1iZGRlZF9leGZpbF9kYXRh" // Hidden exfil payload (Base64-encoded)
 }
-<<<<<<< HEAD
-=======
+
 }
->>>>>>> 77aeb9e (SAFE-T1912: minor README edits)
 ```
 
 ## Advanced Attack Techniques (2023–2024 Research)
@@ -278,14 +274,9 @@ tags:
 - Deploy stricter schema enforcement for all AI-generated content.
 
 ## Related Techniques
-<<<<<<< HEAD
 
-- SAFE-T1006: User Social Engineering Install — Similar reliance on user trust and manual 
-
-=======
-- SAFE-T1006: User Social Engineering Install — Similar reliance on user trust and manual 
->>>>>>> 77aeb9e (SAFE-T1912: minor README edits)
-- SAFE-T1704: Compromised-Server Pivot — May chain with exfiltrated data for lateral movement.
+- SAFE-T1006: User Social Engineering Install 
+- SAFE-T1704: Compromised-Server Pivot 
 
 ## References
 
@@ -303,5 +294,4 @@ rajivsthh marked this conversation as resolved.
 
 | Version | Date       | Changes                     | Author        |
 |--------:|------------|-----------------------------|---------------|
-<<<<<<< HEAD
 | 1.0     | 2025-11-26 | Initial documentation       | rajivsthh |
