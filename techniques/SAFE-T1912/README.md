@@ -1,3 +1,4 @@
+
 # SAFE-T1912: Stego Response Exfiltration
 
 ## Overview
@@ -7,28 +8,16 @@ Technique ID: SAFE-T1912
 Severity: High
 
 
-## Highlights
-
-- Primary vector: hidden payloads inside AI responses (code blocks, JSON, comments).
-- Impact: high confidentiality risk — secrets can be exfiltrated when users copy responses.
-- Quick mitigations: sanitize outputs, enforce manifest/schema validation, monitor entropy patterns.
-
-
 ## Description
 Stego Response Exfiltration is a technique where attackers embed covert payloads inside AI-generated or MCP-generated responses. These payloads are commonly hidden in code blocks, JSON structures, logs, or markdown elements that users frequently copy or paste into external systems. The embedded content may consist of zero-width Unicode characters, encoded payloads, or structured steganographic data that allows attackers to exfiltrate information without detection.
 
 From a technical perspective, the attack exploits the tendency of AI-generated structured outputs to appear trustworthy. MCP systems often generate code, configuration, or schema-based responses; attackers manipulate these formats to insert high‑entropy data or invisible characters that remain undetected by basic sanitation. When users transfer these outputs into IDEs, build systems, cloud consoles, or other environments, the payload propagates and is eventually decoded or executed by downstream processes.
 
-Stego Response Exfiltration is an attack technique where an adversary hides sensitive data inside AI-generated responses—specifically inside code blocks, formatted content, or other output structures that appear harmless to users. The victim unknowingly copies or exports this content into another system, thereby exfiltrating the attacker-embedded payload.
-Stego Response Exfiltration is a technique where attackers embed covert payloads inside AI-generated or MCP-generated responses. These payloads are commonly hidden in code blocks, JSON structures, logs, or markdown elements that users frequently copy or paste into external systems. The embedded content may consist of zero-width Unicode characters, encoded payloads, or structured steganographic data that allows attackers to exfiltrate information without detection.
-
-In the context of Model Context Protocol (MCP), this technique exploits the trust users place in AI responses. Because MCP tools and servers return structured data (JSON, code blocks, logs), attackers can embed hidden content such as base64 blobs, zero-width characters, Unicode steganography, or encoded command sequences that bypass filtering. Once copied, this hidden content is executed or decoded in downstream systems (IDE, shell, cloud console, browser extension, or another application).
-From a technical perspective, the attack exploits the tendency of AI-generated structured outputs to appear trustworthy. MCP systems often generate code, configuration, or schema-based responses; attackers manipulate these formats to insert high‑entropy data or invisible characters that remain undetected by basic sanitation. When users transfer these outputs into IDEs, build systems, cloud consoles, or other environments, the payload propagates and is eventually decoded or executed by downstream processes.
 
 ## Attack Vectors
 
 **Primary Vector:** Payload hidden inside LLM/MCP response code blocks or structured outputs.
-**Primary Vector:** Payload hidden inside AI-generated code blocks, JSON, or structured output.
+
 
 **Secondary Vectors:**
 
@@ -93,7 +82,6 @@ Payload exfiltrates confidential data back to an attacker-controlled channel or 
 
 ## Example Scenario
 
-
 ```json
 {
   "config": {
@@ -103,6 +91,7 @@ Payload exfiltrates confidential data back to an attacker-controlled channel or 
 "config": {
 "theme": "light",
 "user_settings": "ZW1iZWRkZWRfZXhmaWxfZGF0YQ==" // Hidden base64-encoded exfil data
+
     "user_settings": "ZW1iZGRlZF9leGZpbF9kYXRh" // Hidden exfil payload (Base64-encoded)
   }
 }
@@ -112,7 +101,9 @@ Payload exfiltrates confidential data back to an attacker-controlled channel or 
     "user_settings": "ZW1iZGRlZF9leGZpbF9kYXRh" // Hidden exfil payload (Base64-encoded)
 }
 
+
 }
+
 ```
 
 ## Advanced Attack Techniques (2023–2024 Research)
@@ -276,6 +267,7 @@ tags:
 ## Related Techniques
 
 - SAFE-T1006: User Social Engineering Install 
+
 - SAFE-T1704: Compromised-Server Pivot 
 
 ## References
@@ -288,10 +280,13 @@ tags:
 
 - T1020 – Automated Exfiltration
 - https://attack.mitre.org/techniques/T1020/
-rajivsthh marked this conversation as resolved.
+
 
 ## Version History
 
 | Version | Date       | Changes                     | Author        |
 |--------:|------------|-----------------------------|---------------|
+
+| 1.0     | 2025-11-26 | Initial documentation       | rajivsthh |
+
 | 1.0     | 2025-11-26 | Initial documentation       | rajivsthh |
