@@ -20,8 +20,6 @@ From a technical perspective, the attack exploits the tendency of AI-generated s
 Stego Response Exfiltration is an attack technique where an adversary hides sensitive data inside AI-generated responses—specifically inside code blocks, formatted content, or other output structures that appear harmless to users. The victim unknowingly copies or exports this content into another system, thereby exfiltrating the attacker-embedded payload.
 Stego Response Exfiltration is a technique where attackers embed covert payloads inside AI-generated or MCP-generated responses. These payloads are commonly hidden in code blocks, JSON structures, logs, or markdown elements that users frequently copy or paste into external systems. The embedded content may consist of zero-width Unicode characters, encoded payloads, or structured steganographic data that allows attackers to exfiltrate information without detection.
 
-In the context of Model Context Protocol (MCP), this technique exploits the trust users place in AI responses. Because MCP tools and servers return structured data (JSON, code blocks, logs), attackers can embed hidden content such as base64 blobs, zero-width characters, Unicode steganography, or encoded command sequences that bypass filtering. Once copied, this hidden content is executed or decoded in downstream systems (IDE, shell, cloud console, browser extension, or another application).
-From a technical perspective, the attack exploits the tendency of AI-generated structured outputs to appear trustworthy. MCP systems often generate code, configuration, or schema-based responses; attackers manipulate these formats to insert high‑entropy data or invisible characters that remain undetected by basic sanitation. When users transfer these outputs into IDEs, build systems, cloud consoles, or other environments, the payload propagates and is eventually decoded or executed by downstream processes.
 
 ## Attack Vectors
 
@@ -212,24 +210,16 @@ tags:
 ### Preventive Controls
 
 - SAFE-M-003: Output Sanitization — Strip zero-width characters and detect suspicious encoding patterns.
-- SAFE-M-003: Output Sanitization
-  - Strip zero-width Unicode, validate character classes, and reject suspicious embedded content.
 
-- SAFE-M-014: Model Response Validation — Enforce schema validation to detect hidden or unexpected fields.
-- SAFE-M-014: Model Response Validation
-  - Enforce strict schemas; reject unknown fields or high-entropy values.
+- SAFE-M-014: Model Response Validation — Enforce schema validation to detect hidden or unexpected fields.s.
 
 - SAFE-M-021: Content Security Filtering — Reject high-entropy payloads inside text responses.
-- SAFE-M-021: Content Security Filtering
-  - Detect and block compressed blobs, base64 strings, or hidden comments in non-binary contexts.
 
 ### Detective Controls
 
-- SAFE-M-009: Steganography Detection Layer — Scan for entropy anomalies in responses.
 - SAFE-M-009: Steganography Detection Layer
   - Scan for entropy anomalies, invisible Unicode, or structural steganography.
 
-- SAFE-M-011: Logging & Telemetry Controls — Record responses and highlight suspicious patterns.
 - SAFE-M-011: Logging & Telemetry Controls
   - Monitor MCP responses for patterns consistent with hidden payloads.
 
