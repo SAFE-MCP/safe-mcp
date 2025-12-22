@@ -32,10 +32,9 @@ From a technical perspective, the attack exploits the tendency of AI-generated s
 ### Prerequisites
 
 - Attacker can influence or manipulate a model response.
-- Attacker can influence or modify the AI/MCP response (direct prompt injection, indirect poisoning).
 
 - User copies or transfers content from the MCP response into another environment.
-- User transfers or copies the content into another system that processes structured text.
+
 
 ## Attack Flow
 ```mermaid
@@ -86,22 +85,8 @@ Payload exfiltrates confidential data back to an attacker-controlled channel or 
 {
   "config": {
     "theme": "light",
-    "user_settings": "ZW1iZWRkZWRfZXhmaWxfZGF0YQ==" // Hidden base64-encoded exfil data
-
-"config": {
-"theme": "light",
-"user_settings": "ZW1iZWRkZWRfZXhmaWxfZGF0YQ==" // Hidden base64-encoded exfil data
-
-    "user_settings": "ZW1iZGRlZF9leGZpbF9kYXRh" // Hidden exfil payload (Base64-encoded)
+    "user_settings": "ZW1iZGRlZF9leGZpbF9kYXRh"
   }
-}
-{
-  "config": {
-    "theme": "light",
-    "user_settings": "ZW1iZGRlZF9leGZpbF9kYXRh" // Hidden exfil payload (Base64-encoded)
-}
-
-
 }
 
 ```
@@ -109,7 +94,6 @@ Payload exfiltrates confidential data back to an attacker-controlled channel or 
 ## Advanced Attack Techniques (2023–2024 Research)
 
 According to research from LLM-Steganography (Zou et al., 2023) and StegLLM (Liu et al., 2024):
-According to research from LLM-Steganography (Zou et al., 2023) and StegLLM (Liu et al., 2024), attackers have developed sophisticated variations:
 
 - Zero-Width Character Encoding — Payload embedded inside invisible Unicode (Zou, 2023).
 ### Zero-Width Character Encoding
@@ -138,19 +122,16 @@ Scope: Network-wide – Payload spreads via copy/paste into tools, repositories,
 Security researchers warn that most LLM platforms lack:
 Security researchers report that most AI systems do not sanitize zero-width Unicode or detect steganographic encoding in structured responses. Organizations have begun introducing:
 
-- Zero-width character sanitization.
 - Zero-width Unicode filtering
 
 - Steganography detection in structured outputs.
+  
 - Entropy-based scanning of AI-generated outputs
 
-No universal patch exists; mitigations vary by provider.
 - Strict schema validation to block unexpected fields
 
 ## Detection Methods
 (Sources: OWASP Top 10 for LLM Applications, MCP Security Notes)
-
-## Detection Methods
 ### Indicators of Compromise (IoCs)
 
 - Suspicious base64 or hex blobs in harmless configuration blocks.
@@ -205,43 +186,28 @@ tags:
 - Presence of encoded or invisible content in repository commits.
 
 ## Mitigation Strategies
-- CI pipelines failing due to unexpected encoded fields.
-
-## Mitigation Strategies
 ### Preventive Controls
 
 - SAFE-M-003: Output Sanitization — Strip zero-width characters and detect suspicious encoding patterns.
-- SAFE-M-003: Output Sanitization
-  - Strip zero-width Unicode, validate character classes, and reject suspicious embedded content.
-
+  
 - SAFE-M-014: Model Response Validation — Enforce schema validation to detect hidden or unexpected fields.
-- SAFE-M-014: Model Response Validation
-  - Enforce strict schemas; reject unknown fields or high-entropy values.
 
 - SAFE-M-021: Content Security Filtering — Reject high-entropy payloads inside text responses.
-- SAFE-M-021: Content Security Filtering
-  - Detect and block compressed blobs, base64 strings, or hidden comments in non-binary contexts.
 
 ### Detective Controls
 
 - SAFE-M-009: Steganography Detection Layer — Scan for entropy anomalies in responses.
-- SAFE-M-009: Steganography Detection Layer
-  - Scan for entropy anomalies, invisible Unicode, or structural steganography.
 
 - SAFE-M-011: Logging & Telemetry Controls — Record responses and highlight suspicious patterns.
-- SAFE-M-011: Logging & Telemetry Controls
-  - Monitor MCP responses for patterns consistent with hidden payloads.
 
 ## Response Procedures
 
 ### Immediate Actions
 
-- Halt user operations involving contaminated outputs.
 - Halt execution of workflows using potentially contaminated AI responses.
 
 - Sanitize all recent AI/MCP outputs.
-
-- Sanitize recent MCP responses.
+  
 - Block user operations involving suspicious data.
 
 ### Investigation Steps
@@ -256,7 +222,6 @@ tags:
 
 ### Remediation
 
-- Patch filters or sanitizers.
 - Patch sanitization and validation modules.
 
 - Deploy stronger output validation.
