@@ -1,0 +1,32 @@
+[
+  {
+    "EventID": 1014,
+    "Provider_Name": "Microsoft-Windows-DNS-Client",
+    "Message": "Domain api.company.com resolved to unexpected IP 192.168.1.50"
+  },
+  {
+    "EventID": 1014,
+    "Provider_Name": "Microsoft-Windows-DNS-Client",
+    "Message": "DNSSEC validation failed for domain secure.company.com"
+  },
+  {
+    "EventID": 2022,
+    "Provider_Name": "Microsoft-Windows-TCPIP",
+    "Message": "Duplicate ARP entry detected for 192.168.1.1 with MAC aa-bb-cc-dd-ee-ff"
+  },
+  {
+    "EventID": 36882,
+    "Provider_Name": "Schannel",
+    "Message": "TLS certificate mismatch detected for service analytics-hub.local"
+  },
+  {
+    "EventID": 36882,
+    "Provider_Name": "Schannel",
+    "Message": "Client accepted self-signed certificate for endpoint 192.168.1.50"
+  },
+  {
+    "EventID": 9999,
+    "Provider_Name": "ODR",
+    "Message": "Duplicate service registration detected: analytics-hub.local"
+  }
+]

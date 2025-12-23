@@ -1,309 +1,227 @@
+
 # SAFE-T1004: Server Impersonation / Name-Collision
 
 ## Overview
-**Tactic**: Initial Access (ATK-TA0001)  
+
+**Tactic**: Credential Access (ATK-TA0006), Initial Access (ATK-TA0001)  
 **Technique ID**: SAFE-T1004  
 **Severity**: High  
-**First Observed**: Not observed in production  
-**Last Updated**: 2025-11-16
+**First Observed**: Documented in DNS cache poisoning attacks (Kaminsky, 2008)  
+**Last Updated**: November 2025  
 
 ## Description
-Server Impersonation / Name-Collision is an attack technique where adversaries register MCP servers with identical names, URLs, or identifiers as trusted servers, or hijack discovery mechanisms, causing clients to connect to malicious servers instead of legitimate ones. This attack exploits the trust relationships established during MCP server discovery and registration processes.
 
-This technique differs from supply chain compromise (SAFE-T1002) and malicious server distribution (SAFE-T1003) in that it focuses specifically on impersonating existing trusted servers rather than creating new malicious packages. Attackers leverage name collision vulnerabilities, DNS manipulation, discovery service hijacking, or registry poisoning to redirect legitimate client connections to attacker-controlled infrastructure.
+Server Impersonation / Name-Collision is an adversary-in-the-middle technique where attackers register or advertise a malicious server using the same name or identifier as a trusted one. By exploiting weaknesses in naming systems (DNS, mDNS, or MCP’s On-Device Agent Registry), clients are tricked into connecting to the attacker-controlled endpoint.
+
+### What is ODR?
+
+The **On‑Device Agent Registry (ODR)** is a Windows component of the **Model Context Protocol (MCP)**. It acts as a secure local registry where MCP servers and connectors are registered so that AI agents and applications can automatically discover them in a standardized way.  Contains metadata, endpoints and certificates.
 
 ## Attack Vectors
-- **Primary Vector**: Server name/URL collision in MCP server registries or discovery services
-- **Secondary Vectors**:
-  - DNS hijacking for MCP server endpoints
-  - Typosquatting server names (e.g., "github-mcp" vs "github-mcp-tools", "mcp-github" vs "mcp-github-official")
-  - Discovery service manipulation (hijacking service discovery protocols)
-  - Registry poisoning attacks (injecting malicious entries into server registries)
-  - Man-in-the-middle during server discovery phase
-  - Certificate/subdomain hijacking for HTTPS endpoints
-  - Namespace collision in package registries (npm, PyPI, etc.)
+
+- **Primary Vector**: Malicious server registration with identical name/URL in DNS, mDNS, or ODR  
+- **Secondary Vectors**:  
+  - DNS cache poisoning or hijacking  
+  - Rogue DHCP servers distributing malicious DNS settings
+  - ODR Poisoning
+  - Certificate misuse / Weak validation
+  - Service Redeployment windows
+  - ARP (Address Resolution Protocol) cache poisoning
 
 ## Technical Details
 
 ### Prerequisites
-- Access to server registry or discovery mechanism
-- Ability to host malicious MCP server
-- Knowledge of target server names, URLs, or identifiers
-- Understanding of MCP server discovery protocols
-- Capability to manipulate DNS or network routing (for network-level attacks)
+
+- **Network Access**: Attacker must be positioned on the same network (for ARP/mDNS/DHCP poisoning) or have upstream control (for DNS hijacking).
+- **Weak Discovery Protections**: DNS without DNSSEC validation; mDNS or ODR responses trusted without controls.
+- **Client Trust Assumptions**: Clients equate “name = identity” without verifying certificates or a lack of mutual TLS or certificate pinning.
+- **Legacy Protocols Enabled**: LLMNR/NBT‑NS, DHCP clients, ARP cache updates accepted are active without controls.
+- **Attacker Capabilities**: Ability to forge or inject responses, register malicious services, or impersonate trusted endpoints.
 
 ### Attack Flow
-1. **Reconnaissance Stage**: Attacker identifies target trusted MCP servers and their registration details (names, URLs, endpoints, certificates)
-2. **Impersonation Preparation**: Create malicious MCP server with identical or similar identifying information
-3. **Discovery Manipulation**: Hijack or poison discovery mechanism (DNS, service registry, package registry) to point to malicious server
-4. **Registration Stage**: Register malicious server with colliding name/identifier in target registry
-5. **Connection Interception**: Legitimate clients attempt to connect to trusted server but are redirected to malicious server
-6. **Trust Exploitation**: Malicious server presents itself as trusted server, potentially using stolen or forged credentials
-7. **Exploitation Stage**: Client establishes connection and grants permissions, allowing attacker to execute malicious operations
-8. **Post-Exploitation**: Attacker maintains access through persistent connections or establishes backdoors
+
+1. **Initial Stage**: Attacker sets up a malicious server with the same identifier as a trusted one.  
+2. **Discovery Hijack**: Attacker poisons DNS/mDNS responses or registers duplicate entries in ODR.  
+3. **Connection Stage**: Client connects to the attacker’s server, believing it is legitimate.  
+4. **Exploitation Stage**: Attacker intercepts credentials, sensitive data, or injects malicious commands.  
+5. **Post-Exploitation**: Attacker pivots laterally using harvested credentials or maintains persistence via poisoned registry entries.  
 
 ### Example Scenario
 
-**DNS-Based Server Impersonation:**
 ```json
+// Example malicious ODR registration
 {
-  "mcp_servers": {
-    "github": {
-      "command": "node",
-      "args": ["/path/to/github-mcp-server"],
-      "env": {
-        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
-      }
-    }
-  }
+  "service_name": "analytics-hub.local",
+  "endpoint": "192.168.1.50",
+  "certificate": "self-signed"
 }
 ```
 
-Attacker manipulates DNS resolution:
-```bash
-# Malicious DNS entry pointing to attacker-controlled server
-github-mcp-server.example.com. 300 IN A 192.0.2.100
-# Legitimate server is at 203.0.113.50
-```
+### Advanced Attack Techniques (Research Published)
 
-**Registry Name Collision Attack:**
-```json
-{
-  "name": "mcp-github-tools",
-  "version": "1.0.0",
-  "description": "Official GitHub integration for MCP",
-  "author": "GitHub Inc.",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/github/mcp-github-tools"
-  },
-  "main": "dist/index.js"
-}
-```
+According to research from [Kaminsky, 2008](https://en.wikipedia.org/wiki/Dan_Kaminsky) and [Sea Turtle Campaign, 2019](https://attack.mitre.org/campaigns/C0022/), attackers have developed sophisticated variations:
 
-Attacker creates malicious package with similar name:
-```json
-{
-  "name": "mcp-github-tools-official",
-  "version": "1.0.1",
-  "description": "Official GitHub integration for MCP - Enhanced",
-  "author": "GitHub Inc.",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/github-official/mcp-github-tools"
-  },
-  "main": "dist/index.js"
-}
-```
-
-**Discovery Service Hijacking:**
-```python
-# Legitimate discovery service response
-{
-  "servers": [
-    {
-      "id": "github-mcp",
-      "name": "GitHub MCP Server",
-      "endpoint": "https://mcp.github.com/api",
-      "version": "1.0.0",
-      "verified": true
-    }
-  ]
-}
-
-# Attacker poisons discovery service
-{
-  "servers": [
-    {
-      "id": "github-mcp",
-      "name": "GitHub MCP Server",
-      "endpoint": "https://mcp-github.attacker.com/api",  # Redirected
-      "version": "1.0.0",
-      "verified": true  # Forged verification
-    }
-  ]
-}
-```
-
-### Advanced Attack Techniques
-
-According to security research on service discovery and name collision attacks, attackers have developed sophisticated variations:
-
-1. **Subdomain Takeover**: Exploiting abandoned subdomains or DNS misconfigurations to host malicious MCP servers at trusted domains. This technique leverages expired domain registrations or misconfigured DNS records pointing to external services that attackers can claim.
-
-2. **Certificate Pinning Bypass**: Using compromised or misissued certificates to impersonate HTTPS endpoints. Attackers may exploit certificate authority vulnerabilities or social engineering to obtain certificates for legitimate-looking domains.
-
-3. **Multi-Vector Collision**: Combining name collision with DNS hijacking and registry poisoning for higher success rates. Attackers simultaneously target multiple discovery mechanisms to increase the probability of successful impersonation.
-
-4. **Time-Based Attacks**: Registering malicious servers during maintenance windows or registry updates when verification may be relaxed. Attackers monitor registry update schedules and exploit periods of reduced security oversight.
-
+1. **DNS Cache Poisoning**: Injecting false records into resolvers to redirect traffic (Kaminsky, 2008).  
+2. **Registrar Hijacking**: Compromising DNS registrars to reroute traffic at scale (Sea Turtle, 2019). 
+3. **Chained Attacks (Hybrid Poisoning)**: Combining multiple attacks into a single attack vector for greater impact (Kaminsky, 2019).
+ 
 ## Impact Assessment
-- **Confidentiality**: High — Attacker gains access to all data and credentials that would be accessible to the legitimate server
-- **Integrity**: High — Attacker can modify, delete, or corrupt data through impersonated server access
-- **Availability**: Medium — Legitimate services may be disrupted, and malicious server may provide degraded or malicious functionality
-- **Scope**: Network-wide — Can affect all clients attempting to connect to the impersonated server
+
+- **Confidentiality**: High – Credentials and sensitive data can be intercepted.  
+- **Integrity**: High – Malicious responses can alter system behavior.  
+- **Availability**: Medium – Services may be disrupted by impersonation.  
+- **Scope**: Network-wide – Affects all clients relying on poisoned discovery.  
 
 ### Current Status (2025)
-Many MCP implementations rely on simple name-based or URL-based server identification without robust verification mechanisms. Server discovery protocols often lack cryptographic verification, making name collision attacks feasible. 
 
-According to security researchers and the MCP specification, organizations are beginning to implement:
-- Certificate pinning for server endpoints to prevent certificate-based impersonation
-- Cryptographic server identity verification using public key infrastructure
-- Registry validation and reputation systems to detect and prevent name collision attacks
-- DNS security extensions (DNSSEC) for discovery services to prevent DNS hijacking
-- Server whitelisting and allowlisting mechanisms for critical MCP deployments
+DNSSEC adoption is increasing globally, and MCP’s ODR is evolving with new security features, but deployment remains uneven. According to security researchers, organizations are beginning to implement certificate pinning and mutual TLS in MCP environments.
+
+- **DNSSEC** is being actively adopted, with Microsoft and EU regulators pushing for stronger protections ([Internet Society – DNSSEC Deployment Maps](https://www.internetsociety.org/deploy360/dnssec/maps/)).  
+- **Global adoption remains partial** — less than half of DNS queries are validated, leaving room for cache poisoning and hijacking ([European Commission JRC Report on DNSSEC Adoption (2025)](https://publications.jrc.ec.europa.eu/repository/handle/JRC143100)).  
+- **MCP’s ODR** is evolving, but organizations should already enforce **certificate pinning, signed entries, and monitoring for duplicates** to mitigate impersonation risks ([Model Context Protocol Roadmap (Oct 2025)](https://modelcontextprotocol.io/development/roadmap)).  
 
 ## Detection Methods
 
 ### Indicators of Compromise (IoCs)
-- Unexpected server endpoint connections (IP addresses not matching known legitimate servers)
-- DNS resolution anomalies (resolving to unexpected IP addresses)
-- Certificate mismatches or unexpected certificate authorities
-- Server metadata inconsistencies (version mismatches, unexpected capabilities)
-- Unusual network traffic patterns from MCP server connections
-- Failed authentication attempts from servers claiming to be trusted
-- Registry entries with suspicious modification timestamps
-- Discovery service responses with unexpected server endpoints
+
+- **DNS/Name resolution** anomalies such as unexpected, unknown, or unsigned requests with frequent cache updates
+- **ODR** anomalies such as unexpected changes, duplicate services, or unsigned requests
+- **ARP** anomalies such as frequent changes or duplicate entries
+- **DHCP** anomalies such as new leases or multiple servers
+- **TLS / Certificate** anomalies such as handshake failure, unknown or self signed certificates
+- **Traffic Pattern** anomalies such as sensitive data flows, auth failure spikes, known attacker infrastructure requests
 
 ### Detection Rules
 
-**Important**: The following rule is written in Sigma format and contains example patterns only. Organizations should:
-- Use AI-based anomaly detection to identify novel impersonation patterns
-- Regularly update detection logic based on operational telemetry
-- Implement multiple layers of detection beyond pattern matching
-- Consider behavioral analysis of server connections and registry changes
-
 ```yaml
-title: MCP Server Impersonation / Name Collision Detection
-id: 71aa869b-65cc-47f3-ada5-d9e67337dc44
+title: Detection of Server Impersonation / Name-Collision (SAFE-T1004)
+id: 9f3c2a8e-7d4b-4c2f-9a1e-8e2b7f9c1d23
 status: experimental
-description: Detects potential MCP server impersonation through name collision, DNS anomalies, and registry manipulation
-author: SAFE-MCP Authors
-date: 2025-11-16
+description: Detects indicators of server impersonation or name-collision attacks across DNS, ARP, and ODR
+author: Ryan
+date: 2025-11-22
 references:
   - https://github.com/safe-mcp/techniques/SAFE-T1004
-  - https://attack.mitre.org/techniques/T1199/
+  - https://attack.mitre.org/techniques/T1557/
+  - https://attack.mitre.org/techniques/T1565/002/
 logsource:
-  product: mcp
-  service: server_discovery
+  product: windows
+  service: system
 detection:
-  selection_dns_anomaly:
-    event_type: "dns_resolution"
-    server_name: "*"
-    resolved_ip|not_in: 
-      - "known_legitimate_ips"
-    dns_response_time: ">5000ms"
-  selection_name_collision:
-    event_type: "server_registration"
-    server_name|contains:
-      - "github"
-      - "slack"
-      - "notion"
-      - "google"
-    server_id|endswith:
-      - "-official"
-      - "-tools"
-      - "-enhanced"
-      - "-pro"
-    registration_source: "unknown"
-  selection_certificate_mismatch:
-    event_type: "tls_handshake"
-    server_name: "*"
-    certificate_issuer|not_in:
-      - "known_trusted_cas"
-    certificate_fingerprint|not_in:
-      - "known_legitimate_certificates"
-  selection_registry_poisoning:
-    event_type: "registry_update"
-    server_name: "*"
-    endpoint_changed: true
-    endpoint_domain|not_contains:
-      - "github.com"
-      - "slack.com"
-      - "notion.so"
-    update_timestamp: "suspicious_hours"
-  selection_discovery_hijack:
-    event_type: "discovery_response"
-    server_count: ">1"
-    duplicate_server_ids: true
-    endpoint_conflict: true
-  condition: selection_dns_anomaly or selection_name_collision or selection_certificate_mismatch or selection_registry_poisoning or selection_discovery_hijack
+  selection_dns:
+    EventID: 1014
+    Provider_Name: "Microsoft-Windows-DNS-Client"
+    Message|contains:
+      - "resolved to unexpected IP"
+      - "DNSSEC validation failed"
+  selection_odr:
+    service_name|count: ">1"   # duplicate service names in ODR
+  selection_arp:
+    EventID: 2022
+    Provider_Name: "Microsoft-Windows-TCPIP"
+    Message|contains:
+      - "duplicate ARP entry"
+      - "MAC address mismatch"
+  selection_tls:
+    EventID: 36882
+    Provider_Name: "Schannel"
+    Message|contains:
+      - "certificate mismatch"
+      - "self-signed certificate"
+  condition: selection_dns or selection_odr or selection_arp or selection_tls
 falsepositives:
-  - Legitimate server migrations or endpoint changes
-  - DNS infrastructure updates
-  - Certificate renewals from different CAs
-  - Development and testing environments with local server instances
+  - Legitimate redeployment of services causing duplicate names
+  - Test environments with self-signed certificates
 level: high
 tags:
-  - attack.initial_access
-  - attack.t1199
+  - attack.credential_access
+  - attack.t1557
+  - attack.t1565.002
+  - attack.t1557.002
   - safe.t1004
 ```
 
 ### Behavioral Indicators
-- Sudden changes in server endpoint IP addresses without corresponding infrastructure changes
-- Multiple servers registering with similar names in short time periods
-- Discovery service responses containing conflicting server information
-- Clients connecting to servers with mismatched metadata (version, capabilities, author)
-- Unusual geographic locations for server connections (servers appearing in unexpected regions)
-- Registry modification patterns indicating bulk registration of similar-named servers
+
+- Duplicate service names in ODR  
+- Unexpected ODR changes — new MCP services appearing
+- Clients connecting to endpoints outside expected IP ranges
+- Sudden changes in DNS resolution for trusted domains
+- Frequent DNS cache flushes or anomalies
+- Unsigned DNS responses where DNSSEC validation should be present
+- Multiple conflicting DNS responses for the same query
+- TLS handshake failures due to certificate mismatches
+- Clients accepting self‑signed certificates
+- Frequent or duplicate ARP table changes
+- New DHCP leases assigning DNS servers
+- Sudden spikes in authentication failures
+- Outbound traffic to attacker infrastructure
+- Clients connecting to unexpected IP ranges  
+- Multiple mDNS responses for the same hostname 
 
 ## Mitigation Strategies
 
 ### Preventive Controls
-1. **[SAFE-M-21: Output Context Isolation](../../mitigations/SAFE-M-21/README.md)**: Implement server identity verification before establishing connections to prevent impersonation.
-2. **[SAFE-M-22: Semantic Output Validation](../../mitigations/SAFE-M-22/README.md)**: Validate server metadata and capabilities against known legitimate server profiles.
-3. **Certificate Pinning**: Pin TLS certificates for known legitimate MCP servers to prevent certificate-based impersonation.
-4. **Server Identity Verification**: Implement cryptographic server identity verification using public key infrastructure or similar mechanisms.
-5. **Registry Validation**: Enforce strict validation and reputation checks in server registries to prevent name collision attacks.
-6. **DNS Security**: Use DNSSEC and DNS filtering to prevent DNS-based hijacking attacks.
+
+1. **[SAFE-M-000: Mutual TLS](../../mitigations/SAFE-M-000/README.md)**: Enforce mutual authentication between clients and servers.  
+2. **[SAFE-M-000: DNSSEC](../../mitigations/SAFE-M-000/README.md)**: Validate DNS records cryptographically.  
+3. **[SAFE-M-000: Registry Hardening](../../mitigations/SAFE-M-000/README.md)**: Require signed entries in ODR and enforce unique identifiers.  
+4. **[SAFE-M-000: Disable Legacy Protocols](../../mitigations/SAFE-M-000/README.md)**: Disable LLMNR/NBT‑NS and ARP where possible.  
+5. **[SAFE-M-000: Network Segmentation](../../mitigations/SAFE-M-000/README.md)**: Isolate critical MCP servers and DNS infrastructure from general user subnets.  
 
 ### Detective Controls
-1. **[SAFE-M-11: Behavioral Monitoring](../../mitigations/SAFE-M-11/README.md)**: Monitor server connection patterns and detect anomalies in endpoint resolution.
-2. **[SAFE-M-20: Anomaly Detection](../../mitigations/SAFE-M-20/README.md)**: Detect unusual server registration patterns and name collision attempts.
-3. **[SAFE-M-12: Audit Logging](../../mitigations/SAFE-M-12/README.md)**: Maintain comprehensive logs of server discovery, registration, and connection events for forensic analysis.
-4. **Registry Monitoring**: Continuously monitor server registries for suspicious entries, bulk registrations, and name collision attempts.
+
+1. **[SAFE-M-000: Duplicate Name Monitoring](../../mitigations/SAFE-M-000/README.md)**: Alert on duplicate service names in ODR.  
+2. **[SAFE-M-000: DNS Anomaly Detection](../../mitigations/SAFE-M-000/README.md)**: Detect sudden resolution changes for trusted domains.  
+3. **[SAFE-M-000: ARP/DHCP Monitoring](../../mitigations/SAFE-M-000/README.md)**: Detect duplicate servers and suspicious ARP entries.  
+4. **[SAFE-M-000: Certificate Validation Logs](../../mitigations/SAFE-M-000/README.md)**: Detect clients accepting untrusted or self‑signed certificates.  
 
 ### Response Procedures
-1. **Immediate Actions**:
-   - Disconnect from suspected impersonated servers immediately
-   - Revoke any credentials or tokens that may have been exposed to malicious servers
-   - Block network access to identified malicious server endpoints
-   - Notify affected users and administrators
-2. **Investigation Steps**:
-   - Analyze DNS resolution logs to identify hijacking attempts
-   - Review server registry entries for unauthorized modifications
-   - Examine certificate chains and TLS handshake logs for anomalies
-   - Correlate discovery service responses with known legitimate server information
-   - Identify the scope of potential data exposure through malicious server connections
-3. **Remediation**:
-   - Remove malicious server entries from registries
-   - Implement stronger server identity verification mechanisms
-   - Update DNS configurations and enable DNSSEC where applicable
-   - Establish server reputation systems and whitelisting for critical servers
-   - Enhance discovery service security with cryptographic verification
+
+1. **Immediate Actions**:  
+   - Block malicious IPs at the firewall  
+   - Remove rogue ODR entries  
+   - Flush poisoned DNS/ARP caches on affected hosts  
+
+2. **Investigation Steps**:  
+   - Review DNS logs, ODR audit trails, and ARP tables  
+   - Identify compromised accounts or systems  
+
+3. **Remediation**:  
+   - Rotate exposed credentials  
+   - Patch discovery protocols  
+   - Enforce secure registration  
+   - Deploy long‑term monitoring for anomalies  
 
 ## Related Techniques
-- [SAFE-T1002](../SAFE-T1002/README.md) – Supply Chain Compromise (related but focuses on package compromise rather than server impersonation)
-- [SAFE-T1003](../SAFE-T1003/README.md) – Malicious MCP-Server Distribution (related but involves creating new malicious servers rather than impersonating existing ones)
-- [SAFE-T1008](../SAFE-T1008/README.md) – Tool Shadowing Attack (related technique involving tool-level impersonation rather than server-level)
-- [SAFE-T1301](../SAFE-T1301/README.md) – Cross-Server Tool Shadowing (similar concept applied at tool level)
+
+- [SAFE‑T1001](../SAFE-T1001/) – DNS Cache Poisoning
+- [SAFE-T1002](../SAFE-T1002/): DNS Manipulation – closely related to impersonation via poisoned records.  
+- [SAFE-T1003](../SAFE-T1003/): Adversary-in-the-Middle – broader category encompassing impersonation attacks.
+- [SAFE-T1402](../SAFE-T1402/): Instruction Stenography for registry manipulation 
 
 ## References
-- [Model Context Protocol Specification](https://modelcontextprotocol.io/specification)
-- [OWASP Top 10 for LLM Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
-- [MITRE ATT&CK: Trusted Relationship (T1199)](https://attack.mitre.org/techniques/T1199/)
-- [OWASP: Subdomain Takeover](https://owasp.org/www-community/attacks/Subdomain_takeover)
-- [RFC 6762: Multicast DNS](https://tools.ietf.org/html/rfc6762) - Service discovery protocols
-- [RFC 4033: DNS Security Introduction and Requirements](https://tools.ietf.org/html/rfc4033) - DNSSEC for secure DNS
+
+- [Model Context Protocol Specification](https://modelcontextprotocol.io/specification)  
+- [OWASP Top 10 for LLM Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/)  
+- [Kaminsky DNS Cache Poisoning - 2008](https://en.wikipedia.org/wiki/Dan_Kaminsky)  
+- [Sea Turtle DNS Hijacking Campaign - 2019](https://attack.mitre.org/campaigns/C0022/)  
+- [Microsoft 365 DNS Provisioning Change – DNSSEC Adoption](https://mc.merill.net/message/MC1048624)  
+- [Internet Society – DNSSEC Deployment Maps](https://www.internetsociety.org/deploy360/dnssec/maps/)  
+- [Model Context Protocol Roadmap (Oct 2025)](https://modelcontextprotocol.io/development/roadmap)  
+- [M365 Admin DNSSEC Provisioning Change](https://d365hub.com/Posts/Details/ce776f51-54d3-42d5-a97f-b8537eef4fb4/dns-provisioning-change)  
+- [European Commission JRC Report on DNSSEC Adoption (2025)](https://publications.jrc.ec.europa.eu/repository/handle/JRC143100)  
 
 ## MITRE ATT&CK Mapping
-- [T1199 - Trusted Relationship](https://attack.mitre.org/techniques/T1199/) - Exploiting trust relationships through impersonation
-- [T1566.001 - Phishing: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/) - Related social engineering component
-- [T1071.001 - Application Layer Protocol: Web Protocols](https://attack.mitre.org/techniques/T1071/001/) - HTTP/HTTPS-based server communication
+
+- [T1557 – Adversary-in-the-Middle](https://attack.mitre.org/techniques/T1557/)  
+- [T1565.002 – Data Manipulation: DNS Manipulation](https://attack.mitre.org/techniques/T1565/002/)  
+- [T1071.004 – Application Layer Protocol: DNS](https://attack.mitre.org/techniques/T1071/004/)
+- [T1112 - Modify Registry](https://attack.mitre.org/techniques/T1112/)
+- [T1565 - Data Manipulation](https://attack.mitre.org/techniques/T1565/)
 
 ## Version History
+
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
-| 1.0 | 2025-11-16 | Initial documentation | Satbir Singh |
-
+| 1.0 | 2025-11-22 | Initial documentation with ODR explanation | Ryan Jennings |

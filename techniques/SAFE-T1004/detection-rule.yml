@@ -1,147 +1,45 @@
-# SIGMA RULE: MCP Server Impersonation / Name Collision Detection
-# WARNING: This rule contains example patterns only. Organizations should:
-# - Regularly update patterns based on threat intelligence
-# - Implement behavioral analysis beyond pattern matching
-# - Use AI-based anomaly detection for novel attack vectors
-# - Consider environment-specific customizations
-
-title: MCP Server Impersonation / Name Collision Detection
-id: 71aa869b-65cc-47f3-ada5-d9e67337dc44
+title: Detection of Server Impersonation / Name-Collision (SAFE-T1004)
+id: 9f3c2a8e-7d4b-4c2f-9a1e-8e2b7f9c1d23
 status: experimental
-description: Detects potential MCP server impersonation through name collision, DNS anomalies, and registry manipulation
-author: SAFE-MCP Authors
-date: 2025-11-16
-modified: 2025-11-16
+description: Detects indicators of server impersonation or name-collision attacks across DNS, ARP, and ODR
+author: Ryan Jennings
+date: 2025-11-22
 references:
   - https://github.com/safe-mcp/techniques/SAFE-T1004
-  - https://attack.mitre.org/techniques/T1199/
+  - https://attack.mitre.org/techniques/T1557/
+  - https://attack.mitre.org/techniques/T1565/002/
 logsource:
-  product: mcp
-  service: server_discovery
-  definition: |
-    Requires comprehensive MCP server discovery and connection logging that captures:
-    
-    Server Discovery:
-    - Server registration events with names, IDs, and endpoints
-    - Discovery service queries and responses
-    - Server metadata (version, author, capabilities)
-    - Registration timestamps and sources
-    
-    DNS Resolution:
-    - DNS queries for MCP server endpoints
-    - Resolved IP addresses and response times
-    - DNS server information and DNSSEC validation status
-    
-    TLS/Connection:
-    - TLS handshake events with certificate information
-    - Certificate issuer and fingerprint data
-    - Server endpoint connections and IP addresses
-    - Connection establishment timestamps
-    
-    Registry Events:
-    - Server registry modifications
-    - Endpoint changes and updates
-    - Bulk registration events
-    - Registry access patterns
-    
-    Behavioral Context:
-    - Geographic location of server endpoints
-    - Connection frequency and patterns
-    - Server capability mismatches
-    - Anomaly scores from behavioral analysis
+  product: windows
+  service: system
 detection:
-  # DNS-based impersonation detection
-  selection_dns_anomaly:
-    event_type: "dns_resolution"
-    server_name: "*"
-    resolved_ip|not_in: 
-      - "known_legitimate_ips"
-    dns_response_time: ">5000ms"
-  
-  # Name collision in server registration
-  selection_name_collision:
-    event_type: "server_registration"
-    server_name|contains:
-      - "github"
-      - "slack"
-      - "notion"
-      - "google"
-      - "microsoft"
-      - "openai"
-    server_id|endswith:
-      - "-official"
-      - "-tools"
-      - "-enhanced"
-      - "-pro"
-      - "-premium"
-    registration_source: "unknown"
-    server_metadata|contains:
-      - "version_mismatch"
-      - "unexpected_capabilities"
-  
-  # Certificate-based impersonation
-  selection_certificate_mismatch:
-    event_type: "tls_handshake"
-    server_name: "*"
-    certificate_issuer|not_in:
-      - "known_trusted_cas"
-    certificate_fingerprint|not_in:
-      - "known_legitimate_certificates"
-    certificate_validation: "failed"
-  
-  # Registry poisoning detection
-  selection_registry_poisoning:
-    event_type: "registry_update"
-    server_name: "*"
-    endpoint_changed: true
-    endpoint_domain|not_contains:
-      - "github.com"
-      - "slack.com"
-      - "notion.so"
-      - "google.com"
-      - "microsoft.com"
-    update_timestamp: "suspicious_hours"
-    bulk_update: true
-  
-  # Discovery service hijacking
-  selection_discovery_hijack:
-    event_type: "discovery_response"
-    server_count: ">1"
-    duplicate_server_ids: true
-    endpoint_conflict: true
-    response_source: "unverified"
-  
-  # Subdomain takeover indicators
-  selection_subdomain_takeover:
-    event_type: "server_connection"
-    endpoint_subdomain: "*"
-    certificate_status: "invalid"
-    dns_cname: "pointing_to_external"
-    server_metadata: "minimal_or_missing"
-  
-  # Geographic anomaly detection
-  selection_geographic_anomaly:
-    event_type: "server_connection"
-    server_name: "*"
-    endpoint_location|not_in:
-      - "expected_regions"
-    connection_frequency: "unusual"
-    latency: ">threshold"
-  
-  condition: selection_dns_anomaly or selection_name_collision or selection_certificate_mismatch or selection_registry_poisoning or selection_discovery_hijack or selection_subdomain_takeover or selection_geographic_anomaly
-
+  selection_dns:
+    EventID: 1014
+    Provider_Name: "Microsoft-Windows-DNS-Client"
+    Message|contains:
+      - "resolved to unexpected IP"
+      - "DNSSEC validation failed"
+  selection_odr:
+    service_name|count: ">1"   # duplicate service names in ODR
+  selection_arp:
+    EventID: 2022
+    Provider_Name: "Microsoft-Windows-TCPIP"
+    Message|contains:
+      - "duplicate ARP entry"
+      - "MAC address mismatch"
+  selection_tls:
+    EventID: 36882
+    Provider_Name: "Schannel"
+    Message|contains:
+      - "certificate mismatch"
+      - "self-signed certificate"
+  condition: selection_dns or selection_odr or selection_arp or selection_tls
 falsepositives:
-  - Legitimate server migrations or endpoint changes with proper notification
-  - DNS infrastructure updates and maintenance windows
-  - Certificate renewals from different certificate authorities
-  - Development and testing environments with local server instances
-  - Load balancer IP address changes
-  - CDN endpoint variations for legitimate servers
-  - Multi-region server deployments
-
+  - Legitimate redeployment of services causing duplicate names
+  - Test environments with self-signed certificates
 level: high
 tags:
-  - attack.initial_access
-  - attack.t1199
+  - attack.credential_access
+  - attack.t1557
+  - attack.t1565.002
+  - attack.t1557.002
   - safe.t1004
-
