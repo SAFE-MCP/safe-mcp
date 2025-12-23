@@ -237,6 +237,156 @@ tags:
 - Multiple agents targeting the same external endpoint simultaneously.
 - Quota/cost spikes on third‑party APIs.
 
+## Observability & Monitoring
+
+Effective observability is critical for detecting and responding to API flooding attacks. This section provides practical guidance for implementing comprehensive monitoring, metrics collection, and alerting strategies.
+
+### Observability Platform Integration Examples
+
+#### Datadog Integration Example
+
+```python
+from datadog import initialize, api
+import time
+
+# Initialize Datadog
+options = {
+    'api_key': 'your_api_key',
+    'app_key': 'your_app_key'
+}
+initialize(**options)
+
+def send_flooding_metrics(agent_id, session_id, metrics):
+    """Send metrics to Datadog for API flooding detection"""
+    
+    # Send custom metrics
+    api.Metric.send(
+        metric='mcp.agent.api.requests',
+        points=[
+            (int(time.time()), metrics['request_count'])
+        ],
+        tags=[
+            f'agent_id:{agent_id}',
+            f'session_id:{session_id}',
+            f'endpoint:{metrics["endpoint"]}',
+            f'status_code:{metrics["status_code"]}'
+        ]
+    )
+    
+    api.Metric.send(
+        metric='mcp.agent.api.cost',
+        points=[
+            (int(time.time()), metrics['cost'])
+        ],
+        tags=[
+            f'agent_id:{agent_id}',
+            f'session_id:{session_id}',
+            f'api_provider:{metrics["provider"]}'
+        ]
+    )
+    
+    # Create anomaly detection monitor
+    if metrics['request_count'] > 1000:  # Threshold
+        api.Monitor.create(
+            type='metric alert',
+            query=f'avg(last_5m):avg:mcp.agent.api.requests{{agent_id:{agent_id}}}} > 1000',
+            name=f'API Flooding Alert - {agent_id}',
+            message='High API request volume detected',
+            options={
+                'notify_no_data': True,
+                'notify_audit': True
+            }
+        )
+```
+
+#### Splunk Search Queries
+
+```spl
+# Detect high-volume API calls
+index=mcp_logs event_type="tool_execution" tool_name="http*"
+| stats count by session_id, endpoint, _time
+| where count > 100
+| timechart span=1m count by session_id
+
+# Identify rate limit patterns
+index=mcp_logs status_code=429
+| stats count by session_id, endpoint, _time
+| timechart span=5m count by endpoint
+
+# Cost anomaly detection
+index=mcp_logs event_type="api_usage" cost_per_request>0
+| stats sum(cost_per_request) as total_cost by session_id, _time
+| where total_cost > 100
+| timechart span=1h sum(total_cost) by session_id
+
+# Exponential growth detection
+index=mcp_logs event_type="tool_execution"
+| bucket _time span=5m
+| stats count as requests by session_id, _time
+| streamstats window=2 current=true avg(requests) as avg_requests by session_id
+| eval growth_ratio = requests / avg_requests
+| where growth_ratio > 3
+```
+
+#### ELK Stack (Elasticsearch) Query Examples
+
+```json
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "range": {
+            "@timestamp": {
+              "gte": "now-5m"
+            }
+          }
+        },
+        {
+          "term": {
+            "event_type": "tool_execution"
+          }
+        }
+      ],
+      "should": [
+        {
+          "range": {
+            "request_count": {
+              "gte": 100
+            }
+          }
+        },
+        {
+          "term": {
+            "status_code": 429
+          }
+        }
+      ],
+      "minimum_should_match": 1
+    }
+  },
+  "aggs": {
+    "requests_by_session": {
+      "terms": {
+        "field": "session_id",
+        "size": 10,
+        "order": {
+          "_count": "desc"
+        }
+      },
+      "aggs": {
+        "requests_over_time": {
+          "date_histogram": {
+            "field": "@timestamp",
+            "interval": "1m"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
 ## Mitigation Strategies
 
 ### Preventive Controls
@@ -293,3 +443,4 @@ tags:
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
 | 1.0 | 2025-11-09 | Deepened sources; verified First Observed status; added ATT&CK/OWASP/RFC citations and analog MCP‑adjacent case | Pritika Bista |
+| 1.2 | 2025-12-09 | Added platform integration examples for Datadog, Splunk, and ELK Stack | Satbir Singh |
