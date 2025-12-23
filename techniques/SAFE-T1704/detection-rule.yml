@@ -1,0 +1,48 @@
+title: Compromised MCP Server Pivot Detection
+id: 9f8b0dfe-6d8a-45e2-9b33-28f474afdd53
+status: experimental
+description: >
+  Detects suspicious or unauthorized MCP server responses that may indicate 
+  lateral movement or server‑pivoting activity. Focuses on cases where the 
+  server sends unexpected task instructions, execution triggers, or originates 
+  from untrusted sources.
+author: Rajiv Shrestha
+date: 2025/12/04
+
+references:
+  - https://modelcontextprotocol.io/specification
+  - https://owasp.org/www-project-top-10-for-large-language-model-applications/
+
+logsource:
+  product: mcp
+  service: server
+
+detection:
+  selection_unexpected_task:
+    server.response.task:
+      - "auto_run"
+      - "execute"
+      - "system_control"
+    server.response.source: "unknown"
+
+  selection_unusual_broadcast:
+    server.response.mode: "broadcast"
+    server.response.recipients: "*"
+
+  selection_schema_mismatch:
+    server.response.schema_valid: false
+
+  condition: selection_unexpected_task or selection_unusual_broadcast or selection_schema_mismatch
+
+falsepositives:
+  - Automated dev workflows that legitimately run tasks
+  - Internal MCP testing broadcasts
+  - Schema mismatch during active development or testing
+
+level: high
+
+tags:
+  - attack.T1021
+  - attack.T1570
+  - safe.t1704
+  - category.lateral_movement
