@@ -237,6 +237,210 @@ tags:
 - Multiple agents targeting the same external endpoint simultaneously.
 - Quota/cost spikes on third‑party APIs.
 
+## Observability & Monitoring
+
+Effective observability is critical for detecting and responding to API flooding attacks. This section provides practical guidance for implementing comprehensive monitoring, metrics collection, and alerting strategies.
+
+### Key Metrics to Monitor
+
+Organizations should instrument their MCP deployments to track the following metrics:
+
+#### Request Volume Metrics
+- **Requests Per Second (RPS)** by agent, session, tool, and endpoint
+- **Total Request Count** over time windows (1m, 5m, 15m, 1h)
+- **Request Rate Growth** (rate of change in RPS)
+- **Concurrent Request Count** (active in-flight requests)
+
+#### Error Rate Metrics
+- **HTTP 429 Rate** (rate limit errors per second)
+- **HTTP 5xx Rate** (server errors per second)
+- **Error Rate Percentage** (errors / total requests)
+- **Retry Attempt Count** (number of retries per request)
+
+#### Cost Metrics
+- **API Cost Per Request** (for metered APIs)
+- **Total Cost Per Session** (cumulative cost per agent session)
+- **Cost Per Time Window** (hourly, daily spending)
+- **Cost Anomaly Score** (deviation from baseline)
+
+#### Performance Metrics
+- **API Response Time** (p50, p95, p99 latencies)
+- **Request Timeout Rate** (requests exceeding timeout thresholds)
+- **External API Health Status** (availability percentage)
+- **Circuit Breaker State** (open/closed/half-open)
+
+### Observability Platform Integration Examples
+
+#### Prometheus Metrics Export
+
+```python
+from prometheus_client import Counter, Histogram, Gauge
+import time
+
+# Define metrics
+api_requests_total = Counter(
+    'mcp_agent_api_requests_total',
+    'Total number of API requests',
+    ['agent_id', 'session_id', 'tool_name', 'endpoint', 'status_code']
+)
+
+api_request_duration = Histogram(
+    'mcp_agent_api_request_duration_seconds',
+    'API request duration in seconds',
+    ['agent_id', 'endpoint']
+)
+
+api_cost_total = Counter(
+    'mcp_agent_api_cost_total',
+    'Total API cost in currency units',
+    ['agent_id', 'session_id', 'api_provider']
+)
+
+rate_limit_errors = Counter(
+    'mcp_agent_rate_limit_errors_total',
+    'Total rate limit errors (HTTP 429)',
+    ['agent_id', 'session_id', 'endpoint']
+)
+
+concurrent_requests = Gauge(
+    'mcp_agent_concurrent_requests',
+    'Number of concurrent API requests',
+    ['agent_id']
+)
+
+def record_api_call(agent_id, session_id, tool_name, endpoint, status_code, duration, cost=0):
+    """Record an API call for observability"""
+    api_requests_total.labels(
+        agent_id=agent_id,
+        session_id=session_id,
+        tool_name=tool_name,
+        endpoint=endpoint,
+        status_code=status_code
+    ).inc()
+    
+    api_request_duration.labels(
+        agent_id=agent_id,
+        endpoint=endpoint
+    ).observe(duration)
+    
+    if cost > 0:
+        api_cost_total.labels(
+            agent_id=agent_id,
+            session_id=session_id,
+            api_provider=extract_provider(endpoint)
+        ).inc(cost)
+    
+    if status_code == 429:
+        rate_limit_errors.labels(
+            agent_id=agent_id,
+            session_id=session_id,
+            endpoint=endpoint
+        ).inc()
+```
+
+#### Prometheus Alerting Rules
+
+```yaml
+groups:
+  - name: mcp_api_flooding
+    interval: 30s
+    rules:
+      - alert: HighAPICallRate
+        expr: |
+          rate(mcp_agent_api_requests_total[5m]) > 100
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High API call rate detected"
+          description: "Agent {{ $labels.agent_id }} is making {{ $value }} requests/sec"
+      
+      - alert: RateLimitErrorsSpike
+        expr: |
+          rate(mcp_agent_rate_limit_errors_total[5m]) > 10
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Rate limit errors spiking"
+          description: "Agent {{ $labels.agent_id }} receiving {{ $value }} 429 errors/sec"
+      
+      - alert: CostAnomaly
+        expr: |
+          rate(mcp_agent_api_cost_total[1h]) > 1000
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Unusual API cost detected"
+          description: "Session {{ $labels.session_id }} has cost ${{ $value }} in the last hour"
+      
+      - alert: ExponentialRequestGrowth
+        expr: |
+          (
+            rate(mcp_agent_api_requests_total[5m]) /
+            rate(mcp_agent_api_requests_total[15m] offset 5m)
+          ) > 3
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Exponential request growth detected"
+          description: "Agent {{ $labels.agent_id }} request rate increased 3x in 5 minutes"
+```
+
+#### Grafana Dashboard Configuration
+
+```json
+{
+  "dashboard": {
+    "title": "MCP API Flooding Detection",
+    "panels": [
+      {
+        "title": "Requests Per Second",
+        "targets": [
+          {
+            "expr": "sum(rate(mcp_agent_api_requests_total[5m])) by (agent_id)",
+            "legendFormat": "{{agent_id}}"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "title": "Rate Limit Errors (429)",
+        "targets": [
+          {
+            "expr": "sum(rate(mcp_agent_rate_limit_errors_total[5m])) by (endpoint)",
+            "legendFormat": "{{endpoint}}"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "title": "API Cost Over Time",
+        "targets": [
+          {
+            "expr": "sum(rate(mcp_agent_api_cost_total[1h])) by (session_id)",
+            "legendFormat": "Session {{session_id}}"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "title": "Top Agents by Request Volume",
+        "targets": [
+          {
+            "expr": "topk(10, sum(rate(mcp_agent_api_requests_total[5m])) by (agent_id))",
+            "legendFormat": "{{agent_id}}"
+          }
+        ],
+        "type": "table"
+      }
+    ]
+  }
+}
+```
+
 ## Mitigation Strategies
 
 ### Preventive Controls
@@ -293,3 +497,4 @@ tags:
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
 | 1.0 | 2025-11-09 | Deepened sources; verified First Observed status; added ATT&CK/OWASP/RFC citations and analog MCP‑adjacent case | Pritika Bista |
+| 1.1 | 2025-12-09 | Added core observability metrics definitions and Prometheus integration (metrics export, alerting rules, Grafana dashboards) | Satbir Singh |
