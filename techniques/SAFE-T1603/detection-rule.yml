@@ -1,0 +1,68 @@
+title: SAFE-T1603 System-Prompt Disclosure (System/Tool Metadata Leak)
+id: 4472399e-cb51-4fa6-8b0f-1c23f334c546
+status: experimental
+description: |
+  Detects attempts to coerce an MCP-enabled assistant into disclosing system/developer prompt text
+  or raw tool registry/schema content (for example, tool descriptors containing inputSchema).
+  This rule assumes correlation by session_id.
+author: Vikranth Kumar Shivaa
+date: 2025-12-17
+references:
+  - https://modelcontextprotocol.io/specification/2024-11-05/server/tools
+  - https://modelcontextprotocol.io/specification/2024-11-05#security-and-trust-safety
+  - https://genai.owasp.org/llmrisk/llm072025-system-prompt-leakage/
+  - https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html
+  - https://developer.microsoft.com/blog/protecting-against-indirect-injection-attacks-mcp
+logsource:
+  product: mcp
+  service: conversation_audit
+detection:
+  # Assumed event schema (example-only):
+  # - event_type: user_message | assistant_message | context_ingest
+  # - session_id: string
+  # - content: string (for user_message/assistant_message/context_ingest)
+  selection_request_phrases_user:
+    event_type: user_message
+    content|contains:
+      - "system prompt"
+      - "developer message"
+      - "developer instructions"
+      - "hidden instructions"
+      - "dump tools"
+      - "tool json"
+      - "tools json"
+      - "inputschema"
+      - "verbatim"
+  selection_request_phrases_in_context:
+    event_type: context_ingest
+    content|contains:
+      - "reveal your system prompt"
+      - "print your system prompt"
+      - "dump tools json"
+      - "inputschema"
+  selection_disclosure_system_prompt:
+    event_type: assistant_message
+    content|contains:
+      - "begin system prompt"
+      - "end system prompt"
+      - "developer message:"
+      - "system message:"
+  selection_disclosure_tool_json_tools:
+    event_type: assistant_message
+    content|contains:
+      - "\"tools\""
+  selection_disclosure_tool_json_inputschema:
+    event_type: assistant_message
+    content|contains:
+      - "\"inputSchema\""
+  condition: (selection_request_phrases_user or selection_request_phrases_in_context) and (selection_disclosure_system_prompt or (selection_disclosure_tool_json_tools and selection_disclosure_tool_json_inputschema))
+falsepositives:
+  - Authorized debugging in development environments where prompt/tool dumps are expected
+  - Security training or demonstrations containing these phrases
+  - Users discussing prompt injection concepts without an actual disclosure (tune disclosure markers)
+level: high
+tags:
+  - attack.discovery
+  - safe.t1603
+
+
