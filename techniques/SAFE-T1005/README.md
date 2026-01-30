@@ -135,3 +135,15 @@ Defenders can look for signals of unintended access paths, especially:
 - [SNYK-PYTHON-MCP-14171912](https://security.snyk.io/vuln/SNYK-PYTHON-MCP-14171912)
 - [CVE-2025-52882](https://nvd.nist.gov/vuln/detail/CVE-2025-52882)
 - [CVE-2025-54073](https://nvd.nist.gov/vuln/detail/CVE-2025-54073)
+
+## MITRE ATT&CK Mapping
+
+- [T1190 - Exploit Public-Facing Application](https://attack.mitre.org/techniques/T1190/)
+- [T1133 - External Remote Services](https://attack.mitre.org/techniques/T1133/)
+- [T1595 - Active Scanning](https://attack.mitre.org/techniques/T1595/)
+
+## Version History
+
+| Version | Date | Changes | Author |
+|---------|------|---------|--------|
+| 1.0 | 2026-01-28 | Initial documentation of Exposed Endpoint Exploit technique | Felipe Hlibco |
